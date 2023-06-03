@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { loginUser } from '../services/api';
+import logo from "../image/DECOT.png"; //client\src\image\DECOT.png
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -22,6 +23,7 @@ const Login = () => {
 
   return (
     <div>
+      <img src={logo} alt="logo" className="w-5/6 h-5/6 m-auto pt-5" />
       <h1>Login</h1>
       <input
         type="email"
