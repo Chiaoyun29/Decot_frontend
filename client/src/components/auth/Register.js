@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { registerUser } from '../services/api';
 import CustomModal from '../common/customModal';
+import logo from "../image/DECOT.png";
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -29,6 +30,7 @@ const Register = () => {
 
   return (
     <div>
+      <img src={logo} alt="logo" className="w-5/6 h-5/6 m-auto pt-5" />
       <h1>Register</h1>
       {errorMessage && <p>{errorMessage}</p>}
       <input

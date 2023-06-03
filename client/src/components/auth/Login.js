@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { loginUser } from '../services/api';
-import logo from "../image/DECOT.png"; //client\src\image\DECOT.png
+import logo from "../image/DECOT.png";
 
 const Login = () => {
   const [email, setEmail] = useState('');
