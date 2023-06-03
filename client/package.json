@@ -1,6 +1,6 @@
 {
-  "homepage": "https://Chiaoyun29.github.io/decot",
-  "name": "my-app",
+  "homepage": "https://Chiaoyun29.github.io/Decot_frontend",
+  "name": "client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
