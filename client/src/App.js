@@ -15,7 +15,7 @@ const App = () => {
           </Routes>
           
           <nav>
-            <ul>
+            <ul className="list-none">
               <li>
                 <Link to="/register">Register</Link>
               </li>
@@ -24,7 +24,6 @@ const App = () => {
               </li>
             </ul>
           </nav>
-          
         </Router>
       </div>
     </div>

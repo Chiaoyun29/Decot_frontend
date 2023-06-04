@@ -22,8 +22,8 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center text-center">
-      <img src={logo} alt="logo" className="w-5/6 h-5/6 m-auto pt-5" /><br />
+    <div className="box">
+      <img src={logo} alt="logo" className="w-5/6 h-5/6 m-auto pt-5" />
       <h1>Login</h1>
       <input
         type="email"
