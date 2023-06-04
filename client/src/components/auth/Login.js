@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { loginUser } from '../services/api';
-import logo from "../image/DECOT.png";
-import loginBg from "../image/login_bg.png";
+import logo from "../../image/DECOT.png";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -23,27 +22,24 @@ const Login = () => {
   };
 
   return (
-    <div 
-      className="h-screen bg-no-repeat bg-center bg-cover" 
-      style={{ backgroundImage: 'url(${loginBg})' }}
-    >
-      <div className="flex flex-col w-1/3  text-center m-auto">
-        <img src={logo} alt="logo" className="w-5/6 h-5/6 m-auto pt-5" />
-        <h1>Login</h1>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-        />
-        <button onClick={handleLogin}>Login</button>
-      </div>
+    <div className="flex flex-col items-center justify-center text-center">
+      <img src={logo} alt="logo" className="w-5/6 h-5/6 m-auto pt-5" /><br />
+      <h1>Login</h1>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        className="w-64 h-10 rounded-md border-2 border-gray-300 mb-2 px-2"
+      /><br />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+        className="w-64 h-10 rounded-md border-2 border-gray-300 mb-2 px-2"
+      /><br />
+      <button onClick={handleLogin}className="w-64 h-10 bg-blue-500 text-white rounded-md">Login</button>
     </div>
   );
 };

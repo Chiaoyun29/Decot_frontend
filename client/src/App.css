@@ -28,6 +28,31 @@
   color: #61dafb;
 }
 
+.bg{
+  background-image: url(./image/login_bg.png);
+  min-width: 100%;
+  min-height: 100vh;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+} 
+
+.box {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.box div {
+  width: 100px;
+  height: 100px;
+}
+body{
+	background: linear-gradient();
+  align-items: center;
+  justify-content: center;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

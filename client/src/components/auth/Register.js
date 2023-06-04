@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { registerUser } from '../services/api';
 import CustomModal from '../common/customModal';
-import logo from "../image/DECOT.png";
+import logo from "../../image/DECOT.png";
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -38,19 +38,19 @@ const Register = () => {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         placeholder="Username"
-      />
+      /><br />
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
-      />
+      /><br />
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
-      />
+      /><br />
       <button onClick={handleRegister}>Register</button>
       <CustomModal 
       isOpen={modalIsOpen} 
