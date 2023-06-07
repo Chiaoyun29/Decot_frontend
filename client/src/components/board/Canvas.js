@@ -1,0 +1,107 @@
+import React, { useRef, useCallback } from "react";
+import { Layer, Stage, Line } from "react-konva";
+
+import {
+  useShapes,
+  clearSelection,
+  createCircle,
+  createRectangle,
+  saveDiagram,
+  reset,
+} from "./state";
+import { DRAG_DATA_KEY, SHAPE_TYPES } from "./constants";
+import { Shape } from "./Shape";
+
+const handleDragOver = (event) => event.preventDefault();
+
+export function Canvas() {
+  const shapes = useShapes((state) => Object.entries(state.shapes));
+  const stageRef = useRef();
+
+  const handleDrop = useCallback((event) => {
+    const draggedData = event.nativeEvent.dataTransfer.getData(DRAG_DATA_KEY);
+    if (draggedData) {
+      const { offsetX, offsetY, type, clientHeight, clientWidth } = JSON.parse(
+        draggedData
+      );
+
+      stageRef.current.setPointersPositions(event);
+      const coords = stageRef.current.getPointerPosition();
+
+      if (type === SHAPE_TYPES.RECT) {
+        // rectangle x, y is at the top,left corner
+        createRectangle({
+          x: coords.x - offsetX,
+          y: coords.y - offsetY,
+        });
+      } else if (type === SHAPE_TYPES.CIRCLE) {
+        // circle x, y is at the center of the circle
+        createCircle({
+          x: coords.x - (offsetX - clientWidth / 2),
+          y: coords.y - (offsetY - clientHeight / 2),
+        });
+      }
+    }
+  }, []);
+
+  const renderGrids = () => {
+    const gridSize = 20;
+    const width = window.innerWidth-400;
+    const height = window.innerHeight;
+    const columns = Math.floor(width/gridSize);
+    const rows = Math.floor(height/gridSize);
+    const gridLines = [];
+
+    //generate vertical lines
+    for(let i=0; i<columns; i++){
+      const x = (i+1)*gridSize;
+      const verticalLine = (
+        <Line
+          key={`vertical-${i}`}
+          points={[x, 0, x, height]}
+          stroke="#ddd"
+          strokeWidth={1}
+        />
+      );
+      gridLines.push(verticalLine);
+    }
+    //generate horizontal lines
+    for(let i=0; i<rows; i++){
+      const y = (i+1)*gridSize;
+      const horizontalLine = (
+        <Line
+          key={`horizontal-${i}`}
+          points={[0, y, width, y]}
+          stroke="#ddd"
+          strokeWidth={1}
+        />
+      );
+      gridLines.push(horizontalLine);
+    }
+    return gridLines;
+  }
+
+  return (
+    <main className="canvas" onDrop={handleDrop} onDragOver={handleDragOver}>
+      <div className="buttons">
+        <button onClick={saveDiagram}>Save</button>
+        <button onClick={reset}>Reset</button>
+      </div>
+      <Stage
+        ref={stageRef}
+        width={window.innerWidth - 400}
+        height={window.innerHeight}
+        onClick={clearSelection}
+      >
+        <Layer>
+          {/*Render the grids*/}
+          {renderGrids()}
+
+          {shapes.map(([key, shape]) => (
+            <Shape key={key} shape={{ ...shape, id: key }} />
+          ))}
+        </Layer>
+      </Stage>
+    </main>
+  );
+}
