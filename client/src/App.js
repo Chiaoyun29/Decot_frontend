@@ -1,31 +1,20 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import Register from './components/auth/Register';
-import Login from './components/auth/Login';
+import Register from './pages/auth/Register';
+import Login from './pages/auth/Login';
+import HomePage from './pages/HomePage'; // import the Home component
 import "./App.css";
 
 const App = () => {
   return (
     <div className="App">
-      <div className="bg">
-        <Router>
-          <Routes>
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
-          
-          <nav>
-            <ul className="list-none">
-              <li>
-                <Link to="/register">Register</Link>
-              </li>
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
-            </ul>
-          </nav>
-        </Router>
-      </div>
+      <Router>
+        <Routes>
+          <Route path="/Decot_frontend" element={<HomePage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Router>
     </div>
   );
 };

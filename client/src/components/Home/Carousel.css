@@ -1,0 +1,10 @@
+.carousel-indicators {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  
+  .carousel-controls {
+    display: flex;
+    align-items: center;
+  }

@@ -1,0 +1,8 @@
+.bg{
+    background-image: url(../../image/bg_auth_1_blurred.jpg);
+    min-width: 100%;
+    min-height: 100vh;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+} 
