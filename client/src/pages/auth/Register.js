@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { registerUser } from '../../components/services/api';
 import { useNavigate } from 'react-router-dom';
-import CustomModal from '../../components/common/CustomModal';
+import CustomModal from '../../components/common/customModal';
 import logo from "../../image/DECOT.png";
 import { Link } from 'react-router-dom';
 import './auth.css';
