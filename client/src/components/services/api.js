@@ -12,12 +12,13 @@ export const registerUser = async (username, email, password, role) => {
 
     const data = await response.json();
 
-    if (!response.ok) {
-      return { error: data.errors.map(err => err.msg).join(", ") };
-    }
-    return data;
+    // Include the status in the returned object for both success and error cases
+    return { ...data, status: response.status };
+    
   } catch (error) {
-    throw new Error('Failed to register user');
+    console.error('Failed to register user:', error);
+    // Include a status code to indicate a client-side error
+    return { error: 'Failed to register user', status: 0 };
   }
 };
 
@@ -33,11 +34,12 @@ export const loginUser = async (email, password) => {
 
     const data = await response.json();
 
-    if (!response.ok) {
-      return { error: data.errors.map(err => err.msg).join(", ") };
-    }
-    return data;
+    // Include the status in the returned object for both success and error cases
+    return { ...data, status: response.status };
+
   } catch (error) {
-    throw new Error('Failed to login');
+    console.error('Failed to login:', error);
+    // Include a status code to indicate a client-side error
+    return { error: 'Failed to login', status: 0 };
   }
 };

@@ -16,18 +16,18 @@ const Login = () => {
     const handleLogin = async () => {
         try {
             const response = await loginUser(email, password);
-            if (response.ok) {
-                const data = await response.json();
-                const { token } = data;
-                console.log('User logged in successfully. Token:', token);
-                // Redirect the user to the dashboard or homepage after successful login
-                // For example: navigate("/dashboard");
-            } else {
+            
+            if (response.status === 200) {
+                navigate("/dashboard");
+            } else if (response.status === 401) {
+                setErrorMessage('Invalid credentials');
                 setModalIsOpen(true);
-                setErrorMessage('Authentication failed');
+            } else {
+                setErrorMessage('Failed to login');
+                setModalIsOpen(true);
             }
         } catch (error) {
-            setErrorMessage(error.message);
+            setErrorMessage('An error occurred while trying to log in');
             setModalIsOpen(true);
         }
     };
@@ -40,7 +40,6 @@ const Login = () => {
                     <img src={logo} alt="logo" className="w-1/4 h-1/4 m-auto pt-5" />
                   </Link>
                 </div>
-                {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                 <input
                     type="email"
                     value={email}
