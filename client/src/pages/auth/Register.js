@@ -12,30 +12,43 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [role, setRole] = useState('mentor'); 
-    const [errorMessage, setErrorMessage] = useState('');
+    const [message, setMessage] = useState('');
+    const [messageTitle, setMessageTitle] = useState('');
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const navigate = useNavigate();
 
     const handleRegister = async () => {
         if (password !== confirmPassword) {
-            setErrorMessage('Passwords do not match');
+            setMessageTitle("Error!");
+            setMessage('Passwords do not match');
             setModalIsOpen(true);
             return;
         }
-
+    
         try {
-          const response = await registerUser(username, email, password, role); 
-            if (response.error) {
+            const response = await registerUser(username, email, password, role);
+    
+            if (response.status === 201) {
+                setMessageTitle("Congratulations");
+                setMessage('You have been registered successfully!');
                 setModalIsOpen(true);
-                setErrorMessage(response.error);
-            } else {
-                setErrorMessage('');
-                setModalIsOpen(false);
-                // Redirect the user to the login page or homepage after successful registration
+                // Registration successful
+                // Redirect the user to the login page or homepage
                 // For example: navigate("/login");
+            } else if (response.status === 400) {
+                // User already exists
+                setMessageTitle("Error!");
+                setMessage('User already exists');
+                setModalIsOpen(true);
+            } else {
+                // Handle other unexpected status codes
+                setMessageTitle("Error!");
+                setMessage('Failed to register user FK u');
+                setModalIsOpen(true);
             }
         } catch (error) {
-            setErrorMessage(error.message);
+            setMessageTitle("Error!");
+            setMessage('Failed to register user');
             setModalIsOpen(true);
         }
     };
@@ -114,8 +127,8 @@ const Register = () => {
                 <CustomModal
                     isOpen={modalIsOpen}
                     onClose={() => setModalIsOpen(false)}
-                    title="Error"
-                    message={errorMessage}
+                    title= {messageTitle}
+                    message={message}
                 />
             </div>
         </div>
