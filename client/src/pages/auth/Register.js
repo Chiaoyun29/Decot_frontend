@@ -77,28 +77,28 @@ const Register = () => {
                     className="block w-full mt-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 /><br />
                 <div className="flex items-center space-x-4 mt-2">
-                  Choose Role :<br></br>
-                  <label>
-                      <input
-                          type="radio"
-                          value="mentor"
-                          checked={role === 'mentor'}
-                          onChange={(e) => setRole(e.target.value)}
-                          className="mr-1"
-                      />
-                      Mentor
-                  </label>
-                  <label>
-                      <input
-                          type="radio"
-                          value="mentee"
-                          checked={role === 'mentee'}
-                          onChange={(e) => setRole(e.target.value)}
-                          className="mr-1"
-                      />
-                      Mentee
-                  </label>
-                </div>
+                    Choose Role:<br />
+                    <label>
+                        <input
+                        type="radio"
+                        value="mentor"
+                        checked={role === 'mentor'}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="mr-1"
+                        />
+                        Mentor
+                    </label>
+                    <label>
+                        <input
+                        type="radio"
+                        value="mentee"
+                        checked={role === 'mentee'}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="mr-1"
+                        />
+                        Mentee
+                    </label>
+                    </div>
                 <br></br>
                 <button onClick={handleRegister} className="w-full mt-4 px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-700 focus:outline-none">
                     Register
