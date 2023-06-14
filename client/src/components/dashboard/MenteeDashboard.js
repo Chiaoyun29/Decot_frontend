@@ -21,8 +21,6 @@ const MenteeDashboard = () => {
     fetchWorkspaces();
   }, []);
   
-  // Load workspaces from the server here
-  
   return (
     <div className="p-6">
       <div className="flex items-center mb-4">
@@ -31,7 +29,7 @@ const MenteeDashboard = () => {
           placeholder="Search workspace..."
           className="flex-grow p-2 mr-4 border border-gray-300 rounded-md"
         />
-        <JoinWorkspace/>
+        <JoinWorkspace onWorkspaceJoined={fetchWorkspaces}/>
       </div>
       {/* List of workspaces */}
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
