@@ -1,15 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { createWorkspace } from '../services/api';
+import { useAuthContext } from '../../context/AuthContext';
 
-const CreateWorkspaceModal = ({ isOpen, onClose }) => {
+const CreateWorkspaceModal = ({ isOpen, onClose, onWorkspaceCreated }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
-  const handleSubmit = () => {
-    // Call the API to create a workspace here
-    // After success, clear the form
-    setName('');
-    setDescription('');
-    onClose();
+  // Access the token from AuthContext
+  const { token } = useAuthContext();
+
+  const handleSubmit = async () => {
+    try {
+      // Pass the token to the createWorkspace function
+      const response = await createWorkspace(token, name, description);
+      if (response.workspace) {
+        const { workspace } = response;
+        const joinLink = `${window.location.origin}/workspace/join/${workspace.joinToken}`;
+        // After success, clear the form
+        setName('');
+        setDescription('');
+        onClose();
+        onWorkspaceCreated();
+      } else {
+        console.error(response.error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (!isOpen) {

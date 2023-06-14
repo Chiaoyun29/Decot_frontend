@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
-import MentorDashboard from './MentorDashboard';
-import MenteeDashboard from './MenteeDashboard';
+import MentorWorkspaceContent from './MentorWorkspaceContent';
+import MenteeWorkspaceContent from './MenteeWorkspaceContent';
 import Navbar from '../common/Navbar';
 import { useNavigate } from 'react-router-dom';
 
-const Dashboard = () => {
+const WorkspaceContent = () => {
   const navigate = useNavigate();
   const { user } = useAuthContext();
 
@@ -19,11 +19,11 @@ const Dashboard = () => {
     <div>
       <Navbar />
       {
-        user ? (user.role === 'mentor' ? <MentorDashboard /> : <MenteeDashboard />)
+        user ? (user.role === 'mentor' ? <MentorWorkspaceContent /> : <MenteeWorkspaceContent />)
              : (<div>Loading...</div>)
       }
     </div>
   );
 };
 
-export default Dashboard;
+export default WorkspaceContent;
