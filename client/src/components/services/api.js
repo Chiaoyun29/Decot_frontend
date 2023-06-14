@@ -43,3 +43,81 @@ export const loginUser = async (email, password) => {
     return { error: 'Failed to login', status: 0 };
   }
 };
+
+export const createWorkspace = async (token, name, description) => {
+  try {
+    const response = await fetch(`${API_URL}/workspace/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name, description }),
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to create workspace:', error);
+    return { error: 'Failed to create workspace', status: 0 };
+  }
+};
+
+export const getWorkspaces = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/workspace`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to retrieve workspaces:', error);
+    return { error: 'Failed to retrieve workspaces', status: 0 };
+  }
+};
+
+export const getWorkspaceById = async (token, workspaceId) => {
+  try {
+    const response = await fetch(`${API_URL}/workspace/${workspaceId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to retrieve workspace:', error);
+    return { error: 'Failed to retrieve workspace', status: 0 };
+  }
+};
+
+export const joinWorkspace = async (token, joinToken) => {
+  try {
+    const response = await fetch(`${API_URL}/workspace/join`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ token: joinToken }),
+    });
+    console.log("Wthell")
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to join workspace:', error);
+    return { error: 'Failed to join workspace', status: 0 };
+  }
+};

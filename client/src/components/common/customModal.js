@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
 
-const CustomModal = ({ isOpen, onClose, title, message }) => {
+const CustomModal = ({ isOpen, onClose, title, message, children }) => {
   return (
     <Modal
       isOpen={isOpen}
@@ -34,6 +34,10 @@ const CustomModal = ({ isOpen, onClose, title, message }) => {
         <div className="p-8">
           <h2 className="text-2xl font-semibold mb-4">{title}</h2>
           <p className="text-gray-600">{message}</p>
+          {/* Include children here */}
+          <div className="mt-4">
+            {children}
+          </div>
         </div>
       </div>
     </Modal>

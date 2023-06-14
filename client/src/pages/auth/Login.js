@@ -5,8 +5,10 @@ import CustomModal from '../../components/common/customModal';
 import logo from "../../image/DECOT.png";
 import { Link } from 'react-router-dom';
 import './auth.css';
+import { useAuthContext } from '../../context/AuthContext';
 
 const Login = () => {
+    const { setUser, setToken } = useAuthContext();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -18,6 +20,8 @@ const Login = () => {
             const response = await loginUser(email, password);
             
             if (response.status === 200) {
+                setUser(response.user); // set user in context
+                setToken(response.token); // set token in context
                 navigate("/dashboard");
             } else if (response.status === 401) {
                 setErrorMessage('Invalid credentials');
@@ -27,6 +31,7 @@ const Login = () => {
                 setModalIsOpen(true);
             }
         } catch (error) {
+            console.log(error);
             setErrorMessage('An error occurred while trying to log in');
             setModalIsOpen(true);
         }
