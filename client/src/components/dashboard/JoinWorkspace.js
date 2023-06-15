@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import { joinWorkspace } from '../services/api';
 
-const JoinWorkspace = () => {
+const JoinWorkspace = ({ onWorkspaceJoined }) => {
   const [joinToken, setJoinToken] = useState('');
   const { token } = useAuthContext();
   
   const handleJoin = async () => {
     const response = await joinWorkspace(token, joinToken);
     if (response.message) {
-      console.log("successful!!!")
-      // Handle successful joining, e.g., redirect to workspace page or show a success message
+      if (onWorkspaceJoined) onWorkspaceJoined();
     } else {
       console.error(response.error);
     }

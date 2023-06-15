@@ -51,7 +51,7 @@ const MentorDashboard = () => {
         ))}
       </ul>
       {/* Create Workspace Modal */}
-      <CreateWorkspaceModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)} onWorkspaceCreated />
+      <CreateWorkspaceModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)}  onWorkspaceCreated={fetchWorkspaces} />
     </div>
   );
 };
