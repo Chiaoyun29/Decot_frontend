@@ -32,9 +32,6 @@ const Register = () => {
                 setMessageTitle("Congratulations");
                 setMessage('You have been registered successfully!');
                 setModalIsOpen(true);
-                // Registration successful
-                // Redirect the user to the login page or homepage
-                // For example: navigate("/login");
             } else if (response.status === 400) {
                 // User already exists
                 setMessageTitle("Error!");
@@ -127,9 +124,18 @@ const Register = () => {
                 <CustomModal
                     isOpen={modalIsOpen}
                     onClose={() => setModalIsOpen(false)}
-                    title= {messageTitle}
+                    title={messageTitle}
                     message={message}
-                />
+                >
+                    {messageTitle === "Congratulations" && (
+                        <button
+                            className="mt-4 px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-700 focus:outline-none"
+                            onClick={() => navigate("/login")}
+                        >
+                            Click here to Login
+                        </button>
+                    )}
+                </CustomModal>
             </div>
         </div>
     );

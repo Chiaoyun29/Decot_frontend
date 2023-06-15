@@ -121,3 +121,76 @@ export const joinWorkspace = async (token, joinToken) => {
     return { error: 'Failed to join workspace', status: 0 };
   }
 };
+
+export const updateWorkspace = async (token, workspaceId, updatedData) => {
+  try {
+    const response = await fetch(`${API_URL}/workspace/${workspaceId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedData),
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to update workspace:', error);
+    return { error: 'Failed to update workspace', status: 0 };
+  }
+};
+
+export const deleteWorkspace = async (token, workspaceId) => {
+  try {
+    const response = await fetch(`${API_URL}/workspace/${workspaceId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to delete workspace:', error);
+    return { error: 'Failed to delete workspace', status: 0 };
+  }
+};
+
+export const getWorkspaceMembers = async (token, workspaceId) => {
+  try {
+    const response = await fetch(`${API_URL}/workspace/${workspaceId}/members`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.headers.get('content-type')?.includes('application/json') && response.ok) {
+      return response.json();
+    } else {
+      console.error('Unexpected response:', await response.text());
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export const removeWorkspaceMember = async (token, workspaceId, userId) => {
+  try {
+    const response = await fetch(`${API_URL}/workspace/${workspaceId}/members/${userId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { status: response.status, data };
+  } catch (error) {
+    console.error(error);
+  }
+};
