@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from "../../image/DECOT.png";
 import CustomModal from '../common/CustomModal';
 import { useAuthContext } from '../../context/AuthContext';
+import NotificationButton from '../common/NotificationButton';
 
 const Navbar = () => {
   const { setUser } = useAuthContext();
@@ -10,6 +11,7 @@ const Navbar = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   const handleLogout = () => {
     setUser(null); // clear the user
@@ -38,34 +40,32 @@ const Navbar = () => {
         </div>
         <div className={"lg:flex flex-grow items-center" + (navbarOpen ? " flex" : " hidden")} id="example-navbar-danger">
           <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
-            
+
             {/* Dashboard Link */}
             <li className="nav-item">
-              <Link to="/dashboard" className="px-3 py-2 flex items-center text-s uppercase font-bold leading-snug text-black hover:opacity-75">
-                <span className="ml-2">Dashboard</span>
+              <Link to="/dashboard" className="px-3 py-2 flex items-center text-s font-bold leading-snug text-black hover:opacity-75">
+                <span className="ml-2">DASHBOARD</span>
               </Link>
             </li>
 
             {/* Notification Bell */}
-            <li className="nav-item relative mr-4 cursor-pointer" onClick={() => setShowNotifications(!showNotifications)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-bell">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-              {/* Notifications Container */}
-              {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg p-2">
-                  {/* Notification Items Here */}
-                  <div className="p-2">Notification 1</div>
-                  <div className="p-2">Notification 2</div>
+            <li className="nav-item relative px-3 py-2 flex items-center text-s font-bold leading-snug text-black hover:opacity-75" onClick={() => setShowNotifications(!showNotifications)}>
+            <NotificationButton />
+            </li>
+            {/* Profile Dropdown */}
+            <li className="nav-item relative">
+              <button
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                className="px-3 py-2 flex items-center text-s font-bold leading-snug text-black hover:opacity-75"
+              >
+                <span className="ml-2">PROFILE</span>
+              </button>
+              {showProfileDropdown && (
+                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg p-2">
+                  <button onClick={confirmLogout} className="block w-full text-left p-2 hover:bg-gray-200">Logout</button>
+                  <button onClick={() => navigate('/manage-profile')} className="block w-full text-left p-2 hover:bg-gray-200">Manage Profile</button>
                 </div>
               )}
-            </li>
-
-            {/* Logout Button */}
-            <li className="nav-item">
-              <button onClick={confirmLogout} className="px-3 py-2 flex items-center text-s uppercase font-bold leading-snug text-black hover:opacity-75">
-                <span className="ml-2">Logout</span>
-              </button>
             </li>
           </ul>
         </div>

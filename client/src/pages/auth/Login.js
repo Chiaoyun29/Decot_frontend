@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { loginUser } from '../../components/services/api';
 import { useNavigate } from 'react-router-dom';
-import CustomModal from '../../components/common/customModal';
+import CustomModal from '../../components/common/CustomModal';
 import logo from "../../image/DECOT.png";
 import { Link } from 'react-router-dom';
 import './auth.css';
@@ -31,7 +31,6 @@ const Login = () => {
                 setModalIsOpen(true);
             }
         } catch (error) {
-            console.log(error);
             setErrorMessage('An error occurred while trying to log in');
             setModalIsOpen(true);
         }

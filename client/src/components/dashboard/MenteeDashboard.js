@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { getWorkspaces } from '../services/api';
 import { useAuthContext } from '../../context/AuthContext';
+import SocketContext from '../../context/SocketContext';
 import { Link } from 'react-router-dom';
 import JoinWorkspace from './JoinWorkspace';
 
 const MenteeDashboard = () => {
   const [workspaces, setWorkspaces] = useState([]);
   const { token } = useAuthContext();
-  
+  const { socket, addNotificationCallback, removeNotificationCallback } = useContext(SocketContext);
+
   const fetchWorkspaces = async () => {
     const response = await getWorkspaces(token);
     if (response.status === 200) {
@@ -20,7 +22,19 @@ const MenteeDashboard = () => {
   useEffect(() => {
     fetchWorkspaces();
   }, []);
-  
+
+  useEffect(() => {
+    if (socket) {
+      const callback = (message) => {
+        fetchWorkspaces();
+      };
+      addNotificationCallback(callback);
+    return () => {
+      removeNotificationCallback(callback);
+    };
+    }
+  }, [socket]);
+
   return (
     <div className="p-6">
       <div className="flex items-center mb-4">
