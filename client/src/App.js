@@ -7,22 +7,28 @@ import Dashboard from './components/dashboard/Dashboard';
 import HomePage from './pages/HomePage';
 import WorkspaceContent from './components/workspace/WorkspaceContent';
 import "./App.css";
+import { ToastContainer } from 'react-toastify';
+import SocketProvider from './context/SocketProvider';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
   return (
-    <AuthProvider>
-      <div className="App">
-        <Router>
-          <Routes>
-            <Route path="/Decot_frontend" element={<HomePage />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/workspace/:workspaceId" element={<WorkspaceContent />} />
-          </Routes>
-        </Router>
-      </div>
-    </AuthProvider>
+    <div className="App">
+      <ToastContainer />
+      <Router>
+        <AuthProvider>
+          <SocketProvider>
+            <Routes>
+              <Route path="/Decot_frontend" element={<HomePage />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/workspace/:workspaceId" element={<WorkspaceContent />} />
+            </Routes>
+          </SocketProvider>
+        </AuthProvider>
+      </Router>
+    </div>
   );
 };
 

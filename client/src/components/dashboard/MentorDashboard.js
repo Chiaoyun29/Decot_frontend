@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
 import { getWorkspaces } from '../services/api';
 import { useAuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
+import SocketContext from '../../context/SocketContext';
 
 const MentorDashboard = () => {
   const [workspaces, setWorkspaces] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const { token } = useAuthContext();
+  const { socket, addNotificationCallback, removeNotificationCallback } = useContext(SocketContext);
   
   const fetchWorkspaces = async () => {
     const response = await getWorkspaces(token);
@@ -21,8 +23,17 @@ const MentorDashboard = () => {
   useEffect(() => {
     fetchWorkspaces();
   }, []);
-  
-  // Load workspaces from the server here
+
+  useEffect(() => {
+    if (socket) {
+      const callback = (message) => {
+      };
+      addNotificationCallback(callback);
+    return () => {
+      removeNotificationCallback(callback);
+    };
+    }
+  }, [socket]);
   
   return (
     <div className="p-6">

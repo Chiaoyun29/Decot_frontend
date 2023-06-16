@@ -112,7 +112,6 @@ export const joinWorkspace = async (token, joinToken) => {
       },
       body: JSON.stringify({ token: joinToken }),
     });
-    console.log("Wthell")
     const data = await response.json();
     return { ...data, status: response.status };
 
@@ -184,6 +183,98 @@ export const removeWorkspaceMember = async (token, workspaceId, userId) => {
     const response = await fetch(`${API_URL}/workspace/${workspaceId}/members/${userId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { status: response.status, data };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getNotifications = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/notification`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { status: response.status, data };
+    } catch (error) {
+    console.error(error);
+  }
+};
+
+export const removeAllNotifications = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/notification`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { status: response.status, data };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const markAllNotificationsAsRead = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/notification/read`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { status: response.status, data };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const markNotificationAsRead = async (token, notificationId) => {
+  try {
+    const response = await fetch(`${API_URL}/notification/${notificationId}/read`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { status: response.status, data };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const deleteNotification = async (token, notificationId) => {
+  try {
+    const response = await fetch(`${API_URL}/notification/${notificationId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     const data = await response.json();
     if (!response.ok) {

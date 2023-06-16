@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getWorkspaceById, updateWorkspace, deleteWorkspace, getWorkspaceMembers, removeWorkspaceMember } from '../services/api';
 import CustomModal from '../common/CustomModal';
+import SocketContext from '../../context/SocketContext';
+import { useNavigate } from 'react-router-dom';
 
 const MentorWorkspaceContent = () => {
   const { workspaceId } = useParams();
@@ -17,6 +19,8 @@ const MentorWorkspaceContent = () => {
   const [isMemberDeleteModalOpen, setIsMemberDeleteModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [workspaceMembers, setWorkspaceMembers] = useState([]);
+  const { socket, addNotificationCallback, removeNotificationCallback } = useContext(SocketContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchWorkspace = async () => {
@@ -31,6 +35,17 @@ const MentorWorkspaceContent = () => {
   }, [workspaceId, token]);
 
   useEffect(() => {
+    if (socket) {
+      const callback = (message) => {
+      };
+      addNotificationCallback(callback);
+    return () => {
+      removeNotificationCallback(callback);
+    };
+    }
+  }, [socket]);
+
+  useEffect(() => {
     if (isManageMembersModalOpen) {
       fetchWorkspaceMembers();
     }
@@ -39,7 +54,6 @@ const MentorWorkspaceContent = () => {
   const fetchWorkspaceMembers = async () => {
     try {
       const members = await getWorkspaceMembers(token, workspaceId);
-      console.log("here" + JSON.stringify(members));
       setWorkspaceMembers(members);
     } catch (error) {
       console.error('Error fetching members:', error);
@@ -73,8 +87,7 @@ const MentorWorkspaceContent = () => {
   const handleDeleteWorkspace = async () => {
     const response = await deleteWorkspace(token, workspaceId);
     if (response.status === 200) {
-      // You may want to redirect to dashboard or somewhere else
-      console.log("Workspace deleted successfully.");
+        navigate('/dashboard');
     } else {
       console.error(response.error);
     }

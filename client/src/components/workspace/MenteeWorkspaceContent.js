@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getWorkspaceById } from '../services/api';
+import SocketContext from '../../context/SocketContext';
 
 const MenteeWorkspaceContent = () => {
   const { workspaceId } = useParams();
   const [workspace, setWorkspace] = useState(null);
   const { token } = useAuthContext();
+  const { socket, addNotificationCallback, removeNotificationCallback } = useContext(SocketContext);
 
   useEffect(() => {
     const fetchWorkspace = async () => {
@@ -19,6 +21,17 @@ const MenteeWorkspaceContent = () => {
     };
     fetchWorkspace();
   }, [workspaceId, token]);
+
+  useEffect(() => {
+    if (socket) {
+      const callback = (message) => {
+      };
+      addNotificationCallback(callback);
+    return () => {
+      removeNotificationCallback(callback);
+    };
+    }
+  }, [socket]);
 
   if (!workspace) return <div>Loading...</div>;
 
