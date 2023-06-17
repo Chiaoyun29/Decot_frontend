@@ -44,7 +44,7 @@ export const loginUser = async (email, password) => {
   }
 };
 
-export const createWorkspace = async (token, name, description) => {
+export const createWorkspace = async (token, name, description, color) => {
   try {
     const response = await fetch(`${API_URL}/workspace/create`, {
       method: 'POST',
@@ -52,7 +52,7 @@ export const createWorkspace = async (token, name, description) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ name, description }),
+      body: JSON.stringify({ name, description, color }),
     });
 
     const data = await response.json();
@@ -275,6 +275,22 @@ export const deleteNotification = async (token, notificationId) => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { status: response.status, data };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const leaveWorkspace = async (token, workspaceId) => {
+  try {
+    const response = await fetch(`${API_URL}/workspace/${workspaceId}/leave`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
     if (!response.ok) {

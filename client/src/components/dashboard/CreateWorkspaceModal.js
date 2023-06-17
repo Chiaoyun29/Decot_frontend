@@ -9,10 +9,20 @@ const CreateWorkspaceModal = ({ isOpen, onClose, onWorkspaceCreated }) => {
   // Access the token from AuthContext
   const { token } = useAuthContext();
 
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
   const handleSubmit = async () => {
     try {
       // Pass the token to the createWorkspace function
-      const response = await createWorkspace(token, name, description);
+      const color = getRandomColor();
+      const response = await createWorkspace(token, name, description, color);
       if (response.workspace) {
         const { workspace } = response;
         const joinLink = `${window.location.origin}/workspace/join/${workspace.joinToken}`;
@@ -53,7 +63,7 @@ const CreateWorkspaceModal = ({ isOpen, onClose, onWorkspaceCreated }) => {
           />
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+            className="px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-blue-600"
           >
             Create
           </button>
