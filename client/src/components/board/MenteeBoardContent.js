@@ -21,7 +21,9 @@ const MenteeBoardContent = () => {
     fetchBoard();
   }, [boardId, token]);
 
-  if (!board) return <div>Loading...</div>;
+  if (!board) return (<div className="flex items-center justify-center min-h-screen">
+  <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
+</div>);
 
   return (
     <div className="p-6">

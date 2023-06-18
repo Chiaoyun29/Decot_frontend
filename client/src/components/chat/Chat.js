@@ -91,10 +91,24 @@ const Chat =()=>{
     return (
         <div className="chat-window">
             <div className="chat-header">
-                <div className="card">
-                    <button className="card-header" onClick={()=>setIsOpen(!isOpen)}>
-                        <AiOutlineSend className="cursor-pointer" size={25}/>
-                    </button>
+                <div className="card" style={{ position: 'fixed', top: '20px', right: '20px', zIndex: '9999' }}>
+                    <div >
+                        <button 
+                            className="card-header" 
+                            onClick={()=>setIsOpen(!isOpen)}
+                            style={{
+                                backgroundColor: 'lightyellow',
+                                width: '40px',
+                                height: '40px',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderRadius: '5px'
+                            }}
+                        >
+                            <AiOutlineSend className="cursor-pointer" size={25}/>
+                        </button>
+                    </div>
 
                     {isOpen && (
                         <div className="card-body">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from "../../image/DECOT.png";
-import CustomModal from '../common/CustomModal';
+import CustomModal from './CustomModal';
 import { useAuthContext } from '../../context/AuthContext';
 
 const Navbar = () => {

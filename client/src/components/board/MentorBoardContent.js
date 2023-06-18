@@ -3,11 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getBoardById, updateBoard, deleteBoard } from '../services/api';
 import CustomModal from '../common/CustomModal';
+import icon_pencil from  "../../image/icon_pencil.svg";
+import { useNavigate } from 'react-router-dom';
 //import CreateBoardModal from '../dashboard/CreateBoardModal';
 import Canvas from '../canvas/Canvas'
 
 const MentorBoardContent = () => {
-  const { boardId } = useParams();
+  const { boardId, workspaceId } = useParams();
   const [board, setBoard] = useState(null);
   //const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -20,7 +22,7 @@ const MentorBoardContent = () => {
   //const [boards, setBoards] = useState([]);
   //const [modalIsOpen, setModalIsOpen] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBoard = async () => {
@@ -35,7 +37,9 @@ const MentorBoardContent = () => {
     fetchBoard();
   }, [boardId, token]);
 
-  if (!board) return <div>Loading...</div>;
+  if (!board) return (<div className="flex items-center justify-center min-h-screen">
+  <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
+</div>);
 
   const handleUpdateBoard = async () => {
     const response = await updateBoard(token, boardId, {
@@ -57,45 +61,47 @@ const MentorBoardContent = () => {
     if (response.status === 200) {
       // You may want to redirect to dashboard or somewhere else
       console.log("Board deleted successfully.");
+      navigate('/workspace');
     } else {
       console.error(response.error);
     }
   };
 
-  const handleBoardClick = ()=>{
-    setShowCanvas(true);
-  }
+  // const handleBoardClick = ()=>{
+  //   setShowCanvas(true);
+  // }
   return (
-    <div className="p-6 flex">
-      {/* Sidebar for managing board */}
-      <div className="w-1/4 bg-gray-100 p-4 flex flex-col">
-        <h3 className="text-lg font-semibold mb-2">Manage Board</h3>
-        {isEditing ? (
-          <div>
-            <input
-              value={editedBoardTitle}
-              onChange={(e) => setEditedBoardTitle(e.target.value)}
-              className="mb-2 w-full px-3 py-2 border rounded-md"
-              placeholder="Board Name"
-            />
-            <input
-              value={editedDescription}
-              onChange={(e) => setEditedDescription(e.target.value)}
-              className="mb-2 w-full px-3 py-2 border rounded-md"
-              placeholder="Board Description"
-            />
-            <input
-              value={editeddtTag}
-              onChange={(e) => setEditeddtTag(e.target.value)}
-              className="mb-2 w-full px-3 py-2 border rounded-md"
-              placeholder="Board Design Thinking Tag"
-            />
-            <input
-              value={editedDeadline}
-              onChange={(e) => setEditedDeadline(e.target.value)}
-              className="mb-2 w-full px-3 py-2 border rounded-md"
-              placeholder="Board Deadline"
-            />
+    <div className="flex flex-col h-screen bg-gray-100">
+    {/* Sidebar for managing board */}
+    <div className="flex flex-grow overflow-hidden">
+    <div className="w-1/4 h-full bg-white shadow-lg p-4 overflow-y-auto">
+      {isEditing ? (
+        <div>
+          <input
+            value={editedBoardTitle}
+            onChange={(e) => setEditedBoardTitle(e.target.value)}
+            className="mb-2 w-full px-3 py-2 border rounded-md"
+            placeholder="Board Name"
+          />
+          <input
+            value={editedDescription}
+            onChange={(e) => setEditedDescription(e.target.value)}
+            className="mb-2 w-full px-3 py-2 border rounded-md"
+            placeholder="Board Description"
+          />
+          <input
+            value={editeddtTag}
+            onChange={(e) => setEditeddtTag(e.target.value)}
+            className="mb-2 w-full px-3 py-2 border rounded-md"
+            placeholder="Board Design Thinking Tag"
+          />
+          <input
+            value={editedDeadline}
+            onChange={(e) => setEditedDeadline(e.target.value)}
+            className="mb-2 w-full px-3 py-2 border rounded-md"
+            placeholder="Board Deadline"
+          />
+          <div className="flex justify-end">
             <button
               onClick={handleUpdateBoard}
               className="mr-2 px-3 py-1 bg-blue-500 text-white rounded-md"
@@ -108,32 +114,35 @@ const MentorBoardContent = () => {
             >
               Cancel
             </button>
-          </div>
-        ) : (
-          <div className="mb-4">
-            <h3 className="mb-2 font-medium">{board.boardTitle}</h3>
-            <p className="mb-2 text-sm text-gray-600">{board.description}</p>
-            <p className="mb-2 text-sm text-gray-600">{board.dtTag}</p>
-            <p className="mb-2 text-sm text-gray-600">{board.deadline}</p>
-            <button
-              onClick={() => {
-                setIsEditing(true);
-                setEditedBoardTitle(board.boardTitle);
-                setEditedDescription(board.description);
-                setEditeddtTag(board.dtTag);
-                setEditedDeadline(board.deadline);
-              }}
-              className="mb-4 mr-2 px-3 py-1 bg-yellow-500 text-white rounded-md"
-            >
-              Edit
-            </button>
-          </div>
-        )}
+        </div>
+      </div>
+    ) : (
+      <div className="p-4 my-2 text-gray-500 bg-gray-200 rounded-md">
+        <div className="flex justify-between items-center">
+          <h3 className="uppercase mb-2 text-3xl font-bold">{board.boardTitle}</h3>
+          <button
+            onClick={() => {
+              setIsEditing(true);
+              setEditedBoardTitle(board.boardTitle);
+              setEditedDescription(board.description);
+              setEditeddtTag(board.dtTag);
+              setEditedDeadline(board.deadline);
+            }}
+            className="text-xl text-blue-500"
+          >
+            <img src={icon_pencil} alt="edit icon" className="w-4 h-4" />
+        </button>
+      </div>
+      <p className="mb-2 text-sm text-gray-600">{board.description}</p>
+      <p className="mb-2 text-sm text-gray-600">{board.dtTag}</p>
+      <p className="mb-2 text-sm text-gray-600">{board.deadline}</p>
+    </div>
+  )}
 
         {/* Delete Board button at the bottom */}
         <button
           onClick={() => setIsDeleteModalOpen(true)}
-          className="mt-auto px-3 py-1 bg-red-500 text-white rounded-md"
+          className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-red-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
         >
           Delete Board
         </button>
@@ -165,20 +174,22 @@ const MentorBoardContent = () => {
       {/* Main content container */}
       <div className="w-3/4">
       {/* Add content such as boards here */}  
-        {showCanvas ? (
-          <Canvas />
-        ):(
           <div>
             <div>
-              <h3 className="mb-2 font-medium">{board.boardTitle}</h3>
-              <p className="mb-2 text-sm text-gray-600">{board.description}</p>
-              <p className="mb-2 text-sm text-gray-600">{board.dtTag}</p>
-              <p className="mb-2 text-sm text-gray-600">{board.deadline}</p>
+              <h1 
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fondWeight: 'bold'
+                }}
+              >
+                Choose your template
+              </h1>
             </div>
-            <button onClick={handleBoardClick}>Open Canvas</button>
           </div>
-        )}
       </div>
+    </div>
     </div>
   );
 };
