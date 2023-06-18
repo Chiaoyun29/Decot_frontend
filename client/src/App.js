@@ -9,6 +9,9 @@ import WorkspaceContent from './components/workspace/WorkspaceContent';
 import BoardContent from './components/board/BoardContent';
 import Message from './components/chat/Chat';
 import Canvas from './components/canvas/Canvas';
+import { ToastContainer } from 'react-toastify';
+import SocketProvider from './context/SocketProvider';
+import 'react-toastify/dist/ReactToastify.css';
 import "./App.css";
 
 const App = () => {

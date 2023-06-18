@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext} from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getWorkspaceById, updateWorkspace, deleteWorkspace, getWorkspaceMembers, removeWorkspaceMember, getBoards } from '../services/api';
-import CustomModal from '../common/CustomModal';
+import CustomModal from '../common/customModal';
 import SocketContext from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
 import icon_pencil from  "../../image/icon_pencil.svg";
