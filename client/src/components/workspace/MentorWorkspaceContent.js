@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext} from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import { getWorkspaceById, updateWorkspace, deleteWorkspace, getWorkspaceMembers, removeWorkspaceMember } from '../services/api';
+import { getWorkspaceById, updateWorkspace, deleteWorkspace, getWorkspaceMembers, removeWorkspaceMember, getBoards } from '../services/api';
 import CustomModal from '../common/CustomModal';
 import SocketContext from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
 import icon_pencil from  "../../image/icon_pencil.svg";
+import CreateBoardModal from '../dashboard/CreateBoardModal';
 
 const MentorWorkspaceContent = () => {
   const { workspaceId } = useParams();
@@ -23,6 +24,23 @@ const MentorWorkspaceContent = () => {
   const { socket, addNotificationCallback, removeNotificationCallback } = useContext(SocketContext);
   const [isCopied, setIsCopied] = useState(false);
   const navigate = useNavigate();
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [boards, setBoards] = useState([]);
+  const [board, setBoard] = useState([]);
+  const { boardId } = useParams();
+
+  const fetchBoards = async () => {
+    const response = await getBoards(token);
+    if (response.status === 200) {
+      setBoards(response.boards);
+    } else {
+      console.error(response.error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBoards();
+  }, []);
 
   useEffect(() => {
     const fetchWorkspace = async () => {
@@ -95,7 +113,7 @@ const MentorWorkspaceContent = () => {
   const handleDeleteWorkspace = async () => {
     const response = await deleteWorkspace(token, workspaceId);
     if (response.status === 200) {
-        navigate('/dashboard');
+      navigate('/dashboard');
     } else {
       console.error(response.error);
     }
@@ -298,12 +316,36 @@ const MentorWorkspaceContent = () => {
     <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
         <h2 className="text-2xl font-semibold mb-4 uppercase">{workspace.name}</h2>
         <p className="text-gray-600 mb-4">{workspace.description}</p>
-
+        <div className="absolute right-0 pr-10">
+          <button
+            onClick={() => setModalIsOpen(true)}
+            className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-yellow-200 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+          >
+            Create Board
+          </button>
+        </div>
         {/* Your main content */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Section */}
           <div className="p-4 bg-white rounded shadow-md">
             {/* ... content for section 1 ... */}
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {boards&&boards.map((board) => (
+                <li key={boards.id} className="p-6 border rounded-md">
+                  <Link to={`/board/${board.id}`} className="block" 
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <div className="text-center font-medium">{board.boardTitle}</div>
+                    <div className="text-center text-gray-600">{board.description}</div>
+                    <div className="text-center text-gray-600">{board.dtTag}</div>
+                    <div className="text-center text-gray-600">{board.deadline}</div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <CreateBoardModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)}  onBoardCreated={fetchBoards} />
           </div>
           {/* Section */}
           <div className="p-4 bg-white rounded shadow-md">

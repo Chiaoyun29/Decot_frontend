@@ -301,3 +301,191 @@ export const leaveWorkspace = async (token, workspaceId) => {
     console.error(error);
   }
 };
+export const createBoard = async (token, boardTitle, dtTag, deadline, description) => {
+  try {
+    const response = await fetch(`${API_URL}/board/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ boardTitle, dtTag, deadline, description}),
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to create board:', error);
+    return { error: 'Failed to create board', status: 0 };
+  }
+};
+
+export const getBoards = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/board`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    console.log(response)
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to retrieve board:', error);
+    return { error: 'Failed to retrieve board', status: 0 };
+  }
+};
+
+export const getBoardById = async (token, boardId) => {
+  try {
+    const response = await fetch(`${API_URL}/board/${boardId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to retrieve board:', error);
+    return { error: 'Failed to retrieve board', status: 0 };
+  }
+};
+
+export const joinBoard = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/board/join`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({}),
+    });
+    console.log("Wthell")
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to join board:', error);
+    return { error: 'Failed to join board', status: 0 };
+  }
+};
+
+export const updateBoard = async (token, boardId, updatedData) => {
+  try {
+    const response = await fetch(`${API_URL}/board/${boardId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedData),
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to update board:', error);
+    return { error: 'Failed to update board', status: 0 };
+  }
+};
+
+export const deleteBoard = async (token, boardId) => {
+  try {
+    const response = await fetch(`${API_URL}/board/${boardId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to delete board:', error);
+    return { error: 'Failed to delete board', status: 0 };
+  }
+};
+
+// export const uploadImage = async (token, boardId, userId) => {
+//   try {
+//     const response = await fetch(`${API_URL}/board/${boardId}/diagram/${boardId}`, {
+//       method: 'ADD',
+//       headers: { Authorization: `Bearer ${token}` },
+//     });
+//     const data = await response.json();
+//     if (!response.ok) {
+//       throw new Error(data.message || 'Network response was not ok');
+//     }
+//     return { status: response.status, data };
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+export const createMessage = async (token, message, userId, timestamp) => {
+  try {
+    const response = await fetch(`${API_URL}/message/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ message:message, userId:userId, timestamp:timestamp }),
+    });
+
+    const data = await response.json();
+    return { data:data, status: response.status };
+
+  } catch (error) {
+    console.error('Fail to create message:', error);
+    return { error: 'Fail to create message', status: 0 };
+  }
+};
+export const getAllMessages = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/message/list`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to load messages:', error);
+    return { error: 'Failed to load messages', status: 0 };
+  }
+};
+export const deleteMessage = async (token, messageId) => {
+  try {
+    const response = await fetch(`${API_URL}/message/${messageId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to delete message:', error);
+    return { error: 'Failed to delete message', status: 0 };
+  }
+};

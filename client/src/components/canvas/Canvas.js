@@ -1,10 +1,11 @@
 import './Canvas.css';
 import {useEffect, useRef, useState} from 'react';
 import Sidebar from './Sidebar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { createBoard } from '../services/api';
 import { useAuthContext } from '../../context/AuthContext';
+import Chat from '../chat/Chat';
 
 const Canvas = () => {
   const drawingCanvasRef = useRef(null);
@@ -13,14 +14,18 @@ const Canvas = () => {
   const gridContextRef = useRef(null);
   const stickyNoteCanvasRef = useRef(null);
   const stickyNoteContextRef = useRef(null);
-
-  const { token } = useAuthContext();
+  const { user } = useAuthContext();
   const [isDrawing, setIsDrawing] = useState(false);
   const [isStickyNoteMode, setIsStickyNoteMode] = useState(false);
   const [boardTitle, setBoardTitle] = useState('');
 
   const navigate = useNavigate();
   
+  useEffect(()=>{
+    if(user){
+      navigate('/canvas')
+    }
+  })
   useEffect(() => {
     const drawingCanvas = drawingCanvasRef.current;
     const gridCanvas = gridCanvasRef.current;
@@ -140,19 +145,19 @@ const Canvas = () => {
     }
   };
 
-  const navigateToCreateBoard = async() => {
-    try{
-      const response = await createBoard(token, boardTitle, '', '', '');
-      if(response.status===200){
-        const boardId = response.boardId;
-        navigate(`/createBoardModal/${boardId}`);
-      }else{
-        console.error('Failed to create board:', response.error);
-      }
-    }catch(error){
-      console.error('Failed to create board:', error);
-    }
-  };
+  // const navigateToCreateBoard = async() => {
+  //   try{
+  //     const response = await createBoard(token, boardTitle, '', '', '');
+  //     if(response.status===200){
+  //       const boardId = response.boardId;
+  //       navigate(`/createBoardModal/${boardId}`);
+  //     }else{
+  //       console.error('Failed to create board:', response.error);
+  //     }
+  //   }catch(error){
+  //     console.error('Failed to create board:', error);
+  //   }
+  // };
 
   const handleUpload = ()=>{
     console.log('Handle upload')
@@ -168,6 +173,7 @@ const Canvas = () => {
 
   return (
     <div>
+      <Chat />
       <Sidebar
         setToDraw={setToDraw}
         setToErase={setToErase}
@@ -175,7 +181,7 @@ const Canvas = () => {
         //isStickyNoteMode={isStickyNoteMode}
         deleteCanvas={deleteCanvas}
         saveImageToLocal={saveImageToLocal}
-        navigateToCreateBoard={navigateToCreateBoard}
+        //navigateToCreateBoard={navigateToCreateBoard}
         handleUpload={handleUpload}
       />
       <canvas className="canvas-container"
