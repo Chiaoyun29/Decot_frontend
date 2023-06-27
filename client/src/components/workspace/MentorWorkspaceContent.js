@@ -294,7 +294,7 @@ const MentorWorkspaceContent = () => {
       isOpen={isMemberDeleteModalOpen}
       onClose={() => setIsMemberDeleteModalOpen(false)}
       title="Delete Member"
-      message={`Are you sure you want to remove ${selectedMember?.name} from the workspace?`}
+      message={`Are you sure you want to remove ${selectedMember?.username} from the workspace?`}
     >
       <div className="flex items-center">
         <button
