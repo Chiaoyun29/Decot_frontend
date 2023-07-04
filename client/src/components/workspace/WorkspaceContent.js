@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import MentorWorkspaceContent from './MentorWorkspaceContent';
 import MenteeWorkspaceContent from './MenteeWorkspaceContent';
@@ -20,7 +20,9 @@ const WorkspaceContent = () => {
       <Navbar />
       {
         user ? (user.role === 'mentor' ? <MentorWorkspaceContent /> : <MenteeWorkspaceContent />)
-             : (<div>Loading...</div>)
+             : (<div className="flex items-center justify-center min-h-screen">
+             <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
+         </div>)
       }
     </div>
   );

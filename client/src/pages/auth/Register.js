@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { registerUser } from '../../components/services/api';
 import { useNavigate } from 'react-router-dom';
-import CustomModal from '../../components/common/customModal';
+import CustomModal from '../../components/common/CustomModal';
 import logo from "../../image/DECOT.png";
 import { Link } from 'react-router-dom';
 import './auth.css';
@@ -110,13 +110,13 @@ const Register = () => {
                     </label>
                     </div>
                 <br></br>
-                <button onClick={handleRegister} className="w-full mt-4 px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-700 focus:outline-none">
+                <button onClick={handleRegister} className="w-full mt-4 px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-blue-700 focus:outline-none">
                     Register
                 </button>
                 <div className="mt-4 text-grey-600 text-xs">
                     Already have an account?{" "}
                     <span>
-                      <Link to="/login" className="underline-offset-0 text-blue-600 hover:underline">
+                      <Link to="/login" className="underline-offset-0 text-indigo-600 hover:underline">
                        Click here to login
                       </Link>
                     </span>

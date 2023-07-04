@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getBoardById, updateBoard, deleteBoard } from '../services/api';
-import CustomModal from '../common/customModal';
+import CustomModal from '../common/CustomModal';
 import icon_pencil from  "../../image/icon_pencil.svg";
 import { useNavigate } from 'react-router-dom';
 //import CreateBoardModal from '../dashboard/CreateBoardModal';
@@ -56,12 +56,12 @@ const MentorBoardContent = () => {
     }
   };
   
-  const handleDeleteBoard = async () => {
-    const response = await deleteBoard(token, boardId);
+  const handleDeleteBoard = async (workspaceId) => {
+    const response = await deleteBoard(token, boardId, workspaceId);
     if (response.status === 200) {
       // You may want to redirect to dashboard or somewhere else
       console.log("Board deleted successfully.");
-      navigate('/workspace');
+      navigate(`/workspace/{workspaceId}`);
     } else {
       console.error(response.error);
     }

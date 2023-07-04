@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { loginUser } from '../../components/services/api';
 import { useNavigate } from 'react-router-dom';
-import CustomModal from '../../components/common/customModal';
+import CustomModal from '../../components/common/CustomModal';
 import logo from "../../image/DECOT.png";
 import { Link } from 'react-router-dom';
 import './auth.css';
@@ -31,7 +31,6 @@ const Login = () => {
                 setModalIsOpen(true);
             }
         } catch (error) {
-            console.log(error);
             setErrorMessage('An error occurred while trying to log in');
             setModalIsOpen(true);
         }
@@ -59,13 +58,13 @@ const Login = () => {
                     placeholder="Password"
                     className="block w-full mt-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 /><br />
-                <button onClick={handleLogin} className="w-full mt-4 px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-700 focus:outline-none">
+                <button onClick={handleLogin} className="w-full mt-4 px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-blue-700 focus:outline-none">
                     Login
                 </button>
                 <div className="mt-4 text-grey-600 text-xs">
                     Don't have an account?{" "}
                     <span>
-                        <Link to="/register" className=" underline-offset-0 text-blue-600 hover:underline">
+                        <Link to="/register" className=" underline-offset-0 text-indigo-600 hover:underline">
                             Click here to register
                         </Link>
                     </span>

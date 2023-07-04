@@ -44,7 +44,7 @@ export const loginUser = async (email, password) => {
   }
 };
 
-export const createWorkspace = async (token, name, description) => {
+export const createWorkspace = async (token, name, description, color) => {
   try {
     const response = await fetch(`${API_URL}/workspace/create`, {
       method: 'POST',
@@ -52,7 +52,7 @@ export const createWorkspace = async (token, name, description) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ name, description }),
+      body: JSON.stringify({ name, description, color }),
     });
 
     const data = await response.json();
@@ -112,7 +112,6 @@ export const joinWorkspace = async (token, joinToken) => {
       },
       body: JSON.stringify({ token: joinToken }),
     });
-    console.log("Wthell")
     const data = await response.json();
     return { ...data, status: response.status };
 

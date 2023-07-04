@@ -7,12 +7,12 @@ import Dashboard from './components/dashboard/Dashboard';
 import HomePage from './pages/HomePage';
 import WorkspaceContent from './components/workspace/WorkspaceContent';
 import BoardContent from './components/board/BoardContent';
-import Message from './components/chat/Chat';
 import Canvas from './components/canvas/Canvas';
+import Chat from './components/chat/Chat';
+import "./App.css";
 import { ToastContainer } from 'react-toastify';
 import SocketProvider from './context/SocketProvider';
 import 'react-toastify/dist/ReactToastify.css';
-import "./App.css";
 
 const App = () => {
   return (
@@ -28,8 +28,8 @@ const App = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/workspace/:workspaceId" element={<WorkspaceContent />} />
               <Route path="/board/:boardId" element={<BoardContent />} />
-              <Route path="/chat" element={<Message />} />
               <Route path="/canvas" element={<Canvas />} />
+              <Route path="/chat" element={<Chat />} />
             </Routes>
           </SocketProvider>
         </AuthProvider>

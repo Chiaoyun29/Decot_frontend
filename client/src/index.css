@@ -34,7 +34,7 @@ body,
 
 .app {
   display: flex;
-  overflow: hidden;
+  overflow: visible;
 }
 
 aside {

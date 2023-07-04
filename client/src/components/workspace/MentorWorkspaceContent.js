@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext} from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getWorkspaceById, updateWorkspace, deleteWorkspace, getWorkspaceMembers, removeWorkspaceMember, getBoards } from '../services/api';
-import CustomModal from '../common/customModal';
+import CustomModal from '../common/CustomModal';
 import SocketContext from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
 import icon_pencil from  "../../image/icon_pencil.svg";
@@ -55,6 +55,17 @@ const MentorWorkspaceContent = () => {
   }, [workspaceId, token]);
 
   useEffect(() => {
+    if (socket) {
+      const callback = (message) => {
+      };
+      addNotificationCallback(callback);
+    return () => {
+      removeNotificationCallback(callback);
+    };
+    }
+  }, [socket]);
+
+  useEffect(() => {
     if (isManageMembersModalOpen) {
       fetchWorkspaceMembers();
     }
@@ -63,7 +74,6 @@ const MentorWorkspaceContent = () => {
   const fetchWorkspaceMembers = async () => {
     try {
       const members = await getWorkspaceMembers(token, workspaceId);
-      console.log("here" + JSON.stringify(members));
       setWorkspaceMembers(members);
     } catch (error) {
       console.error('Error fetching members:', error);
@@ -73,13 +83,19 @@ const MentorWorkspaceContent = () => {
   const handleCopyCode = async () => {
     try {
       await navigator.clipboard.writeText(workspace.joinToken);
-      alert('Code copied successfully!');
+      setIsCopied(true); // Set isCopied to true
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
   };
 
-  if (!workspace) return <div>Loading...</div>;
+  if (!workspace) {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
+        </div>
+    );
+  }
 
   const handleUpdateWorkspace = async () => {
     const response = await updateWorkspace(token, workspaceId, {
@@ -97,8 +113,7 @@ const MentorWorkspaceContent = () => {
   const handleDeleteWorkspace = async () => {
     const response = await deleteWorkspace(token, workspaceId);
     if (response.status === 200) {
-      // You may want to redirect to dashboard or somewhere else
-      console.log("Workspace deleted successfully.");
+      navigate('/dashboard');
     } else {
       console.error(response.error);
     }
@@ -115,12 +130,13 @@ const MentorWorkspaceContent = () => {
   };
 
   return (
-    <div className="p-6 flex">
-      {/* Sidebar for managing workspace */}
-      <div className="w-1/4 bg-gray-100 p-4 flex flex-col">
-        <h3 className="text-lg font-semibold mb-2">Manage Workspace</h3>
+      <div className="flex flex-col h-screen bg-gray-100">
+
+      {/* Fixed Sidebar for managing workspace */}
+      <div className="flex flex-grow overflow-hidden">
+      <div className="w-1/4 h-full bg-white shadow-lg p-4 overflow-y-auto">
         {isEditing ? (
-          <div>
+          <div className="p-4 my-2 bg-gray-100 text-gray-500">
             <input
               value={editedName}
               onChange={(e) => setEditedName(e.target.value)}
@@ -133,156 +149,172 @@ const MentorWorkspaceContent = () => {
               className="mb-2 w-full px-3 py-2 border rounded-md"
               placeholder="Workspace Description"
             />
-            <button
-              onClick={handleUpdateWorkspace}
-              className="mr-2 px-3 py-1 bg-blue-500 text-white rounded-md"
-            >
-              Save
-            </button>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="px-3 py-1 bg-red-500 text-white rounded-md"
-            >
-              Cancel
-            </button>
+            <div className="flex justify-end">
+              <button
+                onClick={handleUpdateWorkspace}
+                className="mr-2 px-3 py-1 bg-indigo-500 text-white rounded-md"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="px-3 py-1 bg-red-500 text-white rounded-md"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="mb-4">
-            <h3 className="mb-2 font-medium">{workspace.name}</h3>
-            <p className="mb-2 text-sm text-gray-600">{workspace.description}</p>
-            <button
-              onClick={() => {
-                setIsEditing(true);
-                setEditedName(workspace.name);
-                setEditedDescription(workspace.description);
-              }}
-              className="mb-4 mr-2 px-3 py-1 bg-yellow-500 text-white rounded-md"
-            >
-              Edit
-            </button>
+          <div className="p-4 my-2 text-gray-500 bg-gray-200 rounded-md">
+            <div className="flex justify-between items-center">
+              <h3 className="uppercase mb-2 text-3xl font-bold">{workspace.name}</h3>
+              <button
+                onClick={() => {
+                  setIsEditing(true);
+                  setEditedName(workspace.name);
+                  setEditedDescription(workspace.description);
+                }}
+                className="text-xl text-blue-500"
+              >
+                <img src={icon_pencil} alt="edit icon" className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="mb-2 text-xl text-gray-600">{workspace.description}</p>
           </div>
         )}
 
-        {/* Invite button that opens modal */}
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-md"
-        >
-          Invite Members
-        </button>
-        
-         {/* Manage members */}
-        <button
-          onClick={() => setIsManageMembersModalOpen(true)}
-          className="mb-4 px-4 py-2 bg-purple-500 text-white rounded-md"
-        >
-          Manage Members
-        </button>
+        {/* Sidebar Options */}
+      <div className="flex flex-col flex-grow mt-4">
+        <div className="mt-auto"> {/* This div will grow and push the buttons to the bottom */}
+          {/* Invite button that opens modal */}
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+          >
+            Invite Members
+          </button>
 
-        {/* Delete Workspace button at the bottom */}
-        <button
-          onClick={() => setIsDeleteModalOpen(true)}
-          className="mt-auto px-3 py-1 bg-red-500 text-white rounded-md"
-        >
-          Delete Workspace
-        </button>
+          {/* Manage members */}
+          <button
+            onClick={() => setIsManageMembersModalOpen(true)}
+            className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+          >
+            Manage Members
+          </button>
 
-        {/* The Modal for Invite */}
-        <CustomModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title="Invite Members"
-          message="Share this code with the members you want to invite:"
-        >
-          <div className="flex items-center">
-            <span className="mr-4">{workspace.joinToken}</span>
-            <button
-              onClick={handleCopyCode}
-              className="px-4 py-2 bg-green-500 text-white rounded-md"
-            >
-              Copy Code
-            </button>
-          </div>
-        </CustomModal>
-
-        {/* The Modal for Delete Workspace Confirmation */}
-        <CustomModal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          title="Delete Workspace"
-          message="Are you sure you want to delete this workspace?"
-        >
-          <div className="flex items-center">
-            <button
-              onClick={handleDeleteWorkspace}
-              className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
-            >
-              Delete
-            </button>
-            <button
-              onClick={() => setIsDeleteModalOpen(false)}
-              className="px-4 py-2 bg-gray-500 text-white rounded-md"
-            >
-              Cancel
-            </button>
-          </div>
-        </CustomModal>
+          {/* Delete Workspace button at the bottom */}
+          <button
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-red-500 hover:bg-red-600 focus:ring-red-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+          >
+            Delete Workspace
+          </button>
+        </div>
       </div>
 
-      {/* The Modal for Manage Member */}
+      {/* The Modal for Invite */}
       <CustomModal
-        isOpen={isManageMembersModalOpen}
-        onClose={() => setIsManageMembersModalOpen(false)}
-        title="Manage Members"
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setIsCopied(false); // Reset isCopied state when modal is closed
+        }}
+        title="Invite Members"
+        message="Share this code with the members you want to invite:"
       >
-        <ul>
-          {workspaceMembers && workspaceMembers.length > 0 ? (
-            workspaceMembers.map(member => (
-              <li key={member.id} className="flex justify-between items-center mb-2">
-                <span>{member.username}</span>
-                <button
-                  onClick={() => {
-                    setSelectedMember(member);
-                    setIsMemberDeleteModalOpen(true);
-                  }}
-                  className="px-2 py-1 bg-red-500 text-white rounded-md"
-                >
-                  Remove
-                </button>
-              </li>
-            ))
-          ) : (
-            <p>No members found</p>
-          )}
-        </ul>
+        <div className="flex items-center">
+          <span className="mr-4">{workspace.joinToken}</span>
+          <button
+            onClick={handleCopyCode}
+            className={
+              isCopied
+                ? "px-4 py-2 font-semibold bg-green-500 text-white rounded-md"
+                : "px-4 py-2 font-semibold rounded-md bg-gray-100"
+            } // Modify the class names based on isCopied state
+          >
+            {isCopied ? "Copied!" : "Copy Code"}
+          </button>
+        </div>
       </CustomModal>
 
-      {/* The Modal for Delete Member Confirmation */}
+      {/* The Modal for Delete Workspace Confirmation */}
       <CustomModal
-        isOpen={isMemberDeleteModalOpen}
-        onClose={() => setIsMemberDeleteModalOpen(false)}
-        title="Delete Member"
-        message={`Are you sure you want to remove ${selectedMember?.name} from the workspace?`}
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Delete Workspace"
+        message="Are you sure you want to delete this workspace?"
       >
         <div className="flex items-center">
           <button
-            onClick={handleDeleteMember}
+            onClick={handleDeleteWorkspace}
             className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
           >
             Delete
           </button>
           <button
-            onClick={() => setIsMemberDeleteModalOpen(false)}
+            onClick={() => setIsDeleteModalOpen(false)}
             className="px-4 py-2 bg-gray-500 text-white rounded-md"
           >
             Cancel
           </button>
         </div>
       </CustomModal>
+    </div>
 
-      {/* Main content container */}
-      <div className="w-3/4 p-6">
-        <h2 className="text-2xl font-semibold mb-4">{workspace.name}</h2>
+    {/* The Modal for Manage Member */}
+    <CustomModal
+      isOpen={isManageMembersModalOpen}
+      onClose={() => setIsManageMembersModalOpen(false)}
+      title="Manage Members"
+    >
+      <ul>
+        {workspaceMembers && workspaceMembers.length > 0 ? (
+          workspaceMembers.map(member => (
+            <li key={member.id} className="flex justify-between items-center mb-2">
+              <span>{member.username}</span>
+              <button
+                onClick={() => {
+                  setSelectedMember(member);
+                  setIsMemberDeleteModalOpen(true);
+                }}
+                className="px-2 py-1 bg-red-500 text-white rounded-md"
+              >
+                Remove
+              </button>
+            </li>
+          ))
+        ) : (
+          <p>No members found</p>
+        )}
+      </ul>
+    </CustomModal>
+
+    {/* The Modal for Delete Member Confirmation */}
+    <CustomModal
+      isOpen={isMemberDeleteModalOpen}
+      onClose={() => setIsMemberDeleteModalOpen(false)}
+      title="Delete Member"
+      message={`Are you sure you want to remove ${selectedMember?.name} from the workspace?`}
+    >
+      <div className="flex items-center">
+        <button
+          onClick={handleDeleteMember}
+          className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
+        >
+          Delete
+        </button>
+        <button
+          onClick={() => setIsMemberDeleteModalOpen(false)}
+          className="px-4 py-2 bg-gray-500 text-white rounded-md"
+        >
+          Cancel
+        </button>
+      </div>
+    </CustomModal>
+
+    {/* Main content container */}
+    <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
+        <h2 className="text-2xl font-semibold mb-4 uppercase">{workspace.name}</h2>
         <p className="text-gray-600 mb-4">{workspace.description}</p>
         <div className="absolute right-0 pr-10">
           <button
@@ -305,10 +337,10 @@ const MentorWorkspaceContent = () => {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <div className="text-lg font-medium">{board.boardTitle}</div>
-                    <div className="text-gray-600">{board.description}</div>
-                    <div className="text-gray-600">{board.dtTag}</div>
-                    <div className="text-gray-600">{board.deadline}</div>
+                    <div className="text-center font-medium">{board.boardTitle}</div>
+                    <div className="text-center text-gray-600">{board.description}</div>
+                    <div className="text-center text-gray-600">{board.dtTag}</div>
+                    <div className="text-center text-gray-600">{board.deadline}</div>
                   </Link>
                 </li>
               ))}
@@ -320,8 +352,9 @@ const MentorWorkspaceContent = () => {
             {/* ... content for section 2 ... */}
           </div>
         </div>
-      </div>
-    </div>
+  </div>
+  </div>
+  </div>
   );
 };
 
