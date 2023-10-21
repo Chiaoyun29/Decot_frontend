@@ -6,6 +6,7 @@ import axios from 'axios';
 import { createBoard } from '../services/api';
 import { useAuthContext } from '../../context/AuthContext';
 import Chat from '../chat/Chat';
+import Feedback from '../feedback/Feedback';
 
 const Canvas = () => {
   const drawingCanvasRef = useRef(null);
@@ -18,8 +19,12 @@ const Canvas = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [isStickyNoteMode, setIsStickyNoteMode] = useState(false);
   const [boardTitle, setBoardTitle] = useState('');
+  const [isChanged, setIsChanged] = useState(false);
+  const [image, setImage] = useState(null);
 
   const navigate = useNavigate();
+  const saveInterval = useRef(null);
+  
   
   useEffect(()=>{
     if(user){
@@ -69,10 +74,22 @@ const Canvas = () => {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
+    /* const saveCanvasData = (canvasData) =>{
+      axios.post('/api/saveCanvas', { canvasData })
+        .then((response) => {
+          console.log('Canvas data saved successfully:', response.data);
+        })
+        .catch((error) => {
+          console.error('Error saving canvas data:', error);
+        });
+    };
+    saveInterval.current = setInterval(saveCanvasData, 1000);
+    */
     return()=>{
       window.removeEventListener('resize', resizeCanvas);
+      clearInterval(saveInterval.current);
     };
-  }, []);
+    }, [isChanged]);
 
   const startDrawing = ({nativeEvent}) => {
     const {offsetX, offsetY} = nativeEvent;
@@ -92,6 +109,8 @@ const Canvas = () => {
     const {offsetX, offsetY} = nativeEvent;
     drawingContextRef.current.lineTo(offsetX, offsetY);
     drawingContextRef.current.stroke();
+    setIsChanged(true);
+    //saveCanvasData(drawingCanvasRef.current.toDataURL('image/png'));
     nativeEvent.preventDefault();
   };
 
@@ -159,21 +178,20 @@ const Canvas = () => {
   //   }
   // };
 
-  const handleUpload = ()=>{
-    console.log('Handle upload')
-      try{
-        const image = drawingCanvasRef.current.toDataURL('/png');
-        axios.post('http://localhost:5000',{
-          value: 'test'
-        });
-      }catch(error){
-        console.error('Error uploading image', error);
-      }
+  const HandleUploadAndDisplay = () => {
+    axios.post('http://localhost:5000/canvas/imageUpload', image)
+    .then(res =>{
+      console.log('Axios response: ', res)
+    })
+  };
+
+  const handleFileInput = (e) => {
+    console.log('handleFileInput working!')
   };
 
   return (
     <div>
-      <Chat />
+      {/* <Chat /> */}
       <Sidebar
         setToDraw={setToDraw}
         setToErase={setToErase}
@@ -182,8 +200,9 @@ const Canvas = () => {
         deleteCanvas={deleteCanvas}
         saveImageToLocal={saveImageToLocal}
         //navigateToCreateBoard={navigateToCreateBoard}
-        handleUpload={handleUpload}
+        HandleUploadAndDisplay={HandleUploadAndDisplay}
       />
+      {/* <Feedback /> */}
       <canvas className="canvas-container"
         ref={gridCanvasRef} 
         style={{ position: 'absolute' }}

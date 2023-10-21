@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Sidebar = ({ setToDraw, setToErase, toggleStickyNoteMode, isStickyNoteMode, deleteCanvas, saveImageToLocal, navigateToCreateBoard, handleUpload }) => {
+const Sidebar = ({ setToDraw, setToErase, toggleStickyNoteMode, isStickyNoteMode, deleteCanvas, saveImageToLocal, navigateToCreateBoard, HandleUploadAndDisplay, handleFileInput }) => {
   return (
     <div className="sidebar">
       <button className="sidebar-button" onClick={setToDraw}>
@@ -21,9 +21,10 @@ const Sidebar = ({ setToDraw, setToErase, toggleStickyNoteMode, isStickyNoteMode
       <button className="sidebar-button" onClick={navigateToCreateBoard}>
         Create New Board
       </button>
-      <button className="sidebar-button" onClick={handleUpload}>
-        Upload image
-      </button>
+      <label htmlFor="fileInput" className="sidebar-button">
+        Upload Image
+      </label>
+      <input type="file" id="fileInput" onChange={handleFileInput} style={{ display: 'none' }}/>
     </div>
   );
 };

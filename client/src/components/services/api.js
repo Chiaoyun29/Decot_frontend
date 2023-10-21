@@ -452,6 +452,7 @@ export const createMessage = async (token, message, userId, timestamp) => {
     return { error: 'Fail to create message', status: 0 };
   }
 };
+
 export const getAllMessages = async (token) => {
   try {
     const response = await fetch(`${API_URL}/message/list`, {
@@ -470,6 +471,7 @@ export const getAllMessages = async (token) => {
     return { error: 'Failed to load messages', status: 0 };
   }
 };
+
 export const deleteMessage = async (token, messageId) => {
   try {
     const response = await fetch(`${API_URL}/message/${messageId}`, {

@@ -7,6 +7,7 @@ import icon_pencil from  "../../image/icon_pencil.svg";
 import { useNavigate } from 'react-router-dom';
 //import CreateBoardModal from '../dashboard/CreateBoardModal';
 import Canvas from '../canvas/Canvas'
+import Chat from '../chat/Chat';
 
 const MentorBoardContent = () => {
   const { boardId, workspaceId } = useParams();
@@ -20,7 +21,6 @@ const MentorBoardContent = () => {
   const [editeddtTag, setEditeddtTag] = useState('');
   const [editedDeadline, setEditedDeadline] = useState('');
   //const [boards, setBoards] = useState([]);
-  //const [modalIsOpen, setModalIsOpen] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
   const navigate = useNavigate();
 
@@ -173,21 +173,22 @@ const MentorBoardContent = () => {
 
       {/* Main content container */}
       <div className="w-3/4">
-      {/* Add content such as boards here */}  
+        <Chat />
+        {/* Add content such as boards here */}  
+        <div>
           <div>
-            <div>
-              <h1 
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fondWeight: 'bold'
-                }}
-              >
-                Choose your template
-              </h1>
-            </div>
+            <h1 
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fondWeight: 'bold'
+              }}
+            >
+              Choose your template
+            </h1>
           </div>
+        </div>
       </div>
     </div>
     </div>

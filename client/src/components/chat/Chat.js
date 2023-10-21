@@ -31,21 +31,9 @@ const Chat =()=>{
         };
     }, [socket]);
 
-    // const fetchMessages=async()=>{
-    //     try {
-    //         const response = await getAllMessages(token);
-    //         if (response && response.data.messages) {
-    //           setMessages(response.data.messages);
-    //         }else{
-    //             console.error('Invalid response or missing messages', response);
-    //         }
-    //     } catch (error) {
-    //     console.error('Error fetching messages:', error);
-    //     }
-    // };
     const fetchMessages = async () => {
         try {
-          const response = await getAllMessages(token, messages);
+          const response = await getAllMessages(token);
             if(response&&response.data.messages){
                 setMessages(response.data.messages);
             } else {
@@ -62,7 +50,7 @@ const Chat =()=>{
             console.log("dgjgshd",response);
             if (response.message) {
               const { message } = response.message;
-              setMessages('');
+              setNewMessage('');
               socket.emit('send_message', message);
             }
             setNewMessage('');
@@ -71,14 +59,6 @@ const Chat =()=>{
         }
       };  
 
-    // const handleDeleteMessage = async (messageId) => {
-    //     try {
-    //       await deleteMessage(token, messageId);
-    //       setMessages(messages.filter((message) => message.id !== messageId));
-    //     } catch (error) {
-    //       console.error('Error deleting message:', error);
-    //     }
-    // };
     const handleDeleteMessage = async (messageId) => {
         try {
           await deleteMessage(token, messageId);
