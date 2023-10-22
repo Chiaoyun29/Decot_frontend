@@ -27,7 +27,6 @@ const MentorBoardContent = () => {
   useEffect(() => {
     const fetchBoard = async () => {
       const response = await getBoardById(token, boardId);
-      console.log("dsfsdf",response)
       if (response.board) {
         setBoard(response.board);
       } else {

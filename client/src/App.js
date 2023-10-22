@@ -19,20 +19,21 @@ const App = () => {
     <div className="App">
       <ToastContainer />
       <Router>
-        <AuthProvider>
-          <SocketProvider>
-            <Routes>
-              <Route path="/Decot_frontend" element={<HomePage />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/workspace/:workspaceId" element={<WorkspaceContent />} />
-              <Route path="/board/:boardId" element={<BoardContent />} />
-              <Route path="/canvas" element={<Canvas />} />
-              <Route path="/chat" element={<Chat />} />
-            </Routes>
-          </SocketProvider>
-        </AuthProvider>
+          <AuthProvider>
+            <SocketProvider>
+              <Routes>
+                <Route path="/Decot_frontend" element={<HomePage />} />
+                <Route path="/Decot_frontend/googleCallback" element={<Register />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/workspace/:workspaceId" element={<WorkspaceContent />} />
+                <Route path="/board/:boardId" element={<BoardContent />} />
+                <Route path="/canvas" element={<Canvas />} />
+                <Route path="/chat" element={<Chat />} />
+              </Routes>
+            </SocketProvider>
+          </AuthProvider>
       </Router>
     </div>
   );
