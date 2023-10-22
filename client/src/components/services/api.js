@@ -489,3 +489,25 @@ export const deleteMessage = async (token, messageId) => {
     return { error: 'Failed to delete message', status: 0 };
   }
 };
+
+export const authenticateWithGoogle = async () => {
+  window.location.href = `${API_URL}/auth/google`;
+};
+
+export const updateUserRole = async (email, role) => {
+  try {
+      const response = await fetch(`${API_URL}/auth/updateRole`, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              email,
+              role
+          })
+      });
+      return await response.json();
+  } catch (error) {
+      throw error;
+  }
+};
