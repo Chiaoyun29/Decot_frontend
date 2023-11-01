@@ -301,17 +301,20 @@ export const leaveWorkspace = async (token, workspaceId) => {
     console.error(error);
   }
 };
-export const createBoard = async (token, boardTitle, dtTag, deadline, description) => {
+export const createBoard = async (token, boardTitle, dtTag, deadline, description, workspaceId) => {
   try {
-    const response = await fetch(`${API_URL}/board/create`, {
+    const response = await fetch(`${API_URL}/board/workspace/${workspaceId}/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ boardTitle, dtTag, deadline, description}),
+      body: JSON.stringify({ boardTitle, dtTag, deadline, description }),
     });
-
+    //console.log(token);
+    console.log(workspaceId);
+    console.log("create board: " + JSON.stringify(response));
+    
     const data = await response.json();
     return { ...data, status: response.status };
 
@@ -321,20 +324,19 @@ export const createBoard = async (token, boardTitle, dtTag, deadline, descriptio
   }
 };
 
-export const getBoards = async (token) => {
+export const getBoards = async (token, workspaceId) => {
   try {
-    const response = await fetch(`${API_URL}/board`, {
+    const response = await fetch(`${API_URL}/board/workspace/${workspaceId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
     });
-
-    console.log(response)
+    console.log(workspaceId);
+    console.log(response);
     const data = await response.json();
     return { ...data, status: response.status };
-
   } catch (error) {
     console.error('Failed to retrieve board:', error);
     return { error: 'Failed to retrieve board', status: 0 };

@@ -1,12 +1,19 @@
 import './Canvas.css';
-import {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useCallback} from 'react';
 import Sidebar from './Sidebar';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { createBoard } from '../services/api';
 import { useAuthContext } from '../../context/AuthContext';
-import Chat from '../chat/Chat';
 import Feedback from '../feedback/Feedback';
+import DrawAndErase from './DrawAndErase';
+import PropertiesPanel from './PropertiesPanel';
+import { Layer, Stage } from "react-konva";
+import { useShapes, createCircle, createRectangle, clearSelection } from "./state";
+import { DRAG_DATA_KEY, SHAPE_TYPES } from "./constants";
+import Shape from "./Shape";
+
+const handleDragOver = (event)=>event.preventDefault();
 
 const Canvas = () => {
   const drawingCanvasRef = useRef(null);
@@ -21,10 +28,10 @@ const Canvas = () => {
   const [boardTitle, setBoardTitle] = useState('');
   const [isChanged, setIsChanged] = useState(false);
   const [image, setImage] = useState(null);
-
   const navigate = useNavigate();
   const saveInterval = useRef(null);
-  
+  const shapes = useShapes((state)=>Object.entries(state.shapes));
+  //const handleDragOver = (event)=>event.preventDefault();
   
   useEffect(()=>{
     if(user){
@@ -54,16 +61,18 @@ const Canvas = () => {
     const drawGridLines=()=>{
       const { width, height }=drawingCanvas;
       const gridSize=20;
+      const scrollX = drawingCanvas.scrollLeft;
+      const scrollY = drawingCanvas.scrollTop;
 
       gridContext.clearRect(0, 0, width, height);
 
       gridContext.beginPath();
-      for (let x = 0; x <= width; x += gridSize) {
+      for (let x = -scrollX%gridSize; x <= width; x += gridSize) {
         gridContext.moveTo(x, 0);
         gridContext.lineTo(x, height);
       }
 
-      for (let y = 0; y <= height; y += gridSize) {
+      for (let y = -scrollY%gridSize; y <= height; y += gridSize) {
         gridContext.moveTo(0, y);
         gridContext.lineTo(width, y);
       }
@@ -73,7 +82,7 @@ const Canvas = () => {
     };
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
-
+    drawingCanvas.addEventListener('scroll', drawGridLines);
     /* const saveCanvasData = (canvasData) =>{
       axios.post('/api/saveCanvas', { canvasData })
         .then((response) => {
@@ -89,35 +98,7 @@ const Canvas = () => {
       window.removeEventListener('resize', resizeCanvas);
       clearInterval(saveInterval.current);
     };
-    }, [isChanged]);
-
-  const startDrawing = ({nativeEvent}) => {
-    const {offsetX, offsetY} = nativeEvent;
-    drawingContextRef.current.beginPath();
-    drawingContextRef.current.moveTo(offsetX, offsetY);
-    drawingContextRef.current.lineTo(offsetX, offsetY);
-    drawingContextRef.current.stroke();
-    setIsDrawing(true);
-    nativeEvent.preventDefault();
-  };
-
-  const draw = ({nativeEvent}) => {
-    if(!isDrawing||isStickyNoteMode) {
-      return;
-    }
-    
-    const {offsetX, offsetY} = nativeEvent;
-    drawingContextRef.current.lineTo(offsetX, offsetY);
-    drawingContextRef.current.stroke();
-    setIsChanged(true);
-    //saveCanvasData(drawingCanvasRef.current.toDataURL('image/png'));
-    nativeEvent.preventDefault();
-  };
-
-  const stopDrawing = () => {
-    drawingContextRef.current.closePath();
-    setIsDrawing(false);
-  };
+  }, [isChanged]);
 
   const setToDraw = () => {
     drawingContextRef.current.globalCompositeOperation = 'source-over';
@@ -189,31 +170,53 @@ const Canvas = () => {
     console.log('handleFileInput working!')
   };
 
+  const handleDrop = useCallback((event)=>{
+    const draggedData = event.nativeEvent.dataTransfer.getData(DRAG_DATA_KEY);
+    if(draggedData){
+      const{ offsetX, offsetY, type, clientHeight, clientWidth }=JSON.parse(draggedData);
+      gridCanvasRef.current.setPointersPositions(event);
+      const coords = drawingCanvasRef().current.getPointerPosition();
+      if(type===SHAPE_TYPES.RECT){
+        createRectangle({
+          X: coords.X - offsetX,
+          y: coords.y - offsetY,
+          width: clientWidth,  // Add width and height properties if needed
+          height: clientHeight,
+        });
+      }else if(type===SHAPE_TYPES.CIRCLE){
+        createCircle({
+          x: coords.x - (offsetX - clientWidth / 2),
+          y: coords.y - (offsetY - clientHeight / 2),
+          radius: clientWidth/2,
+        });
+      }
+    }
+  }, []);
+
   return (
     <div>
       {/* <Chat /> */}
-      <Sidebar
-        setToDraw={setToDraw}
-        setToErase={setToErase}
-        toggleStickyNoteMode={toggleStickyNoteMode}
-        //isStickyNoteMode={isStickyNoteMode}
-        deleteCanvas={deleteCanvas}
-        saveImageToLocal={saveImageToLocal}
-        //navigateToCreateBoard={navigateToCreateBoard}
-        HandleUploadAndDisplay={HandleUploadAndDisplay}
-      />
-      {/* <Feedback /> */}
+      {/* <canvas className="canvas-container" onDrop={handleDrop} onDragOver={handleDragOver}>
+        <Stage ref={gridCanvasRef} style={{ position: 'absolute' }} onClick={clearSelection}>
+          <Layer>
+            {shapes.map(([key, shape]) => (
+              <Shape key={key} shape={{ ...shape, id: key }} />
+            ))}
+          </Layer>
+        </Stage>
+      </canvas> */}
       <canvas className="canvas-container"
         ref={gridCanvasRef} 
         style={{ position: 'absolute' }}
       />
-      <canvas className="canvas-container"
-        ref={drawingCanvasRef}
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={stopDrawing}
-        onMouseLeave={stopDrawing}>
-      </canvas>
+      <DrawAndErase 
+        drawingCanvasRef={drawingCanvasRef}
+        drawingContextRef={drawingContextRef}
+        isDrawing={isDrawing}
+        setIsDrawing={setIsDrawing}
+        setIsChanged={setIsChanged}
+        isStickyNoteMode={isStickyNoteMode}
+      />
       <canvas
         className="canvas-container"
         ref={stickyNoteCanvasRef}
@@ -224,6 +227,18 @@ const Canvas = () => {
         onMouseDown={startStickyNote}
         onMouseUp={stopStickyNote}
       />
+      {/* <Sidebar
+        setToDraw={setToDraw}
+        setToErase={setToErase}
+        toggleStickyNoteMode={toggleStickyNoteMode}
+        //isStickyNoteMode={isStickyNoteMode}
+        deleteCanvas={deleteCanvas}
+        saveImageToLocal={saveImageToLocal}
+        //navigateToCreateBoard={navigateToCreateBoard}
+        HandleUploadAndDisplay={HandleUploadAndDisplay}
+      /> */}
+      <Feedback />
+      <PropertiesPanel />
     </div>
   );
 };

@@ -30,7 +30,7 @@
     font-size: 16px;
     font-weight: bold;
     color: #333;
-    background-color: #F9A826; /* Set the background color for the buttons */
+    background-color: #f9a826; /* Set the background color for the buttons */
     transition: background-color 0.3s ease;
   }
   

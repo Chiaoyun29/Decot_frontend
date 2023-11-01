@@ -9,7 +9,7 @@ import icon_pencil from  "../../image/icon_pencil.svg";
 import CreateBoardModal from '../dashboard/CreateBoardModal';
 
 const MentorWorkspaceContent = () => {
-  const { workspaceId } = useParams();
+  const { workspaceId, boardId } = useParams();
   const [workspace, setWorkspace] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -26,11 +26,10 @@ const MentorWorkspaceContent = () => {
   const navigate = useNavigate();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [boards, setBoards] = useState([]);
-  const [board, setBoard] = useState([]);
-  const { boardId } = useParams();
 
   const fetchBoards = async () => {
-    const response = await getBoards(token);
+    const response = await getBoards(token, workspaceId);
+    console.log(response);
     if (response.status === 200) {
       setBoards(response.boards);
     } else {
@@ -40,7 +39,7 @@ const MentorWorkspaceContent = () => {
 
   useEffect(() => {
     fetchBoards();
-  }, []);
+  }, [workspaceId, token]);
 
   useEffect(() => {
     const fetchWorkspace = async () => {
@@ -294,7 +293,7 @@ const MentorWorkspaceContent = () => {
       isOpen={isMemberDeleteModalOpen}
       onClose={() => setIsMemberDeleteModalOpen(false)}
       title="Delete Member"
-      message={`Are you sure you want to remove ${selectedMember?.username} from the workspace?`}
+      message={`Are you sure you want to remove ${selectedMember?.name} from the workspace?`}
     >
       <div className="flex items-center">
         <button
@@ -317,41 +316,39 @@ const MentorWorkspaceContent = () => {
         <h2 className="text-2xl font-semibold mb-4 uppercase">{workspace.name}</h2>
         <p className="text-gray-600 mb-4">{workspace.description}</p>
         <div className="absolute right-0 pr-10">
-          <button
-            onClick={() => setModalIsOpen(true)}
-            className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-yellow-200 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
-          >
-            Create Board
-          </button>
+          
         </div>
         {/* Your main content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Section */}
-          <div className="p-4 bg-white rounded shadow-md">
-            {/* ... content for section 1 ... */}
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {boards&&boards.map((board) => (
-                <li key={boards.id} className="p-6 border rounded-md">
-                  <Link to={`/board/${board.id}`} className="block" 
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <div className="text-center font-medium">{board.boardTitle}</div>
-                    <div className="text-center text-gray-600">{board.description}</div>
-                    <div className="text-center text-gray-600">{board.dtTag}</div>
-                    <div className="text-center text-gray-600">{board.deadline}</div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <CreateBoardModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)}  onBoardCreated={fetchBoards} />
-          </div>
-          {/* Section */}
-          <div className="p-4 bg-white rounded shadow-md">
-            {/* ... content for section 2 ... */}
-          </div>
+        {/* Section */}
+        <div className="p-4 bg-white rounded shadow-md">
+          {/* ... content for section 1 ... */}
+            <div style={{ textAlign: 'right' }}>
+              <button
+                onClick={() => setModalIsOpen(true)}
+                className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-yellow-200 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+              >
+                Create Board
+              </button>
+            </div>
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {boards.map((board) => (
+              <li key={board.id} className="p-6 border rounded-md">
+                <Link to={`board/${board.id}`} className="block" //need to do modi for linkage
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <div className="text-center font-medium">{board.boardTitle}</div>
+                  <div className="text-center text-gray-600">{board.description}</div>
+                  <div className="text-center text-gray-600">{board.dtTag}</div>
+                  <div className="text-center text-gray-600">{board.deadline}</div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <CreateBoardModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)}  onBoardCreated={fetchBoards} />
         </div>
+        {/* Section */}
       </div>
     </div>
   </div>
