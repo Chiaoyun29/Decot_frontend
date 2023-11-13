@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { loginUser, authenticateWithGoogle, updateUserRole } from '../../components/services/api';
+import { loginUser, authenticateWithGoogle, updateUserRole, changePassword } from '../../components/services/api';
 import { useNavigate } from 'react-router-dom';
 import CustomModal from '../../components/common/CustomModal';
 import logo from "../../image/DECOT.png";

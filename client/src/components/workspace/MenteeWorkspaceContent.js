@@ -23,6 +23,7 @@ const MenteeWorkspaceContent = () => {
     const fetchWorkspace = async () => {
       const response = await getWorkspaceById(token, workspaceId, user.id);
       if (response.workspace) {
+        socket.emit('userAction', { action: 'viewWorkspace' });
         setWorkspace(response.workspace);
       } else {
         console.error(response.error);
@@ -70,6 +71,7 @@ const MenteeWorkspaceContent = () => {
     try {
       const response = await leaveWorkspace(token, workspaceId);
       if (response.status === 200) {
+        socket.emit('userAction', { action: 'leaveWorkspace' });
         navigate('/dashboard');
       } else {
         console.error(response.error);

@@ -511,3 +511,90 @@ export const updateUserRole = async (email, role) => {
       throw error;
   }
 };
+
+export const updateProfile = async (userId, username, expertise) => {
+  try {
+      const response = await fetch(`${API_URL}/auth/updateProfile`, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              userId,
+              username,
+              expertise,
+          })
+      });
+      return await response.json();
+  } catch (error) {
+      throw error;
+  }
+};
+
+export const changePassword = async (userId, newPassword) => {
+  try {
+      const response = await fetch(`${API_URL}/auth/changePassword`, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              userId,
+              newPassword
+          })
+      });
+      return await response.json();
+  } catch (error) {
+      throw error;
+  }
+};
+
+export const verifyEnteredPassword = async (userId, enteredPassword) => {
+  try {
+      const response = await fetch(`${API_URL}/auth/verifyEnteredPassword`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              userId,
+              enteredPassword,
+          })
+      });
+      return await response.json();
+  } catch (error) {
+      throw error;
+  }
+};
+
+export const deleteAccount = async (userId) => {
+  try {
+      const response = await fetch(`${API_URL}/auth/deleteAccount`, {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              userId
+          })
+      });
+      return await response.json();
+  } catch (error) {
+      throw error;
+  }
+};
+export const uploadProfilePic = async (userId, file) => {
+  const formData = new FormData();
+  formData.append('profilePic', file);
+
+  try {
+    const response = await fetch(`${API_URL}/auth/uploadProfilePic/${userId}`, {
+      method: 'POST',
+      body: formData // Pass formData directly
+    });
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+

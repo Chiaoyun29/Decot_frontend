@@ -18,11 +18,21 @@ const SocketProvider = ({ children }) => {
 
       setSocket(newSocket);
 
+      newSocket.on('connect', () => {
+        // Emit event when user connects
+        newSocket.emit('userAction', { action: 'userOnline', userId: user.id });
+      });
+
       newSocket.on('notification', (message) => {
         setNotifications((prev) => [...prev, message]);
         toast(message.content);
 
         notificationCallbacksRef.current.forEach(callback => callback(message));
+      });
+
+      newSocket.on('disconnect', () => {
+        // Emit event when user disconnects
+        newSocket.emit('userAction', { action: 'userOffline', userId: user.id });
       });
 
       return () => newSocket.close();
