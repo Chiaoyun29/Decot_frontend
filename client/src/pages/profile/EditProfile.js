@@ -126,11 +126,21 @@ const EditProfile = ({ user,  setUser,isEditing, setIsEditing, onCancel }) => {
 
     const handleFileChange = (event) => {
         if (event.target.files && event.target.files[0]) {
-        const file = event.target.files[0];
-        setSelectedFile(file);
-        setPreviewUrl(URL.createObjectURL(file)); // Creates a preview URL
+            const file = event.target.files[0];
+    
+            if (!file.type.match('image.*')) {
+                setSelectedFile(null);
+                setMessageTitle('Invalid File');
+                setMessage('Please select an image file.');
+                setModalIsOpen(true);
+                return;
+            }
+    
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file)); // Creates a preview URL
         }
     };
+    
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md">
@@ -184,18 +194,18 @@ const EditProfile = ({ user,  setUser,isEditing, setIsEditing, onCancel }) => {
                 </div>
                 </div>
                 <div className="border-b border-gray-900/10 pb-5">
-                <h2 className="text-lg font-semibold leading-7 text-gray-900">Account Management</h2>
-                <div className="mt-4 flex space-x-4">
-                    {isDirectRegistration && (
-                        <div>
+                    <h2 className="text-lg font-semibold leading-7 text-gray-900">Account Management</h2>
+                    <div className="mt-4 flex flex-col space-y-4 ">
+                        {isDirectRegistration && (
+                        <div className="w-1/4">
                             {!isPasswordVerified ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setVerifyPasswordModalIsOpen(true)}
-                                    className="px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-700 focus:outline-none"
-                                >
-                                    Change Password
-                                </button>
+                            <button
+                                type="button"
+                                onClick={() => setVerifyPasswordModalIsOpen(true)}
+                                className="w-full px-4 py-2 text-white font-semibold bg-gray-500 rounded-md hover:bg-gray-700 focus:outline-none"
+                            >
+                                Change Password
+                            </button>
                             ) : (
                                 <div>
                                     <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
@@ -227,16 +237,16 @@ const EditProfile = ({ user,  setUser,isEditing, setIsEditing, onCancel }) => {
                         </div>
                     )}
 
-                    {/* Account Deletion Section - Available for all users */}
-                    <div>
-                        <button
-                            type="button"
-                            onClick={() => setDeleteConfirmationModalIsOpen(true)}
-                            className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-700 focus:outline-none"
-                        >
-                            Delete Account
-                        </button>
-                    </div>
+                  {/* Account Deletion Section - Available for all users */}
+                <div className="w-1/4">
+                    <button
+                        type="button"
+                        onClick={() => setDeleteConfirmationModalIsOpen(true)}
+                        className="w-full px-4 py-2 font-semibold text-white bg-red-500 rounded-md hover:bg-red-700 focus:outline-none"
+                    >
+                        Delete Account
+                    </button>
+                </div>
                 </div>
             </div>
                
