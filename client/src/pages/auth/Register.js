@@ -95,6 +95,7 @@ const Register = () => {
             const data = await updateUserRole(user.email, selectedRole);
     
             if (data) {
+                setUser(prevUser => ({ ...prevUser, role: selectedRole }));
                 setMessageTitle("Registered Successfully");
                 setMessage('You have been registered successfully with your google account!');
                 setModalIsOpen(true);
