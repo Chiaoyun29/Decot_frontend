@@ -26,6 +26,7 @@ const MentorWorkspaceContent = () => {
   const navigate = useNavigate();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [boards, setBoards] = useState([]);
+  const [board, setBoard] = useState(null);
 
   const fetchBoards = async () => {
     const response = await getBoards(token, workspaceId);
@@ -130,7 +131,6 @@ const MentorWorkspaceContent = () => {
 
   return (
       <div className="flex flex-col h-screen bg-gray-100">
-
       {/* Fixed Sidebar for managing workspace */}
       <div className="flex flex-grow overflow-hidden">
       <div className="w-1/4 h-full bg-white shadow-lg p-4 overflow-y-auto">
@@ -332,7 +332,7 @@ const MentorWorkspaceContent = () => {
             </div>
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {boards.map((board) => (
-              <li key={board.id} className="p-6 border rounded-md">
+              <li key={board.id} className="p-15 border rounded-md">
                 <Link to={`board/${board.id}`} className="block" //need to do modi for linkage
                   style={{
                     justifyContent: 'center',
@@ -341,7 +341,17 @@ const MentorWorkspaceContent = () => {
                   <div className="text-center font-medium">{board.boardTitle}</div>
                   <div className="text-center text-gray-600">{board.description}</div>
                   <div className="text-center text-gray-600">{board.dtTag}</div>
-                  <div className="text-center text-gray-600">{board.deadline}</div>
+                  <div className="text-center text-gray-600">
+                    {(board.deadline).toLocaleString('en-US',{
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false,
+                      timeZone: 'auto',
+                    })}
+                  </div>
                 </Link>
               </li>
             ))}

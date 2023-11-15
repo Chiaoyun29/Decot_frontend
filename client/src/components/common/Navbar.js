@@ -4,6 +4,7 @@ import logo from "../../image/DECOT.png";
 import CustomModal from './CustomModal';
 import { useAuthContext } from '../../context/AuthContext';
 import NotificationButton from '../common/NotificationButton';
+import ChatButton from '../chat/Chat';
 
 const Navbar = (props) => {
   const { setUser } = useAuthContext();
@@ -12,6 +13,7 @@ const Navbar = (props) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showMessages, setShowMessages] = useState(false);
 
   const handleLogout = () => {
     setUser(null); // clear the user
@@ -74,6 +76,11 @@ const Navbar = (props) => {
                   <button onClick={() => navigate('/manage-profile')} className="block w-full text-left p-2 hover:bg-gray-200">Manage Profile</button>
                 </div>
               )}
+            </li>
+
+            {/* Chat Button */}
+            <li className="nav-item relative px-3 py-2 flex items-center text-s font-bold leading-snug text-black hover:opacity-75 z-10" onClick={() => setShowMessages(!showMessages)}>
+              <ChatButton />
             </li>
           </ul>
         </div>

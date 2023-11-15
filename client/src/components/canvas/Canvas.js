@@ -227,7 +227,7 @@ const Canvas = () => {
         onMouseDown={startStickyNote}
         onMouseUp={stopStickyNote}
       />
-      {/* <Sidebar
+      <Sidebar
         setToDraw={setToDraw}
         setToErase={setToErase}
         toggleStickyNoteMode={toggleStickyNoteMode}
@@ -236,8 +236,8 @@ const Canvas = () => {
         saveImageToLocal={saveImageToLocal}
         //navigateToCreateBoard={navigateToCreateBoard}
         HandleUploadAndDisplay={HandleUploadAndDisplay}
-      /> */}
-      <Feedback />
+      />
+      {/* <Feedback /> */}
       <PropertiesPanel />
     </div>
   );

@@ -11,8 +11,6 @@ const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
   const [dtTag, setDtTag] = useState('');
   const [deadline, setDeadline] = useState(new Date());
   const [description, setDescription] = useState('');
-  //const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [boards, setBoards] = useState([]);
 
   const { token } = useAuthContext(); //not this
   const location=useLocation();
@@ -21,10 +19,8 @@ const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
   const handleBoardSubmit = async () => {
     try {
       const formatDeadline = deadline.toISOString(); //causing dateMZ
-      // Pass the token to the createBoard function
-      //let workspaceId = 4;
       const response = await createBoard(token, boardTitle, dtTag, formatDeadline, description, workspaceId);
-      console.log("fk u where r u",response);
+      console.log(response);
       if (response.board) {
         const { Board } = response.board;
         // After success, clear the form
