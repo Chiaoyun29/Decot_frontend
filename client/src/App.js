@@ -13,6 +13,7 @@ import "./App.css";
 import { ToastContainer } from 'react-toastify';
 import SocketProvider from './context/SocketProvider';
 import 'react-toastify/dist/ReactToastify.css';
+import Profile from "./pages/profile/Profile"
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
                 <Route path="/workspace/:workspaceId/board/:boardId" element={<BoardContent />} />
                 <Route path="/canvas" element={<Canvas />} />
                 <Route path="/chat" element={<Chat />} />
+                <Route path="/profile" element={<Profile />} />
               </Routes>
             </SocketProvider>
           </AuthProvider>

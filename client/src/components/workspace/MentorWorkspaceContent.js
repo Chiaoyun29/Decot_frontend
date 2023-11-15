@@ -46,6 +46,7 @@ const MentorWorkspaceContent = () => {
     const fetchWorkspace = async () => {
       const response = await getWorkspaceById(token, workspaceId);
       if (response.workspace) {
+        socket.emit('userAction', { action: 'viewWorkspace' });
         setWorkspace(response.workspace);
       } else {
         console.error(response.error);
@@ -84,6 +85,7 @@ const MentorWorkspaceContent = () => {
     try {
       await navigator.clipboard.writeText(workspace.joinToken);
       setIsCopied(true); // Set isCopied to true
+      socket.emit('userAction', { action: 'copyJoinCode' });
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from "../../image/DECOT.png";
 import CustomModal from './CustomModal';
@@ -7,7 +7,7 @@ import NotificationButton from '../common/NotificationButton';
 import ChatButton from '../chat/Chat';
 
 const Navbar = (props) => {
-  const { setUser } = useAuthContext();
+  const { setUser, setToken } = useAuthContext();
   const navigate = useNavigate();
   const [navbarOpen, setNavbarOpen] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -17,7 +17,9 @@ const Navbar = (props) => {
 
   const handleLogout = () => {
     setUser(null); // clear the user
+    setToken(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     navigate('/Decot_frontend'); // navigate to homepage
   };
 
@@ -72,8 +74,8 @@ const Navbar = (props) => {
               </button>
               {showProfileDropdown && (
                 <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg p-2 z-100">
+                  <button onClick={() => navigate('/profile')} className="block w-full text-left p-2 hover:bg-gray-200">Manage Profile</button>
                   <button onClick={confirmLogout} className="block w-full text-left p-2 hover:bg-gray-200">Logout</button>
-                  <button onClick={() => navigate('/manage-profile')} className="block w-full text-left p-2 hover:bg-gray-200">Manage Profile</button>
                 </div>
               )}
             </li>
