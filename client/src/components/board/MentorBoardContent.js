@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getBoardById, updateBoard, deleteBoard } from '../services/api';
 import CustomModal from '../common/CustomModal';
 import icon_pencil from  "../../image/icon_pencil.svg";
-import { useNavigate } from 'react-router-dom';
-//import CreateBoardModal from '../dashboard/CreateBoardModal';
 import Canvas from '../canvas/Canvas'
 
 const MentorBoardContent = () => {
@@ -20,13 +18,12 @@ const MentorBoardContent = () => {
   const [editeddtTag, setEditeddtTag] = useState('');
   const [editedDeadline, setEditedDeadline] = useState('');
   //const [boards, setBoards] = useState([]);
-  //const [modalIsOpen, setModalIsOpen] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBoard = async () => {
-      const response = await getBoardById(token, boardId);
+      const response = await getBoardById(token, boardId, workspaceId);
       if (response.board) {
         setBoard(response.board);
       } else {
@@ -34,7 +31,7 @@ const MentorBoardContent = () => {
       }
     };
     fetchBoard();
-  }, [boardId, token]);
+  }, [workspaceId, boardId, token]);
 
   if (!board) return (<div className="flex items-center justify-center min-h-screen">
   <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
@@ -58,9 +55,8 @@ const MentorBoardContent = () => {
   const handleDeleteBoard = async (workspaceId) => {
     const response = await deleteBoard(token, boardId, workspaceId);
     if (response.status === 200) {
-      // You may want to redirect to dashboard or somewhere else
-      console.log("Board deleted successfully.");
-      navigate(`/workspace/{workspaceId}`);
+      // get budao workspaceId
+      navigate("/workspace/:workspaceId");
     } else {
       console.error(response.error);
     }
@@ -166,27 +162,33 @@ const MentorBoardContent = () => {
             >
               Cancel
             </button>
+            <Link to={`/workspace/${workspaceId}`}></Link>
           </div>
         </CustomModal>
       </div>
 
       {/* Main content container */}
       <div className="w-3/4">
-      {/* Add content such as boards here */}  
-          <div>
-            <div>
-              <h1 
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fondWeight: 'bold'
-                }}
-              >
-                Choose your template
-              </h1>
+        {/* Add content such as boards here */}  
+        <div>
+          <h1 
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fondWeight: 'bold'
+            }}
+          >
+            Choose your template
+          </h1>
+          <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
+            <div className="p-4 bg-white rounded shadow-md">
+            {/* <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              
+            </ul> */}
             </div>
           </div>
+        </div>
       </div>
     </div>
     </div>

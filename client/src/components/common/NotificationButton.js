@@ -176,8 +176,8 @@ const NotificationButton = () => {
             )}
         </ul>
     </div>
-        )}
-    </div>
+    )}
+  </div>
 );
 };
 

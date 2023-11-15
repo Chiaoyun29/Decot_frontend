@@ -1,29 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Palette from '../canvas/Palette';
+import { PiPencil, PiEraser, PiStickerDuotone, PiDownload, PiUploadSimpleDuotone, PiShapes } from 'react-icons/pi';
+import { RiDeleteBinLine } from 'react-icons/ri';
+import { IoCreateOutline } from 'react-icons/io5';
 
-const Sidebar = ({ setToDraw, setToErase, toggleStickyNoteMode, isStickyNoteMode, deleteCanvas, saveImageToLocal, navigateToCreateBoard, handleUpload }) => {
+const Sidebar = ({ setToDraw, setToErase, toggleStickyNoteMode, isStickyNoteMode, deleteCanvas, saveImageToLocal, navigateToCreateBoard, HandleUploadAndDisplay, showDropdown }) => {
+  const [showPalette, setShowPalette]=useState(false);
+
+  const handleTogglePalette=()=>{
+    setShowPalette(!showPalette);
+  };
+
   return (
     <div className="sidebar">
       <button className="sidebar-button" onClick={setToDraw}>
-        Draw
+        <PiPencil/>Draw
       </button>
       <button className="sidebar-button" onClick={setToErase}>
-        Erase
+        <PiEraser/>Erase
       </button>
       <button className="sidebar-button" onClick={toggleStickyNoteMode}>
-        {isStickyNoteMode ? "Exit Sticky Notes" : "Sticky Notes"}
+        <PiStickerDuotone/>{isStickyNoteMode ? "Exit Sticky Notes" : "Sticky Notes"}
       </button>
       <button className="sidebar-button" onClick={deleteCanvas}>
-        Delete
+        <RiDeleteBinLine/>Delete
       </button>
       <a className="sidebar-button" href="download_link" onClick={saveImageToLocal}>
-        Download Image
+        <PiDownload/>Download Image
       </a>
       <button className="sidebar-button" onClick={navigateToCreateBoard}>
-        Create New Board
+        <IoCreateOutline/>Create New
       </button>
-      <button className="sidebar-button" onClick={handleUpload}>
-        Upload image
+      <label htmlFor="fileInput" className="sidebar-button" onClick={HandleUploadAndDisplay}>
+        <PiUploadSimpleDuotone/>Upload Image
+      </label>
+      <button className="sidebar-button" onClick={handleTogglePalette}>
+        <PiShapes/>Insert Shapes
       </button>
+      {showPalette&&(
+        <Palette onShapeSelect={(type)=>{
+          console.log(`Selected shape: ${type}`);
+        }}/>
+      )}
+      {/* <input type="file" id="fileInput" onChange={handleFileInput} style={{ display: 'none' }}/> */}
     </div>
   );
 };

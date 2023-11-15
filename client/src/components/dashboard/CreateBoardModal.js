@@ -1,38 +1,26 @@
-import React, { useState } from 'react';
-import { createBoard, getBoards } from '../services/api';
+import React, { useState, useEffect } from 'react';
+import { createBoard } from '../services/api';
 import { useAuthContext } from '../../context/AuthContext';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
+  const { workspaceId } = useParams();
   const [boardTitle, setBoardTitle] = useState('');
   const [dtTag, setDtTag] = useState('');
   const [deadline, setDeadline] = useState(new Date());
   const [description, setDescription] = useState('');
-  //const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [boards, setBoards] = useState([]);
 
-  const { token } = useAuthContext();
-  const navigate = useNavigate();
+  const { token } = useAuthContext(); //not this
   const location=useLocation();
   const boardTitleFromState = location.state?.boardTitle; 
 
-  const fetchBoards = async () => {
-    const response = await getBoards(token);
-    if (response.status === 200) {
-      setBoards(response.workspaces);
-    } else {
-      console.error(response.error);
-    }
-  };
-
   const handleBoardSubmit = async () => {
     try {
-      const formatDeadline = deadline.toISOString();
-      // Pass the token to the createBoard function
-      const response = await createBoard(token, boardTitle, dtTag, formatDeadline, description);
-      console.log("fk u where r u",response);
+      const formatDeadline = deadline.toISOString(); //causing dateMZ
+      const response = await createBoard(token, boardTitle, dtTag, formatDeadline, description, workspaceId);
+      console.log(response);
       if (response.board) {
         const { Board } = response.board;
         // After success, clear the form
@@ -44,13 +32,13 @@ const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
         onBoardCreated();
         console.log("walao")
       } else {
-        console.error(response.error);
+        console.error("err:" + response.error);
       }
     } catch (error) {
       console.error(error);
     }
   };
-
+  
   if (!isOpen) {
     return null;
   }
@@ -103,19 +91,6 @@ const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
           <button onClick={onClose} className="ml-2 text-gray-500 hover:text-gray-600">
             Cancel
           </button>
-          {/* <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {boards.map((board) => (
-              <li key={board.id} className="p-6 border rounded-md">
-                <Link to={`/board/${board.id}`} className="block">
-                  <div className="text-lg font-medium">{board.boardTitle}</div>
-                  <div className="text-gray-600">{board.description}</div>
-                  <div className="text-gray-600">{board.dtTag}</div>
-                  <div className="text-gray-600">{board.deadline}</div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <CreateBoardModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)}  onBoardCreated={fetchBoards} /> */}
         </div>
       </div>
     </div>

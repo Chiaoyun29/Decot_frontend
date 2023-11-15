@@ -17,7 +17,7 @@ const boundBoxCallbackForCircle = (oldBox, newBox) => {
   return newBox;
 };
 
-export function Circle({ id, isSelected, type, ...shapeProps }) {
+const Circle=({ id, isSelected, type, ...shapeProps }) =>{
   const shapeRef = useRef();
   const transformerRef = useRef();
 
@@ -80,4 +80,6 @@ export function Circle({ id, isSelected, type, ...shapeProps }) {
       )}
     </>
   );
-}
+};
+
+export default Circle;
