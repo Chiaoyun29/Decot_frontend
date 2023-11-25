@@ -7,6 +7,7 @@ import SocketContext from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
 import icon_pencil from  "../../image/icon_pencil.svg";
 import CreateBoardModal from '../dashboard/CreateBoardModal';
+import ChatButton from '../chat/Chat';
 
 const MentorWorkspaceContent = () => {
   const { workspaceId, boardId } = useParams();
@@ -27,6 +28,7 @@ const MentorWorkspaceContent = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [boards, setBoards] = useState([]);
   const [board, setBoard] = useState(null);
+  const [showMessages, setShowMessages] = useState(false);
 
   const fetchBoards = async () => {
     const response = await getBoards(token, workspaceId);
@@ -317,9 +319,13 @@ const MentorWorkspaceContent = () => {
     <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
         <h2 className="text-2xl font-semibold mb-4 uppercase">{workspace.name}</h2>
         <p className="text-gray-600 mb-4">{workspace.description}</p>
-        <div className="absolute right-0 pr-10">
-          
-        </div>
+        <li
+            className="nav-item relative px-3 py-2 flex items-center text-s font-bold leading-snug text-black hover:opacity-75 z-10"
+            style={{ position: 'absolute', right: '40px', top: '100px' }}
+            onClick={() => setShowMessages(!showMessages)}
+        >
+          <ChatButton />
+        </li>
         {/* Your main content */}
         {/* Section */}
         <div className="p-4 bg-white rounded shadow-md">

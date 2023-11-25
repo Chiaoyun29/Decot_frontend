@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import { getBoardById, leaveWorkspace } from '../services/api';
+import { getBoardById } from '../services/api';
 
 const MenteeBoardContent = () => {
   const { boardId } = useParams();

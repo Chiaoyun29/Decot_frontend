@@ -3,7 +3,7 @@ import { useShapes, updateAttribute } from "./state";
 
 const shapeSelector = (state) => state.shapes[state.selected];
 
-const PropertiesPanel=() =>{
+export function PropertiesPanel() {
   const selectedShape = useShapes(shapeSelector);
 
   const updateAttr = useCallback((event) => {
@@ -51,5 +51,3 @@ const PropertiesPanel=() =>{
     </aside>
   );
 };
-
-export default PropertiesPanel;

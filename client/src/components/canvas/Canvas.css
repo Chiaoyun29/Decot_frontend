@@ -1,5 +1,9 @@
 .canvas-container {
     position: absolute;
+    margin-left: 200px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 .display_under{
     background-color: #ece75f; /* yellow */
@@ -24,7 +28,7 @@
   .sidebar-button {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     width: 100%;
     height: 50px;
     font-size: 16px;
@@ -32,6 +36,7 @@
     color: #333;
     background-color: #f9a826; /* Set the background color for the buttons */
     transition: background-color 0.3s ease;
+    padding: 0 25px;
   }
   
   .sidebar-button:hover {
@@ -39,9 +44,72 @@
   }
   
   .sidebar-button i {
-    margin-right: 8px;
+    margin-bottom: 8px;
   }
-  
-  .canvas-container {
-    margin-left: 200px; /* Adjust the left margin to accommodate the sidebar width */
+
+  .sidebar-button span{
+    margin-left: 12px;
   }
+
+  .note-form{
+    display: middle;
+    flex-direction: column;
+    width: 200px;
+    margin: 0 auto;
+  }
+
+  .note-form button:hover {
+    background-color: tomato;
+    color: white;
+  }
+
+  .note-form textarea{
+    font-family: Arial, sans-serif;
+    border: 1px solid gray;
+    min-width: 100%;
+    max-width: 100%;
+    height: 100px;
+    padding: 10px;
+    outline: none;
+  }
+
+  .note-form button{
+    width: 100%;
+    background-color: #fff27f;
+    cursor: pointer;
+    padding: 10px;
+    border: 0;
+    outline: none;
+  }
+
+  .note{
+    position: absolute;
+    cursor: pointer;
+    background-image: url('https://github.com/Chiaoyun29/Decot_frontend/blob/add_board_and_chat/client/src/image/stickyNote.png');
+    background-size: cover;
+    top: 100px;
+    left: 300px;
+    height: 200px;
+    width: 200px;
+    padding: 20px;
+  }
+
+  .note .text {
+    font-family: Arial, sans-serif;
+    height: 100%;
+    width: 100%;
+    white-space: pre-wrap;
+    overflow-y: scroll;
+  }
+
+  .note .close {
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    right: 15px;
+    transition: transform .3s ease;
+  }
+
+  .note .close:hover {
+    transform: scale(1.6);
+}

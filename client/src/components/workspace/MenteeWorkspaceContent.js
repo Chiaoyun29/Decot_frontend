@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext} from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import { getWorkspaceById, leaveWorkspace, getWorkspaceMembers,} from '../services/api';
+import { getWorkspaceById, leaveWorkspace, getWorkspaceMembers,getBoards } from '../services/api';
 import CustomModal from '../common/CustomModal';
 import SocketContext from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
+import ChatButton from '../chat/Chat';
 
 const MenteeWorkspaceContent = () => {
   const { workspaceId } = useParams();
@@ -18,6 +19,22 @@ const MenteeWorkspaceContent = () => {
   const { user } = useAuthContext();
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const navigate = useNavigate();
+  const [boards, setBoards] = useState([]);
+  const [showMessages, setShowMessages] = useState(false);
+
+  const fetchBoards = async () => {
+    const response = await getBoards(token, workspaceId);
+    console.log(response);
+    if (response.status === 200) {
+      setBoards(response.boards);
+    } else {
+      console.error(response.error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBoards();
+  }, [workspaceId, token]);
 
   useEffect(() => {
     const fetchWorkspace = async () => {
@@ -90,8 +107,7 @@ const MenteeWorkspaceContent = () => {
   }
 
   return (
-      <div className="flex flex-col h-screen bg-gray-100">
-
+    <div className="flex flex-col h-screen bg-gray-100">
       {/* Fixed Sidebar for managing workspace */}
       <div className="flex flex-grow overflow-hidden">
       <div className="w-1/4 h-full bg-white shadow-lg p-4 overflow-y-auto">
@@ -203,21 +219,49 @@ const MenteeWorkspaceContent = () => {
     <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
         <h2 className="text-2xl font-semibold mb-4 uppercase">{workspace.name}</h2>
         <p className="text-gray-600 mb-4">{workspace.description}</p>
-
+        <li
+            className="nav-item relative px-3 py-2 flex items-center text-s font-bold leading-snug text-black hover:opacity-75 z-10"
+            style={{ position: 'absolute', right: '40px', top: '100px' }}
+            onClick={() => setShowMessages(!showMessages)}
+        >
+          <ChatButton />
+        </li>
         {/* Your main content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Section */}
-          <div className="p-4 bg-white rounded shadow-md">
-            {/* ... content for section 1 ... */}
-          </div>
-          {/* Section */}
-          <div className="p-4 bg-white rounded shadow-md">
-            {/* ... content for section 2 ... */}
-          </div>
+        {/* Section */}
+        <div className="p-4 bg-white rounded shadow-md">
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {boards.map((board) => (
+              <li key={board.id} className="p-15 border rounded-md">
+                <Link to={`board/${board.id}`} className="block" //need to do modi for linkage
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <div className="text-center font-medium">{board.boardTitle}</div>
+                  <div className="text-center text-gray-600">{board.description}</div>
+                  <div className="text-center text-gray-600">{board.dtTag}</div>
+                  <div className="text-center text-gray-600">
+                    {(board.deadline).toLocaleString('en-US',{
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false,
+                      timeZone: 'auto',
+                    })}
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
-  </div>
-  </div>
-  </div>
+        {/* Section */}
+        {/* <div className="p-4 bg-white rounded shadow-md">
+          {/* ... content for section 2 ... */}
+      </div>
+    </div>
+    </div>
   );
 };
 

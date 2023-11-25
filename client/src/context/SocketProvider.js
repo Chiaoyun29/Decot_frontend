@@ -9,6 +9,7 @@ const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const { user } = useAuthContext();
   const notificationCallbacksRef = useRef([]);
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     if (user && user.id) {

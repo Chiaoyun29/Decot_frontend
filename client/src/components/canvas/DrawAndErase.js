@@ -1,6 +1,5 @@
 import './Canvas.css';
 import React from 'react';
-import { createBoard } from '../services/api';
 
 const DrawAndErase=({
     drawingCanvasRef,
@@ -24,13 +23,12 @@ const DrawAndErase=({
     if(!isDrawing||isStickyNoteMode) {
         return;
     }
-    
-    const {offsetX, offsetY} = nativeEvent;
-    drawingContextRef.current.lineTo(offsetX, offsetY);
-    drawingContextRef.current.stroke();
-    setIsChanged(true);
-    //saveCanvasData(drawingCanvasRef.current.toDataURL('image/png'));
-    nativeEvent.preventDefault();
+        const {offsetX, offsetY} = nativeEvent;
+        drawingContextRef.current.lineTo(offsetX, offsetY);
+        drawingContextRef.current.stroke();
+        setIsChanged(true);
+        //saveCanvasData(drawingCanvasRef.current.toDataURL('image/png'));
+        nativeEvent.preventDefault();
     };
 
     const stopDrawing = () => {
