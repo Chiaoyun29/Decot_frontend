@@ -40,6 +40,12 @@ const SocketProvider = ({ children }) => {
     }
   }, [user, setSocket]);
 
+  const sendMessage=(recipientId, message)=>{
+    if(socket){
+      socket.emit('chatMessage', {recipientId: user.id, message});
+    }
+  };
+
   const value = useMemo(
     () => ({
       socket,
@@ -50,6 +56,7 @@ const SocketProvider = ({ children }) => {
       removeNotificationCallback: (callback) => {
         notificationCallbacksRef.current = notificationCallbacksRef.current.filter(c => c !== callback);
       },
+      sendMessage,
     }),
     [socket, notifications]
   );

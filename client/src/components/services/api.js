@@ -600,9 +600,9 @@ export const uploadProfilePic = async (userId, file) => {
     throw error;
   }
 };
-export const createCanvas = async (token, boardId, canvasName) => {
+export const createCanvas = async (token, boardId, workspaceId, canvasName ) => {
   try {
-    const response = await fetch(`${API_URL}/canvas/board/${boardId}/create`, {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -622,9 +622,9 @@ export const createCanvas = async (token, boardId, canvasName) => {
   }
 };
 
-export const getCanvases = async (token, boardId) => {
+export const getCanvases = async (token, boardId, workspaceId) => {
   try {
-    const response = await fetch(`${API_URL}/canvas/board/${boardId}`, {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -640,9 +640,9 @@ export const getCanvases = async (token, boardId) => {
   }
 };
 
-export const getCanvasById = async (token, boardId, canvasId) => {//open to Canvas.js
+export const getCanvasById = async (token, boardId, canvasId, workspaceId) => {//open to Canvas.js
   try {
-    const response = await fetch(`${API_URL}/canvas/board/${boardId}/canvas/${canvasId}`, {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -657,9 +657,9 @@ export const getCanvasById = async (token, boardId, canvasId) => {//open to Canv
     return { error: 'Failed to retrieve canvas', status: 0 };
   }
 };
-export const updateCanvas = async (token, boardId, updatedData, canvasId) => {//for modify purpose
+export const updateCanvas = async (token, boardId, updatedData, canvasId, workspaceId) => {//for modify purpose
   try {
-    const response = await fetch(`${API_URL}/canvas/board/${boardId}/canvas/${canvasId}`, {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -677,9 +677,9 @@ export const updateCanvas = async (token, boardId, updatedData, canvasId) => {//
   }
 };
 
-export const deleteCanvas = async (token, boardId, canvasId) => {
+export const deleteCanvas = async (token, boardId, canvasId, workspaceId) => {
   try {
-    const response = await fetch(`${API_URL}/canvas/board/${boardId}/canvas/${canvasId}`, {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,

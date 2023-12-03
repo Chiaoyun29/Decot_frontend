@@ -1,5 +1,6 @@
 import './Canvas.css';
 import React from 'react';
+import GridLines from './GridLines';
 
 const DrawAndErase=({
     drawingCanvasRef,

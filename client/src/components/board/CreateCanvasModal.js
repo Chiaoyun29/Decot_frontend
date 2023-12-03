@@ -4,14 +4,14 @@ import { useAuthContext } from '../../context/AuthContext';
 import { useParams } from 'react-router-dom';
 
 const CreateCanvasModal = ({ isOpen, onClose, onCanvasCreated }) => {
-  const { boardId } = useParams();
+  const { boardId, workspaceId } = useParams();
   const [canvasName, setCanvasName] = useState('');
 
   const { token } = useAuthContext();
 
   const handleCanvasSubmit = async () => {
     try {
-      const response = await createCanvas(token, boardId, canvasName);
+      const response = await createCanvas(token, boardId, workspaceId, canvasName);
       console.log(response);
       if (response.canvas) {
         // After success, clear the form

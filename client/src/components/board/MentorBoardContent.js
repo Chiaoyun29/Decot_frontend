@@ -18,13 +18,12 @@ const MentorBoardContent = () => {
   const [editedDescription, setEditedDescription] = useState('');
   const [editeddtTag, setEditeddtTag] = useState('');
   const [editedDeadline, setEditedDeadline] = useState('');
-  const [canvas, setCanvas] = useState([]);
   const [showCanvas, setShowCanvas] = useState(false);
   const navigate = useNavigate();
   const [canvases, setCanvases] = useState([]);
 
   const fetchCanvases = async () => {
-    const response = await getCanvases(token, boardId);
+    const response = await getCanvases(token, boardId, workspaceId);
     console.log(response);
     if (response.status === 200) {
       setCanvases(response.canvases);
@@ -35,7 +34,7 @@ const MentorBoardContent = () => {
 
   useEffect(() => {
     fetchCanvases();
-  }, [boardId, token]);
+  }, [boardId, workspaceId, token]);
 
   useEffect(() => {
     const fetchBoard = async () => {
@@ -146,7 +145,7 @@ const MentorBoardContent = () => {
       </div>
       <p className="mb-2 text-sm text-gray-600">{board.description}</p>
       <p className="mb-2 text-sm text-gray-600">{board.dtTag}</p>
-      <p className="mb-2 text-sm text-gray-600">{board.deadline}</p>
+      <p className="mb-2 text-sm text-gray-600">{new Date(board.deadline).toLocaleString()}</p>
     </div>
   )}
 

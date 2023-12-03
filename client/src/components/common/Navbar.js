@@ -85,9 +85,6 @@ const Navbar = (props) => {
             <li className="nav-item relative px-3 py-2 flex items-center text-s font-bold leading-snug text-black hover:opacity-75 z-10">
               <FeedbackButton />
             </li>
-            {/* <li className="nav-item relative px-3 py-2 flex items-center text-s font-bold leading-snug text-black hover:opacity-75 z-10" onClick={() => setShowMessages(!showMessages)}>
-              <ChatButton />
-            </li> */}
           </ul>
         </div>
       </div>

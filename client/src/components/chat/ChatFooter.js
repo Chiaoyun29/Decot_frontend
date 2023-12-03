@@ -1,17 +1,18 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { createMessage } from '../services/api';
 import { useParams } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import SocketContext from '../../context/SocketContext';
+import SocketContext from '../../context/SocketContext.js';
 
-const ChatFooter=()=>{
+const ChatFooter=({ setMessages })=>{
     const [message, setMessage]=useState([]);
     const { workspaceId, messageId, userId } = useParams();
-    const [messages, setMessages]=useState([]);
+    // const [messages, setMessages]=useState([]);
     const { token } = useAuthContext();
     const { socket } = useContext(SocketContext);
 
-    const sendMessage = () => {
+    const sendMessage = (e) => {
+        e.preventDefault();
         const newMessage={
             id: messageId,
             message,
@@ -31,6 +32,19 @@ const ChatFooter=()=>{
           console.error('Error sending message:', error);
         }
     }; 
+    useEffect(()=>{
+        if(socket){
+            console.log('Socket connected!');
+            socket.on('new_message', (data)=>{
+                setMessages((prevMessages)=>[...prevMessages, data]);
+            });
+        }
+        return()=>{
+            if(socket){
+                socket.off('new_message');
+            }
+        };
+    }, [socket]);
 
     return(
         <div className="chat_footer">

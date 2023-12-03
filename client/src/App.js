@@ -8,7 +8,7 @@ import HomePage from './pages/HomePage';
 import WorkspaceContent from './components/workspace/WorkspaceContent';
 import BoardContent from './components/board/BoardContent';
 import Canvas from './components/canvas/Canvas';
-import Chat from './components/chat/Chat';
+import Chat from './components/chat/ChatDropdown';
 import "./App.css";
 import { ToastContainer } from 'react-toastify';
 import SocketProvider from './context/SocketProvider';
@@ -30,7 +30,7 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/workspace/:workspaceId" element={<WorkspaceContent />} />
                 <Route path="/workspace/:workspaceId/board/:boardId" element={<BoardContent />} />
-                <Route path="/board/:boardId/canvas" element={<Canvas />} />
+                <Route path="/workspace/:workspaceId/board/:boardId/canvas/:canvasId" element={<Canvas />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/profile" element={<Profile />} />
               </Routes>

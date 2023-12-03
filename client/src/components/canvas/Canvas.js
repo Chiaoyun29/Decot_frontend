@@ -2,25 +2,22 @@ import './Canvas.css';
 import React, {useEffect, useRef, useState, useCallback} from 'react';
 import Sidebar from './Sidebar';
 import GridLines from './GridLines';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuthContext } from '../../context/AuthContext';
 import DrawAndErase from './DrawAndErase';
 import StickyNote from './StickyNote';
 import { PropertiesPanel } from './PropertiesPanel';
-import { Layer, Stage } from "react-konva";
-import { useShapes, createCircle, createRectangle, clearSelection } from "./state";
-import { DRAG_DATA_KEY, SHAPE_TYPES } from "./constants";
-import Shape from "./Shape";
-
-const handleDragOver = (event)=>event.preventDefault();
+import { useShapes } from "./state";
+import ShapeCanvas from "./ShapeCanvas";
+import AddText from './AddText';
 
 const Canvas = () => {
+  const { boardId, workspaceId, canvasId } = useParams();
   const drawingCanvasRef = useRef(null);
   const drawingContextRef = useRef(null);
   const gridCanvasRef = useRef(null);
   const stickyNoteCanvasRef = useRef(null);
-  const stickyNoteContextRef = useRef(null);
   const saveInterval = useRef(null);
   const shapeCanvasRef = useRef(null);
   const shapeContextRef = useRef(null);
@@ -34,10 +31,12 @@ const Canvas = () => {
   const shapes = useShapes((state)=>Object.entries(state.shapes));
   const [isAddingShape, setIsAddingShape] = useState(false);
   const stageRef=useRef(null);
+  const [isAddingTextbox, setIsAddingTextbox] = useState(false);
+  const textboxRef = useRef(null);
   
   useEffect(()=>{
     if(user){
-      navigate('/canvas')
+      navigate(`/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`)
     }
   })
   useEffect(() => {
@@ -118,41 +117,36 @@ const Canvas = () => {
 
   const handleAddingShape=()=>{
     setIsAddingShape(!isAddingShape);
-    handleDrop();
   };
 
-  // const addShape = (event)=>{
-  //   event.preventDefault();
-  //   console.log('Shape added:', event.target.elements[0].value);
-  //   setIsAddingShape(false);
-  // };
+  const addShape = (event)=>{
+    event.preventDefault();
+    console.log('Shape added:', event.target.elements[0].value);
+    setIsAddingShape(false);
+  };
 
-  const handleDrop = useCallback((event)=>{
-    const draggedData = event.nativeEvent.dataTransfer.getData(DRAG_DATA_KEY);
-    if(draggedData){
-      const{ offsetX, offsetY, type, clientHeight, clientWidth }=JSON.parse(draggedData);
-      stageRef.current.setPointersPositions(event);
-      const coords = stageRef().current.getPointerPosition();
-      if(type===SHAPE_TYPES.RECT){
-        createRectangle({
-          X: coords.X - offsetX,
-          y: coords.y - offsetY,
-          width: clientWidth,  // Add width and height properties if needed
-          height: clientHeight,
-        });
-      }else if(type===SHAPE_TYPES.CIRCLE){
-        createCircle({
-          x: coords.x - (offsetX - clientWidth / 2),
-          y: coords.y - (offsetY - clientHeight / 2),
-          radius: clientWidth/2,
-        });
-      }
-    }
-  }, []);
+  const handleAddingTextbox=()=>{
+    setIsAddingTextbox(!isAddingTextbox);
+  };
+
+  const addText = (event)=>{
+    event.preventDefault();
+    console.log('Text added:', event.target.elements[0].value);
+    setIsAddingTextbox(false);
+  };
 
   return (
     <div>
-      <GridLines gridCanvasRef={gridCanvasRef} />
+      <Sidebar
+        setToDraw={setToDraw}
+        setToErase={setToErase}
+        handleAddingNote={handleAddingNote}
+        deleteCanvas={deleteCanvas}
+        saveImageToLocal={saveImageToLocal}
+        HandleUploadAndDisplay={HandleUploadAndDisplay}
+        handleAddingShape={handleAddingShape}
+        handleAddingTextbox={handleAddingTextbox}
+      />
       <DrawAndErase 
         drawingCanvasRef={drawingCanvasRef}
         drawingContextRef={drawingContextRef}
@@ -168,28 +162,21 @@ const Canvas = () => {
           addNote={addNote}
         />
       )}
-      <Sidebar
-        setToDraw={setToDraw}
-        setToErase={setToErase}
-        handleAddingNote={handleAddingNote}
-        deleteCanvas={deleteCanvas}
-        saveImageToLocal={saveImageToLocal}
-        HandleUploadAndDisplay={HandleUploadAndDisplay}
-        handleAddingShape={handleAddingShape}
+      {isAddingShape&&(
+        <ShapeCanvas 
+          stageRef={stageRef}
+          handleAddingShape={handleAddingShape}
+          addShape={addShape}
       />
-      {/* <canvas className="canvas-container" onDrop={handleDrop} onDragOver={handleDragOver}>
-        <Stage
-          ref={stageRef}
-          onClick={clearSelection}
-        >
-          <Layer>
-            {shapes.map(([key, shape]) => (
-              <Shape key={key} shape={{ ...shape, id: key }} />
-            ))}
-          </Layer>
-        </Stage>
-      </canvas> */}
-      <PropertiesPanel />
+      )}
+      {isAddingTextbox&&(
+        <AddText 
+          textboxRef={textboxRef}
+          handleAddingTextbox={handleAddingTextbox}
+          AddText={addText}
+      />
+      )}
+      {/* <PropertiesPanel />*/}
     </div>
   );
 };

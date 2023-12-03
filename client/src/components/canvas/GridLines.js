@@ -51,11 +51,14 @@ const GridLines=({ drawingCanvasRef })=>{
     },[drawingCanvasRef]);
 
     return(
+      <div className="canvas">
         <canvas
-        className="grid-container"
-        ref={gridCanvasRef}
-        style={{ position: 'absolute' }}
-      />
+          className="grid-container"
+          ref={gridCanvasRef}
+          style={{ position: 'absolute' }}
+        />
+      </div>
+
     );
 };
 
