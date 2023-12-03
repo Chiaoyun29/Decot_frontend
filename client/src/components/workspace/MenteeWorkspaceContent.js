@@ -15,7 +15,8 @@ const MenteeWorkspaceContent = () => {
   const [isManageMembersModalOpen, setIsManageMembersModalOpen] = useState(false);
   const [workspaceMembers, setWorkspaceMembers] = useState([]);
   const { socket, addNotificationCallback, removeNotificationCallback } = useContext(SocketContext);
-  const [isCopied, setIsCopied] = useState(false);
+  const [isCodeCopied, setIsCodeCopied] = useState(false);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
   const { user } = useAuthContext();
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -78,9 +79,18 @@ const MenteeWorkspaceContent = () => {
   const handleCopyCode = async () => {
     try {
       await navigator.clipboard.writeText(workspace.joinToken);
-      setIsCopied(true); // Set isCopied to true
+      setIsCodeCopied(true); // Set isCopied to true
     } catch (err) {
       console.error('Failed to copy text: ', err);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(workspace.inviteLink);
+      setIsLinkCopied(true);
+    } catch (err) {
+      console.error('Failed to copy link: ', err);
     }
   };
 
@@ -126,7 +136,7 @@ const MenteeWorkspaceContent = () => {
             onClick={() => setIsModalOpen(true)}
             className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
           >
-            Share Code
+            Invite Others
           </button>
 
           {/* View members */}
@@ -152,23 +162,52 @@ const MenteeWorkspaceContent = () => {
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          setIsCopied(false); // Reset isCopied state when modal is closed
+          setIsCodeCopied(false);
+          setIsLinkCopied(false);
         }}
         title="Invite Others"
-        message="Share this code with others you want to invite:"
+        message="Share this code/link with others you want to invite:"
+        modalStyle={{ minWidth: '500px' }} // Add a modalStyle prop if your CustomModal supports it
       >
-        <div className="flex items-center">
-          <span className="mr-4">{workspace.joinToken}</span>
-          <button
-            onClick={handleCopyCode}
-            className={
-              isCopied
-                ? "px-4 py-2 font-semibold bg-green-500 text-white rounded-md"
-                : "px-4 py-2 font-semibold rounded-md bg-gray-100"
-            } // Modify the class names based on isCopied state
-          >
-            {isCopied ? "Copied!" : "Copy Code"}
-          </button>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              readOnly
+              value={workspace.joinToken}
+              className="flex-1 p-2 border border-gray-300 rounded-md"
+              onClick={(e) => e.target.select()}
+            />
+            <button
+              onClick={handleCopyCode}
+              className={
+                isCodeCopied
+                  ? "px-4 py-2 font-semibold bg-green-500 text-white rounded-md"
+                  : "px-4 py-2 font-semibold rounded-md bg-gray-100"
+              }
+            >
+              {isCodeCopied ? "Copied!" : "Copy Code"}
+            </button>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              readOnly
+              value={workspace.inviteLink}
+              className="flex-1 p-2 border border-gray-300 rounded-md"
+              onClick={(e) => e.target.select()}
+            />
+            <button
+              onClick={handleCopyLink}
+              className={
+                isLinkCopied
+                  ? "px-4 py-2 font-semibold bg-green-500 text-white rounded-md"
+                  : "px-4 py-2 font-semibold rounded-md bg-gray-100"
+              }
+            >
+              {isLinkCopied ? "Copied!" : "Copy Link"}
+            </button>
+          </div>
         </div>
       </CustomModal>
     </div>

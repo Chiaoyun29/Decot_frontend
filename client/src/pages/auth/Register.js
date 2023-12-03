@@ -6,20 +6,20 @@ import logo from "../../image/DECOT.png";
 import { Link } from 'react-router-dom';
 import './auth.css';
 import { useAuthContext } from '../../context/AuthContext';
-import g_sign_up from  "../../image/google_sign_up.png";
+import g_sign_up from "../../image/google_sign_up.png";
 
 const Register = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [role, setRole] = useState('mentor'); 
+    const [role, setRole] = useState('mentor');
     const [message, setMessage] = useState('');
     const [messageTitle, setMessageTitle] = useState('');
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [roleModalIsOpen, setRoleModalIsOpen] = useState(false);
     const navigate = useNavigate();
-    const {user, setUser, setToken } = useAuthContext();
+    const { user, setUser, setToken } = useAuthContext();
 
     const handleRegister = async () => {
         if (password !== confirmPassword) {
@@ -28,10 +28,10 @@ const Register = () => {
             setModalIsOpen(true);
             return;
         }
-    
+
         try {
             const response = await registerUser(username, email, password, role);
-    
+
             if (response.status === 201) {
                 setMessageTitle("Congratulations");
                 setMessage('You have been registered successfully!');
@@ -58,43 +58,53 @@ const Register = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const userJSON = urlParams.get('user');
-        console.log(token)
-        
-        // Check if both token and user parameters exist in the URL
-        if (token && userJSON) {
-            const user = JSON.parse(userJSON);
-            console.log(user)
-    
-            if (user && user.email) {
+
+        // Check for Google login redirect
+        const postLoginRedirect = JSON.parse(sessionStorage.getItem('postLoginRedirect'));
+        if (postLoginRedirect?.from === 'joinWorkspace' && postLoginRedirect?.token) {
+            if (token && userJSON) {
+                const user = JSON.parse(userJSON);
+                console.log("wth hell user@!")
+                console.log(user)
                 setUser(user);
-                setToken(token); 
-                if (user.role === null) {
+                setToken(token);
+
+                if (user?.role === null) {
                     setRoleModalIsOpen(true);
                 } else {
-                    navigate("/dashboard");
+                    navigate(`/join/${postLoginRedirect.token}`);
                 }
-            } else {
-                setMessageTitle("Error!");
-                setMessage('Failed to get user data from Google');
-                setModalIsOpen(true);
             }
         }
-    
-        // Since the dependencies array includes navigate, setUser, and setToken, the useEffect will only re-run if any of these change, which is unlikely in this context.
+
+        // Normal login process
+        else if (!postLoginRedirect && token && userJSON) {
+            const user = JSON.parse(userJSON);
+
+            setUser(user);
+            setToken(token);
+
+            if (user?.role === null) {
+                setRoleModalIsOpen(true);
+            } else {
+                navigate("/dashboard");
+            }
+        }
     }, [navigate, setToken, setUser]);
 
     const handleGoogleRegister = async () => {
         authenticateWithGoogle();
     };
-    
+
     const handleRoleSelection = async (selectedRole) => {
         setRole(selectedRole);
         setRoleModalIsOpen(false);
 
         try {
             const data = await updateUserRole(user.email, selectedRole);
-    
+
             if (data) {
+                setUser(data.user);
                 setMessageTitle("Registered Successfully");
                 setMessage('You have been registered successfully with your google account!');
                 setModalIsOpen(true);
@@ -109,14 +119,14 @@ const Register = () => {
             setModalIsOpen(true);
         }
     };
-    
+
     return (
         <div className="bg-blend-darken bg flex flex-col items-center min-h-screen pt-6 sm:justify-center sm:pt-0 bg-black-800">
             <div className="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-lg sm:rounded-lg">
                 <div className="flex flex-col items-center">
-                  <Link to="/Decot_frontend">
-                    <img src={logo} alt="logo" className="w-1/4 h-1/4 m-auto pt-5" />
-                  </Link>
+                    <Link to="/Decot_frontend">
+                        <img src={logo} alt="logo" className="w-1/4 h-1/4 m-auto pt-5" />
+                    </Link>
                 </div>
                 <input
                     type="text"
@@ -150,39 +160,39 @@ const Register = () => {
                     Choose Role:<br />
                     <label>
                         <input
-                        type="radio"
-                        value="mentor"
-                        checked={role === 'mentor'}
-                        onChange={(e) => setRole(e.target.value)}
-                        className="mr-1"
+                            type="radio"
+                            value="mentor"
+                            checked={role === 'mentor'}
+                            onChange={(e) => setRole(e.target.value)}
+                            className="mr-1"
                         />
                         Mentor
                     </label>
                     <label>
                         <input
-                        type="radio"
-                        value="mentee"
-                        checked={role === 'mentee'}
-                        onChange={(e) => setRole(e.target.value)}
-                        className="mr-1"
+                            type="radio"
+                            value="mentee"
+                            checked={role === 'mentee'}
+                            onChange={(e) => setRole(e.target.value)}
+                            className="mr-1"
                         />
                         Mentee
                     </label>
-                    </div>
+                </div>
                 <br></br>
                 <div className="w-full flex justify-center mt-4">
                     <button onClick={handleRegister} className="w-40 px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-blue-700 focus:outline-none">
                         Register
                     </button>
                 </div>
-               <div className="flex flex-col items-center mt-4 space-y-2">
-                    <div className="w-full h-px bg-gray-300"></div> 
+                <div className="flex flex-col items-center mt-4 space-y-2">
+                    <div className="w-full h-px bg-gray-300"></div>
                     <p className="text-xs text-gray-600">Or Register With</p>
-                    <button 
-                        onClick={handleGoogleRegister} 
+                    <button
+                        onClick={handleGoogleRegister}
                         className="mt-4 px-2 py-2 bg-white border border-gray-300 rounded-full hover:bg-blue-100 focus:outline-none"
                     >
-                        <img 
+                        <img
                             src={g_sign_up}
                             alt="Register with Google"
                             className="w-40 h-auto"  // Adjust w-24 to the width you want. h-auto will maintain aspect ratio.
@@ -192,9 +202,9 @@ const Register = () => {
                 <div className="mt-4 text-grey-600 text-xs">
                     Already have an account?{" "}
                     <span>
-                      <Link to="/login" className="underline-offset-0 text-indigo-600 hover:underline">
-                       Click here to login
-                      </Link>
+                        <Link to="/login" className="underline-offset-0 text-indigo-600 hover:underline">
+                            Click here to login
+                        </Link>
                     </span>
                 </div>
                 <CustomModal
@@ -214,9 +224,16 @@ const Register = () => {
                     {messageTitle === "Registered Successfully" && (
                         <button
                             className="mt-4 px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-700 focus:outline-none"
-                            onClick={() => navigate("/dashboard")}
+                            onClick={() => {
+                                const postLoginRedirect = JSON.parse(sessionStorage.getItem('postLoginRedirect'));
+                                if (postLoginRedirect?.from === 'joinWorkspace' && postLoginRedirect?.token) {
+                                    navigate(`/join/${postLoginRedirect.token}`);
+                                } else {
+                                    navigate("/dashboard");
+                                }
+                            }}
                         >
-                            Direct to dashboard
+                            Proceed
                         </button>
                     )}
                 </CustomModal>
