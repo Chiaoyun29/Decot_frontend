@@ -1,10 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { createWorkspace } from '../services/api';
 import { useAuthContext } from '../../context/AuthContext';
+import SocketContext from '../../context/SocketContext';
 
 const CreateWorkspaceModal = ({ isOpen, onClose, onWorkspaceCreated }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const { socket} = useContext(SocketContext);
 
   // Access the token from AuthContext
   const { token } = useAuthContext();
@@ -25,6 +27,7 @@ const CreateWorkspaceModal = ({ isOpen, onClose, onWorkspaceCreated }) => {
       const response = await createWorkspace(token, name, description, color);
       if (response.workspace) {
         const { workspace } = response;
+        socket.emit('userAction', { action: 'createWorkspace' });
         const joinLink = `${window.location.origin}/workspace/join/${workspace.joinToken}`;
         // After success, clear the form
         setName('');

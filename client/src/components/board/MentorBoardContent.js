@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import { getBoardById, updateBoard, deleteBoard } from '../services/api';
+import { getBoardById, updateBoard, deleteBoard, getCanvases } from '../services/api';
 import CustomModal from '../common/CustomModal';
 import icon_pencil from  "../../image/icon_pencil.svg";
-import Canvas from '../canvas/Canvas'
+import Canvas from '../canvas/Canvas';
+import CreateCanvasModal from '../board/CreateCanvasModal';
 
 const MentorBoardContent = () => {
-  const { boardId, workspaceId } = useParams();
+  const { boardId, workspaceId, canvasId } = useParams();
   const [board, setBoard] = useState(null);
-  //const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { token } = useAuthContext();
   const [isEditing, setIsEditing] = useState(false);
@@ -17,9 +18,23 @@ const MentorBoardContent = () => {
   const [editedDescription, setEditedDescription] = useState('');
   const [editeddtTag, setEditeddtTag] = useState('');
   const [editedDeadline, setEditedDeadline] = useState('');
-  //const [boards, setBoards] = useState([]);
   const [showCanvas, setShowCanvas] = useState(false);
   const navigate = useNavigate();
+  const [canvases, setCanvases] = useState([]);
+
+  const fetchCanvases = async () => {
+    const response = await getCanvases(token, boardId, workspaceId);
+    console.log(response);
+    if (response.status === 200) {
+      setCanvases(response.canvases);
+    } else {
+      console.error(response.error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCanvases();
+  }, [boardId, workspaceId, token]);
 
   useEffect(() => {
     const fetchBoard = async () => {
@@ -130,7 +145,7 @@ const MentorBoardContent = () => {
       </div>
       <p className="mb-2 text-sm text-gray-600">{board.description}</p>
       <p className="mb-2 text-sm text-gray-600">{board.dtTag}</p>
-      <p className="mb-2 text-sm text-gray-600">{board.deadline}</p>
+      <p className="mb-2 text-sm text-gray-600">{new Date(board.deadline).toLocaleString()}</p>
     </div>
   )}
 
@@ -168,30 +183,34 @@ const MentorBoardContent = () => {
       </div>
 
       {/* Main content container */}
-      <div className="w-3/4">
-        {/* Add content such as boards here */}  
-        <div>
-          <h1 
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              fondWeight: 'bold'
-            }}
-          >
-            Choose your template
-          </h1>
-          <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
-            <div className="p-4 bg-white rounded shadow-md">
-            {/* <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              
-            </ul> */}
-            </div>
+      <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
+        <div className="p-4 bg-white rounded shadow-md">
+          <div style={{ textAlign: 'right' }}>
+            <button
+              onClick={() => setModalIsOpen(true)}
+              className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-yellow-200 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+            >
+              Create New Canvas
+            </button>
           </div>
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {canvases.map((canvas) => (
+              <li key={canvas.id} className="p-15 border rounded-md">
+                <Link to={`canvas/${canvas.id}`} className="block" //need to do modi for linkage
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <div className="text-center font-medium">{canvas.canvasName}</div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <CreateCanvasModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)}  onCanvasCreated={fetchCanvases} />
         </div>
       </div>
     </div>
-    </div>
+  </div>
   );
 };
 

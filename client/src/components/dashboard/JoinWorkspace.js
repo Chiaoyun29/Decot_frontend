@@ -1,15 +1,18 @@
 import React, { useState, useContext } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import { joinWorkspace } from '../services/api';
+import SocketContext from '../../context/SocketContext';
 
 const JoinWorkspace = ({ onWorkspaceJoined }) => {
   const [joinToken, setJoinToken] = useState('');
   const { token } = useAuthContext();
+  const { socket } = useContext(SocketContext);
   
   const handleJoin = async () => {
     const response = await joinWorkspace(token, joinToken);
     if (response.message) {
       if (onWorkspaceJoined) {
+        socket.emit('userAction', { action: 'joinWorkspace' });
         onWorkspaceJoined();
       }
     } else {

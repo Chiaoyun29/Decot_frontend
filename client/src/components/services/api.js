@@ -311,7 +311,6 @@ export const createBoard = async (token, boardTitle, dtTag, deadline, descriptio
       },
       body: JSON.stringify({ boardTitle, dtTag, deadline, description }),
     });
-    //console.log(token);
     console.log(workspaceId, deadline);
     console.log("create board: " + JSON.stringify(response));
     
@@ -334,6 +333,7 @@ export const getBoards = async (token, workspaceId) => {
       },
     });
     console.log(workspaceId);
+    //console.log(token);
     console.log(response);
     const data = await response.json();
     return { ...data, status: response.status };
@@ -472,9 +472,10 @@ export const getAllMessages = async (token, workspaceId) => {
   }
 };
 
-export const deleteMessage = async (token, messageId) => {
+export const deleteMessage = async (token, messageId, workspaceId) => {
   try {
-    const response = await fetch(`${API_URL}/message/${messageId}`, {
+    console.log(workspaceId)
+    const response = await fetch(`${API_URL}/message/${workspaceId}/${messageId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -599,4 +600,97 @@ export const uploadProfilePic = async (userId, file) => {
     throw error;
   }
 };
+export const createCanvas = async (token, boardId, workspaceId, canvasName ) => {
+  try {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ canvasName }),
+    });
+    console.log(token);
+    console.log("create canvas: " + JSON.stringify(response));
+    
+    const data = await response.json();
+    return { ...data, status: response.status };
 
+  } catch (error) {
+    console.error('Failed to create canvas:', error);
+    return { error: 'Failed to create canvas', status: 0 };
+  }
+};
+
+export const getCanvases = async (token, boardId, workspaceId) => {
+  try {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    console.log(response);
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to retrieve canvas:', error);
+    return { error: 'Failed to retrieve canvas', status: 0 };
+  }
+};
+
+export const getCanvasById = async (token, boardId, canvasId, workspaceId) => {//open to Canvas.js
+  try {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to retrieve canvas:', error);
+    return { error: 'Failed to retrieve canvas', status: 0 };
+  }
+};
+export const updateCanvas = async (token, boardId, updatedData, canvasId, workspaceId) => {//for modify purpose
+  try {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedData),
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to update canvas:', error);
+    return { error: 'Failed to update canvas', status: 0 };
+  }
+};
+
+export const deleteCanvas = async (token, boardId, canvasId, workspaceId) => {
+  try {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to delete canvas:', error);
+    return { error: 'Failed to delete canvas', status: 0 };
+  }
+};
