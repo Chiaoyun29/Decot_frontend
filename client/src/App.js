@@ -14,6 +14,7 @@ import { ToastContainer } from 'react-toastify';
 import SocketProvider from './context/SocketProvider';
 import 'react-toastify/dist/ReactToastify.css';
 import Profile from "./pages/profile/Profile"
+import JoinWorkspacePage from './pages/JoinWorkspacePage'
 
 const App = () => {
   return (
@@ -33,6 +34,7 @@ const App = () => {
                 <Route path="/canvas" element={<Canvas />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/join/:token" element={<JoinWorkspacePage />} />
               </Routes>
             </SocketProvider>
           </AuthProvider>
