@@ -3,9 +3,10 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getBoardById, updateBoard, deleteBoard, getCanvases } from '../services/api';
 import CustomModal from '../common/CustomModal';
-import icon_pencil from  "../../image/icon_pencil.svg";
+import icon_pencil from "../../image/icon_pencil.svg";
 import Canvas from '../canvas/Canvas';
 import CreateCanvasModal from '../board/CreateCanvasModal';
+
 
 const MentorBoardContent = () => {
   const { boardId, workspaceId, canvasId } = useParams();
@@ -18,6 +19,7 @@ const MentorBoardContent = () => {
   const [editedDescription, setEditedDescription] = useState('');
   const [editeddtTag, setEditeddtTag] = useState('');
   const [editedDeadline, setEditedDeadline] = useState('');
+  const [editedStatus, setEditedStatus] = useState('');
   const [showCanvas, setShowCanvas] = useState(false);
   const navigate = useNavigate();
   const [canvases, setCanvases] = useState([]);
@@ -49,15 +51,16 @@ const MentorBoardContent = () => {
   }, [workspaceId, boardId, token]);
 
   if (!board) return (<div className="flex items-center justify-center min-h-screen">
-  <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
-</div>);
+    <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
+  </div>);
 
   const handleUpdateBoard = async () => {
     const response = await updateBoard(token, boardId, {
       boardTitle: editedBoardTitle,
       description: editedDescription,
       dtTag: editeddtTag,
-      deadline: editedDeadline
+      deadline: editedDeadline,
+      status: editedStatus
     });
     if (response.status === 200) {
       setBoard(response.board);
@@ -66,7 +69,7 @@ const MentorBoardContent = () => {
       console.error(response.error);
     }
   };
-  
+
   const handleDeleteBoard = async (workspaceId) => {
     const response = await deleteBoard(token, boardId, workspaceId);
     if (response.status === 200) {
@@ -82,135 +85,152 @@ const MentorBoardContent = () => {
   // }
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-    {/* Sidebar for managing board */}
-    <div className="flex flex-grow overflow-hidden">
-    <div className="w-1/4 h-full bg-white shadow-lg p-4 overflow-y-auto">
-      {isEditing ? (
-        <div>
-          <input
-            value={editedBoardTitle}
-            onChange={(e) => setEditedBoardTitle(e.target.value)}
-            className="mb-2 w-full px-3 py-2 border rounded-md"
-            placeholder="Board Name"
-          />
-          <input
-            value={editedDescription}
-            onChange={(e) => setEditedDescription(e.target.value)}
-            className="mb-2 w-full px-3 py-2 border rounded-md"
-            placeholder="Board Description"
-          />
-          <input
-            value={editeddtTag}
-            onChange={(e) => setEditeddtTag(e.target.value)}
-            className="mb-2 w-full px-3 py-2 border rounded-md"
-            placeholder="Board Design Thinking Tag"
-          />
-          <input
-            value={editedDeadline}
-            onChange={(e) => setEditedDeadline(e.target.value)}
-            className="mb-2 w-full px-3 py-2 border rounded-md"
-            placeholder="Board Deadline"
-          />
-          <div className="flex justify-end">
-            <button
-              onClick={handleUpdateBoard}
-              className="mr-2 px-3 py-1 bg-blue-500 text-white rounded-md"
-            >
-              Save
-            </button>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="px-3 py-1 bg-red-500 text-white rounded-md"
-            >
-              Cancel
-            </button>
-        </div>
-      </div>
-    ) : (
-      <div className="p-4 my-2 text-gray-500 bg-gray-200 rounded-md">
-        <div className="flex justify-between items-center">
-          <h3 className="uppercase mb-2 text-3xl font-bold">{board.boardTitle}</h3>
+      {/* Sidebar for managing board */}
+      <div className="flex flex-grow overflow-hidden">
+        <div className="w-1/4 h-full bg-white shadow-lg p-4 overflow-y-auto">
+          {isEditing ? (
+            <div>
+              <input
+                value={editedBoardTitle}
+                onChange={(e) => setEditedBoardTitle(e.target.value)}
+                className="mb-2 w-full px-3 py-2 border rounded-md"
+                placeholder="Board Name"
+              />
+              <input
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                className="mb-2 w-full px-3 py-2 border rounded-md"
+                placeholder="Board Description"
+              />
+              <select
+                value={editeddtTag}
+                onChange={(e) => setEditeddtTag(e.target.value)}
+                className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
+              >
+                <option value="" disabled>Select design thinking stage</option>
+                <option value="Stage 1 (Empathize)">Empathize</option>
+                <option value="Stage 2 (Define)">Define</option>
+                <option value="Stage 3 (Ideate)">Ideate</option>
+                <option value="Stage 4 (Prototype)">Prototype</option>
+                <option value="Stage 5 (Test)">Test</option>
+              </select>
+              <input
+                type="date" //later change to date picker (?) tried but got problem
+                value={editedDeadline}
+                onChange={(e) => setEditedDeadline(e.target.value)}
+                className="mb-2 w-full px-3 py-2 border rounded-md"
+                placeholder="Board Deadline"
+              />
+              <select
+                value={editedStatus}
+                onChange={(e) => setEditedStatus(e.target.value)}
+                className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
+              >
+                <option value="Incomplete">Incomplete</option>
+                <option value="Done">Done</option>
+              </select>
+              <div className="flex justify-end">
+                <button
+                  onClick={handleUpdateBoard}
+                  className="mr-2 px-3 py-1 bg-blue-500 text-white rounded-md"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="px-3 py-1 bg-red-500 text-white rounded-md"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 my-2 text-gray-500 bg-gray-200 rounded-md">
+              <div className="flex justify-between items-center">
+                <h3 className="uppercase mb-2 text-3xl font-bold">{board.boardTitle}</h3>
+                <button
+                  onClick={() => {
+                    setIsEditing(true);
+                    setEditedBoardTitle(board.boardTitle);
+                    setEditedDescription(board.description);
+                    setEditeddtTag(board.dtTag);
+                    setEditedDeadline(board.deadline);
+                    setEditedStatus(board.status);
+                  }}
+                  className="text-xl text-blue-500"
+                >
+                  <img src={icon_pencil} alt="edit icon" className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="mb-2 text-sm text-gray-600">{board.description}</p>
+              <p className="mb-2 text-sm text-gray-600">{board.dtTag}</p>
+              <p className="mb-2 text-sm text-gray-600">Status: {board.status}</p>
+              <p className="mb-2 text-sm text-gray-600">{new Date(board.deadline).toLocaleString()}</p>
+            </div>
+          )}
+
+          {/* Delete Board button at the bottom */}
           <button
-            onClick={() => {
-              setIsEditing(true);
-              setEditedBoardTitle(board.boardTitle);
-              setEditedDescription(board.description);
-              setEditeddtTag(board.dtTag);
-              setEditedDeadline(board.deadline);
-            }}
-            className="text-xl text-blue-500"
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-red-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
           >
-            <img src={icon_pencil} alt="edit icon" className="w-4 h-4" />
-        </button>
-      </div>
-      <p className="mb-2 text-sm text-gray-600">{board.description}</p>
-      <p className="mb-2 text-sm text-gray-600">{board.dtTag}</p>
-      <p className="mb-2 text-sm text-gray-600">{new Date(board.deadline).toLocaleString()}</p>
-    </div>
-  )}
+            Delete Board
+          </button>
 
-        {/* Delete Board button at the bottom */}
-        <button
-          onClick={() => setIsDeleteModalOpen(true)}
-          className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-red-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
-        >
-          Delete Board
-        </button>
+          {/* The Modal for Delete Board Confirmation */}
+          <CustomModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            title="Delete Board"
+            message="Are you sure you want to delete this board?"
+          >
+            <div className="flex items-center">
+              <button
+                onClick={handleDeleteBoard}
+                className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded-md"
+              >
+                Cancel
+              </button>
+              <Link to={`/workspace/${workspaceId}`}></Link>
+            </div>
+          </CustomModal>
+        </div>
 
-        {/* The Modal for Delete Board Confirmation */}
-        <CustomModal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          title="Delete Board"
-          message="Are you sure you want to delete this board?"
-        >
-          <div className="flex items-center">
-            <button
-              onClick={handleDeleteBoard}
-              className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
-            >
-              Delete
-            </button>
-            <button
-              onClick={() => setIsDeleteModalOpen(false)}
-              className="px-4 py-2 bg-gray-500 text-white rounded-md"
-            >
-              Cancel
-            </button>
-            <Link to={`/workspace/${workspaceId}`}></Link>
+        {/* Main content container */}
+        <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
+          <div className="p-4 bg-white rounded shadow-md">
+            <div style={{ textAlign: 'right' }}>
+              <button
+                onClick={() => setModalIsOpen(true)}
+                className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-yellow-200 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+              >
+                Create New Canvas
+              </button>
+            </div>
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {canvases.map((canvas) => (
+                <li key={canvas.id} className="p-15 border rounded-md">
+                  <Link to={`canvas/${canvas.id}`} className="block" //need to do modi for linkage
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <div className="text-center font-medium">{canvas.canvasName}</div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <CreateCanvasModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)} onCanvasCreated={fetchCanvases} />
           </div>
-        </CustomModal>
-      </div>
-
-      {/* Main content container */}
-      <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
-        <div className="p-4 bg-white rounded shadow-md">
-          <div style={{ textAlign: 'right' }}>
-            <button
-              onClick={() => setModalIsOpen(true)}
-              className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-yellow-200 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
-            >
-              Create New Canvas
-            </button>
-          </div>
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {canvases.map((canvas) => (
-              <li key={canvas.id} className="p-15 border rounded-md">
-                <Link to={`canvas/${canvas.id}`} className="block" //need to do modi for linkage
-                  style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <div className="text-center font-medium">{canvas.canvasName}</div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <CreateCanvasModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)}  onCanvasCreated={fetchCanvases} />
         </div>
       </div>
     </div>
-  </div>
   );
 };
 

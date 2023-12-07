@@ -279,6 +279,7 @@ const MenteeWorkspaceContent = () => {
                   <div className="text-center font-medium">{board.boardTitle}</div>
                   <div className="text-center text-gray-600">{board.description}</div>
                   <div className="text-center text-gray-600">{board.dtTag}</div>
+                  <div className="text-center text-gray-600">Status: {board.status}</div>
                   <div className="text-center text-gray-600">
                     {new Date(board.deadline).toLocaleString()}
                   </div>

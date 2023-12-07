@@ -13,13 +13,14 @@ const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
   const [description, setDescription] = useState('');
 
   const { token } = useAuthContext(); //not this
-  const location=useLocation();
-  const boardTitleFromState = location.state?.boardTitle; 
+  const location = useLocation();
+  const boardTitleFromState = location.state?.boardTitle;
+  const [status, setStatus] = useState('Incomplete');
 
   const handleBoardSubmit = async () => {
     try {
       const formatDeadline = deadline.toISOString(); //causing dateMZ
-      const response = await createBoard(token, boardTitle, dtTag, formatDeadline, description, workspaceId);
+      const response = await createBoard(token, boardTitle, dtTag, formatDeadline, description, status, workspaceId);
       console.log(response);
       if (response.board) {
         const { Board } = response.board;
@@ -28,6 +29,7 @@ const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
         setDtTag('');
         setDeadline(''); //css
         setDescription('');
+        setStatus('');
         onClose();
         onBoardCreated();
         console.log("walao")
@@ -38,7 +40,7 @@ const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
       console.error(error);
     }
   };
-  
+
   if (!isOpen) {
     return null;
   }
@@ -60,22 +62,30 @@ const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
             onChange={(e) => setDtTag(e.target.value)}
             className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
           >
-            <option value="">Select design thinking stage</option>
-            <option value="Stage 1">Empathize</option>
-            <option value="Stage 2">Define</option>
-            <option value="Stage 3">Ideate</option>
-            <option value="Stage 4">Prototype</option>
-            <option value="Stage 5">Test</option>
+            <option value="" disabled>Select design thinking stage</option>
+            <option value="Stage 1 (Empathize)">Empathize</option>
+            <option value="Stage 2 (Define)">Define</option>
+            <option value="Stage 3 (Ideate)">Ideate</option>
+            <option value="Stage 4 (Prototype)">Prototype</option>
+            <option value="Stage 5 (Test)">Test</option>
           </select>
-          <DatePicker 
+          <DatePicker
             selected={deadline}
-            onChange={(date)=>setDeadline(date)}
+            onChange={(date) => setDeadline(date)}
             showTimeSelect
             timeFormat="HH:mm"
             timeIntervals={15}
             dateFormat="MMMM d, yyyy h:mm aa"
             className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
           />
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
+          >
+            <option value="Incomplete">Incomplete</option>
+            <option value="Done">Done</option>
+          </select>
           <textarea
             placeholder="Board Description"
             value={description}
