@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getWorkspaceById, updateWorkspace, deleteWorkspace, getWorkspaceMembers, removeWorkspaceMember, getBoards } from '../services/api';
 import CustomModal from '../common/CustomModal';
 import SocketContext from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
-import icon_pencil from  "../../image/icon_pencil.svg";
-import CreateBoardModal from '../dashboard/CreateBoardModal';
+import icon_pencil from "../../image/icon_pencil.svg";
+import CreateBoardModal from './CreateBoardModal';
 import ChatButton from '../chat/ChatDropdown';
 
 const MentorWorkspaceContent = () => {
@@ -63,9 +63,9 @@ const MentorWorkspaceContent = () => {
       const callback = (message) => {
       };
       addNotificationCallback(callback);
-    return () => {
-      removeNotificationCallback(callback);
-    };
+      return () => {
+        removeNotificationCallback(callback);
+      };
     }
   }, [socket]);
 
@@ -96,9 +96,9 @@ const MentorWorkspaceContent = () => {
 
   if (!workspace) {
     return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
+      </div>
     );
   }
 
@@ -123,7 +123,7 @@ const MentorWorkspaceContent = () => {
       console.error(response.error);
     }
   };
-  
+
   const handleDeleteWorkspace = async () => {
     const response = await deleteWorkspace(token, workspaceId);
     if (response.status === 200) {
@@ -143,90 +143,101 @@ const MentorWorkspaceContent = () => {
     }
   };
 
+  const handleAnalysisClick = () => {
+    navigate(`/workspace/${workspaceId}/menteeAnalysis`);
+  };
+
   return (
-      <div className="flex flex-col h-screen bg-gray-100">
-      {/* Fixed Sidebar for managing workspace */}
+    <div className="flex flex-col h-screen bg-gray-100">
       <div className="flex flex-grow overflow-hidden">
-      <div className="w-1/4 h-full bg-white shadow-lg p-4 overflow-y-auto">
-        {isEditing ? (
-          <div className="p-4 my-2 bg-gray-100 text-gray-500">
-            <input
-              value={editedName}
-              onChange={(e) => setEditedName(e.target.value)}
-              className="mb-2 w-full px-3 py-2 border rounded-md"
-              placeholder="Workspace Name"
-            />
-            <input
-              value={editedDescription}
-              onChange={(e) => setEditedDescription(e.target.value)}
-              className="mb-2 w-full px-3 py-2 border rounded-md"
-              placeholder="Workspace Description"
-            />
-            <div className="flex justify-end">
+        <div class="bg-white h-full w-1/4  shadow-lg overflow-y-auto p-4 space-y-4 ">
+          {isEditing ? (
+            <div className="p-4 my-2 bg-gray-100 text-gray-500">
+              <input
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                className="mb-2 w-full px-3 py-2 border rounded-md"
+                placeholder="Workspace Name"
+              />
+              <input
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                className="mb-2 w-full px-3 py-2 border rounded-md"
+                placeholder="Workspace Description"
+              />
+              <div className="flex justify-end">
+                <button
+                  onClick={handleUpdateWorkspace}
+                  className="mr-2 px-3 py-1 bg-indigo-500 text-white rounded-md"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="px-3 py-1 bg-red-500 text-white rounded-md"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div class="bg-gray-100 p-4 rounded-md shadow">
+              <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-semibold text-gray-700 uppercase">{workspace.name}</h2>
+                <button
+                  onClick={() => {
+                    setIsEditing(true);
+                    setEditedName(workspace.name);
+                    setEditedDescription(workspace.description);
+                  }}
+                  className="text-blue-500 hover:text-blue-600"
+                >
+                  <img src={icon_pencil} alt="edit icon" className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="pt-2 mb-2 text-xl text-gray-600">{workspace.description}</p>
+            </div>
+          )}
+
+          {/* Sidebar Options */}
+          <div className="flex flex-col space-y-2">
+            <div className="mt-auto"> {/* This div will grow and push the buttons to the bottom */}
+              {/* Invite button that opens modal */}
               <button
-                onClick={handleUpdateWorkspace}
-                className="mr-2 px-3 py-1 bg-indigo-500 text-white rounded-md"
+                onClick={() => setIsModalOpen(true)}
+                className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
               >
-                Save
+                Invite Members
               </button>
+
+              {/* Manage members */}
               <button
-                onClick={() => setIsEditing(false)}
-                className="px-3 py-1 bg-red-500 text-white rounded-md"
+                onClick={() => setIsManageMembersModalOpen(true)}
+                className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
               >
-                Cancel
+                Manage Members
+              </button>
+
+              {/* Add Analysis Button */}
+              <button
+                onClick={handleAnalysisClick}
+                className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+              >
+                Mentee Analysis
+              </button>
+
+              {/* Delete Workspace button at the bottom */}
+              <button
+                onClick={() => setIsDeleteModalOpen(true)}
+                className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-red-500 hover:bg-red-600 focus:ring-red-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+              >
+                Delete Workspace
               </button>
             </div>
           </div>
-        ) : (
-          <div className="p-4 my-2 text-gray-500 bg-gray-200 rounded-md">
-            <div className="flex justify-between items-center">
-              <h3 className="uppercase mb-2 text-3xl font-bold">{workspace.name}</h3>
-              <button
-                onClick={() => {
-                  setIsEditing(true);
-                  setEditedName(workspace.name);
-                  setEditedDescription(workspace.description);
-                }}
-                className="text-xl text-blue-500"
-              >
-                <img src={icon_pencil} alt="edit icon" className="w-4 h-4" />
-              </button>
-            </div>
-            <p className="mb-2 text-xl text-gray-600">{workspace.description}</p>
-          </div>
-        )}
 
-        {/* Sidebar Options */}
-      <div className="flex flex-col flex-grow mt-4">
-        <div className="mt-auto"> {/* This div will grow and push the buttons to the bottom */}
-          {/* Invite button that opens modal */}
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
-          >
-            Invite Members
-          </button>
-
-          {/* Manage members */}
-          <button
-            onClick={() => setIsManageMembersModalOpen(true)}
-            className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
-          >
-            Manage Members
-          </button>
-
-          {/* Delete Workspace button at the bottom */}
-          <button
-            onClick={() => setIsDeleteModalOpen(true)}
-            className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-red-500 hover:bg-red-600 focus:ring-red-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
-          >
-            Delete Workspace
-          </button>
-        </div>
-      </div>
-
-      {/* The Modal for Invite */}
-      <CustomModal
+          {/* The Modal for Invite */}
+          <CustomModal
             isOpen={isModalOpen}
             onClose={() => {
               setIsModalOpen(false);
@@ -279,129 +290,130 @@ const MentorWorkspaceContent = () => {
             </div>
           </CustomModal>
 
-      {/* The Modal for Delete Workspace Confirmation */}
-      <CustomModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        title="Delete Workspace"
-        message="Are you sure you want to delete this workspace?"
-      >
-        <div className="flex items-center">
-          <button
-            onClick={handleDeleteWorkspace}
-            className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
+          {/* The Modal for Delete Workspace Confirmation */}
+          <CustomModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            title="Delete Workspace"
+            message="Are you sure you want to delete this workspace?"
           >
-            Delete
-          </button>
-          <button
-            onClick={() => setIsDeleteModalOpen(false)}
-            className="px-4 py-2 bg-gray-500 text-white rounded-md"
-          >
-            Cancel
-          </button>
-        </div>
-      </CustomModal>
-    </div>
-
-    {/* The Modal for Manage Member */}
-    <CustomModal
-      isOpen={isManageMembersModalOpen}
-      onClose={() => setIsManageMembersModalOpen(false)}
-      title="Manage Members"
-    >
-      <ul>
-        {workspaceMembers && workspaceMembers.length > 0 ? (
-          workspaceMembers.map(member => (
-            <li key={member.id} className="flex justify-between items-center mb-2">
-              <span>{member.username}</span>
+            <div className="flex items-center">
               <button
-                onClick={() => {
-                  setSelectedMember(member);
-                  setIsMemberDeleteModalOpen(true);
-                }}
-                className="px-2 py-1 bg-red-500 text-white rounded-md"
+                onClick={handleDeleteWorkspace}
+                className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
               >
-                Remove
+                Delete
               </button>
-            </li>
-          ))
-        ) : (
-          <p>No members found</p>
-        )}
-      </ul>
-    </CustomModal>
-
-    {/* The Modal for Delete Member Confirmation */}
-    <CustomModal
-      isOpen={isMemberDeleteModalOpen}
-      onClose={() => setIsMemberDeleteModalOpen(false)}
-      title="Delete Member"
-      message={`Are you sure you want to remove ${selectedMember?.name} from the workspace?`}
-    >
-      <div className="flex items-center">
-        <button
-          onClick={handleDeleteMember}
-          className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
-        >
-          Delete
-        </button>
-        <button
-          onClick={() => setIsMemberDeleteModalOpen(false)}
-          className="px-4 py-2 bg-gray-500 text-white rounded-md"
-        >
-          Cancel
-        </button>
-      </div>
-    </CustomModal>
-
-    {/* Main content container */}
-    <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
-        <h2 className="text-2xl font-semibold mb-4 uppercase">{workspace.name}</h2>
-        <p className="text-gray-600 mb-4">{workspace.description}</p>
-        <li
-            className="nav-item relative px-3 py-2 flex items-center text-s font-bold leading-snug text-black z-10"
-            style={{ position: 'absolute', right: '40px', top: '100px' }}
-            onClick={() => setShowMessages(!showMessages)}
-        >
-          <ChatButton />
-        </li>
-        {/* Your main content */}
-        {/* Section */}
-        <div className="p-4 bg-white rounded shadow-md">
-          {/* ... content for section 1 ... */}
-            <div style={{ textAlign: 'right' }}>
               <button
-                onClick={() => setModalIsOpen(true)}
-                className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-yellow-200 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded-md"
               >
-                Create Board
+                Cancel
               </button>
             </div>
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {boards.map((board) => (
-              <li key={board.id} className="p-15 border rounded-md">
-                <Link to={`board/${board.id}`} className="block" //need to do modi for linkage
-                  style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <div className="text-center font-medium">{board.boardTitle}</div>
-                  <div className="text-center text-gray-600">{board.description}</div>
-                  <div className="text-center text-gray-600">{board.dtTag}</div>
-                  <div className="text-center text-gray-600">
-                    {new Date(board.deadline).toLocaleString()}
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <CreateBoardModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)}  onBoardCreated={fetchBoards} />
+          </CustomModal>
         </div>
-        {/* Section */}
+
+        {/* The Modal for Manage Member */}
+        <CustomModal
+          isOpen={isManageMembersModalOpen}
+          onClose={() => setIsManageMembersModalOpen(false)}
+          title="Manage Members"
+        >
+          <ul>
+            {workspaceMembers && workspaceMembers.length > 0 ? (
+              workspaceMembers.map(member => (
+                <li key={member.id} className="flex justify-between items-center mb-2">
+                  <span>{member.username}</span>
+                  <button
+                    onClick={() => {
+                      setSelectedMember(member);
+                      setIsMemberDeleteModalOpen(true);
+                    }}
+                    className="px-2 py-1 bg-red-500 text-white rounded-md"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))
+            ) : (
+              <p>No members found</p>
+            )}
+          </ul>
+        </CustomModal>
+
+        {/* The Modal for Delete Member Confirmation */}
+        <CustomModal
+          isOpen={isMemberDeleteModalOpen}
+          onClose={() => setIsMemberDeleteModalOpen(false)}
+          title="Delete Member"
+          message={`Are you sure you want to remove ${selectedMember?.name} from the workspace?`}
+        >
+          <div className="flex items-center">
+            <button
+              onClick={handleDeleteMember}
+              className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => setIsMemberDeleteModalOpen(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md"
+            >
+              Cancel
+            </button>
+          </div>
+        </CustomModal>
+
+        {/* Main content container */}
+        <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
+          <li
+            className="fixed bottom-4 right-4 px-3 py-2 flex items-center text-xs font-bold leading-snug text-black z-50"
+            onClick={() => setShowMessages(!showMessages)}
+          >
+            <ChatButton />
+          </li>
+
+          {/* Your main content */}
+          {/* Section */}
+          <div style={{ textAlign: 'right' }} className='py-2'>
+            <button
+              onClick={() => setModalIsOpen(true)}
+              className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-yellow-200 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+            >
+              Create Board
+            </button>
+          </div>
+          <div className="p-4 bg-white rounded shadow-md">
+            {/* ... content for section 1 ... */}
+
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {boards.map((board) => (
+                <li key={board.id} className="p-15 border rounded-md">
+                  <Link to={`board/${board.id}`} className="block" //need to do modi for linkage
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <div className="text-center font-medium">{board.boardTitle}</div>
+                    <div className="text-center text-gray-600">{board.description}</div>
+                    <div className="text-center text-gray-600">{board.dtTag}</div>
+                    <div className="text-center text-gray-600">Status: {board.status}</div>
+                    <div className="text-center text-gray-600">
+                      {new Date(board.deadline).toLocaleString()}
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <CreateBoardModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)} onBoardCreated={fetchBoards} />
+          </div>
+          {/* Section */}
+        </div>
       </div>
     </div>
-  </div>
   );
+
 };
 
 export default MentorWorkspaceContent;

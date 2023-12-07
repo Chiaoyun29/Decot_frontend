@@ -301,7 +301,7 @@ export const leaveWorkspace = async (token, workspaceId) => {
     console.error(error);
   }
 };
-export const createBoard = async (token, boardTitle, dtTag, deadline, description, workspaceId) => {
+export const createBoard = async (token, boardTitle, dtTag, deadline, description, status, workspaceId) => {
   try {
     const response = await fetch(`${API_URL}/board/workspace/${workspaceId}/create`, {
       method: 'POST',
@@ -309,9 +309,8 @@ export const createBoard = async (token, boardTitle, dtTag, deadline, descriptio
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ boardTitle, dtTag, deadline, description }),
+      body: JSON.stringify({ boardTitle, dtTag, deadline, description, status }),
     });
-    console.log(workspaceId, deadline);
     console.log("create board: " + JSON.stringify(response));
     
     const data = await response.json();
@@ -586,6 +585,7 @@ export const deleteAccount = async (userId) => {
       throw error;
   }
 };
+
 export const uploadProfilePic = async (userId, file) => {
   const formData = new FormData();
   formData.append('profilePic', file);
@@ -598,6 +598,26 @@ export const uploadProfilePic = async (userId, file) => {
     return await response.json();
   } catch (error) {
     throw error;
+  }
+};
+
+export const getMenteeAnalysisData = async (workspaceId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/workspace/${workspaceId}/menteeAnalysis`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to fetch mentee analysis data:', error);
+    return { error: 'Failed to fetch mentee analysis data', status: 0 };
   }
 };
 export const createCanvas = async (token, boardId, workspaceId, canvasName ) => {

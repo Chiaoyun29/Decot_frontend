@@ -15,6 +15,7 @@ import SocketProvider from './context/SocketProvider';
 import 'react-toastify/dist/ReactToastify.css';
 import Profile from "./pages/profile/Profile";
 import JoinWorkspacePage from './pages/JoinWorkspacePage';
+import MenteeAnalysis from './components/workspace/MenteeAnalysis';
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/join/:token" element={<JoinWorkspacePage />} />
+                <Route path="/workspace/:workspaceId/menteeAnalysis" element={<MenteeAnalysis />} />
               </Routes>
             </SocketProvider>
           </AuthProvider>

@@ -49,6 +49,7 @@ const MenteeBoardContent = () => {
           <h2 className="text-2xl font-semibold mb-4 uppercase">{board.boardTitle}</h2>
           <p className="text-gray-600 mb-4">{board.description}</p>
           <p className="text-gray-600 mb-4">{board.dtTag}</p>
+          <p className="text-gray-600 mb-4">{board.status}</p>
           <p className="text-gray-600 mb-4">{new Date(board.deadline).toLocaleString()}</p>
         </div>
       </div>

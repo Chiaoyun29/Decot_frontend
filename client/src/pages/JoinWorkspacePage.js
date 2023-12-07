@@ -39,6 +39,7 @@ const JoinWorkspacePage = () => {
   return (
     <div>
       <h1>Joining Workspace...</h1>
+      <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
     </div>
   );
 };
