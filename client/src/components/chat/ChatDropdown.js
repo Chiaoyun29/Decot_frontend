@@ -23,20 +23,28 @@ const ChatDropdown =()=>{
     },[socket, messages]);
 
     return (
-        <div className="relative text-center z-100" onContextMenu={handleContextMenu}>
-            <button ref={chatRef} onClick={() => setShowMessages(!showMessages)} className="relative">
-                {messages.length > 0 && (
-                <span className="absolute top-0 right-0 inline-block w-4 h-4 text-xs text-center text-white bg-red-500 rounded-full">
-                    {messages.length}
-                </span>
-                )}
-                <img src={icon_message} className="w-6 h-6 text-black" alt="Messages" />
-            </button>
+        <div className="chat-icon-container" onContextMenu={handleContextMenu}>
+    <button ref={chatRef} onClick={() => setShowMessages(!showMessages)} className="relative">
+        {messages.length > 0 && (
+            <span className="notification-badge">
+                {messages.length}
+            </span>
+        )}
+        <img src={icon_message} className="w-6 h-6 text-black" alt="Messages" />
+    </button>
 
-            {showMessages&&(
-                <ChatBody showContextMenu={showContextMenu} setShowContextMenu={setShowContextMenu} messages={messages} user={user} socket={socket} setMessages={setMessages}/>
-            )}
-        </div>
+    {showMessages && (
+        <ChatBody
+            showContextMenu={showContextMenu}
+            setShowContextMenu={setShowContextMenu}
+            messages={messages}
+            user={user}
+            socket={socket}
+            setMessages={setMessages}
+        />
+    )}
+</div>
+
     );
 };    
 
