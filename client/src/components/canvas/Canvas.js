@@ -20,7 +20,7 @@ const Canvas = () => {
   const { boardId, workspaceId, canvasId } = useParams();
   const drawingCanvasRef = useRef(null);
   const drawingContextRef = useRef(null);
-  const stickyNoteCanvasRef = useRef(null);
+  //const stickyNoteCanvasRef = useRef(null);
   const saveInterval = useRef(null);
   const shapeCanvasRef = useRef(null);
   const shapeContextRef = useRef(null);
@@ -35,7 +35,7 @@ const Canvas = () => {
   const [isAddingShape, setIsAddingShape] = useState(false);
   const stageRef=useRef(null);
   const [isAddingTextbox, setIsAddingTextbox] = useState(false);
-  const textboxRef = useRef(null);
+  //const textboxRef = useRef(null);
   const imageRef = useRef(null);
   const [drawingData, setDrawingData] = useState([]);
   const { token } = useAuthContext();
@@ -211,7 +211,7 @@ const Canvas = () => {
       )}
       {isAddingTextbox&&(
         <AddText 
-          textboxRef={textboxRef}
+          drawingCanvasRef={drawingCanvasRef}
           handleAddingTextbox={handleAddingTextbox}
           AddText={addText}
       />

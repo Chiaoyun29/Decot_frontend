@@ -91,7 +91,7 @@ const Sidebar = ({ setToDraw, setToErase, handleAddingNote, deleteCanvas, saveIm
           {/* <input type="file" id="fileInput" onChange={handleFileInput} style={{ display: 'none' }}/> */}
       </div>
       <GridLines gridCanvasRef={gridCanvasRef} sidebarWidth={open?72:16}/>
-      <DrawAndErase drawingCanvasRef={drawingCanvasRef} sidebarWidth={open?72:16}/>
+      {/* <DrawAndErase drawingCanvasRef={drawingCanvasRef} sidebarWidth={open?72:16}/> */}
     </section>
   );
 };

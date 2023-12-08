@@ -106,7 +106,7 @@ const MentorBoardContent = () => {
     const response = await deleteBoard(token, boardId, workspaceId);
     if (response.status === 200) {
       // get budao workspaceId
-      navigate("/workspace/:workspaceId");
+      navigate(-1);
     } else {
       console.error(response.error);
     }
@@ -337,7 +337,6 @@ const MentorBoardContent = () => {
               >
                 Cancel
               </button>
-              <Link to={`/workspace/${workspaceId}`}></Link>
             </div>
           </CustomModal>
         </div>

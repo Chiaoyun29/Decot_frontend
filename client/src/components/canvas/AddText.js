@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import Draggable from 'react-draggable';
 
-const AddText = ({ textboxRef }) => {
+const AddText = ({ drawingCanvasRef }) => {
   const [text, setText] = useState('');
   const [width, setWidth] = useState(200);
   const [height, setHeight] = useState(200);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: window.innerWidth / 2 - 100, y: window.innerHeight / 2 - 100 });
   const [isDragging, setIsDragging] = useState(false);
 
   const handleTextChange = (e) => {
@@ -40,8 +40,9 @@ const AddText = ({ textboxRef }) => {
   return (
     <Draggable>
       <input
-        ref={textboxRef}
+        ref={drawingCanvasRef}
         type="text"
+        className="canvas-container"
         style={{
           position: 'absolute',
           left: position.x + 'px',

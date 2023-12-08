@@ -12,8 +12,6 @@ const DrawAndErase=({
     isStickyNoteMode,
     setDrawingData,
 })=>{
-    // const [drawingData, setDrawingData] = useState([]);
-    // const { token } = useAuthContext();
 
     const startDrawing = ({nativeEvent}) => {
         const {offsetX, offsetY} = nativeEvent;

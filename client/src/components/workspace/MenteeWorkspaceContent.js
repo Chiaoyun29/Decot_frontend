@@ -21,6 +21,7 @@ const MenteeWorkspaceContent = () => {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const navigate = useNavigate();
   const [boards, setBoards] = useState([]);
+  const [board, setBoard] = useState(null);
   const [showMessages, setShowMessages] = useState(false);
   const [boardMembers, setBoardMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -40,18 +41,22 @@ const MenteeWorkspaceContent = () => {
     fetchBoards();
   }, [workspaceId, token]);
 
-  const fetchBoardMembers = async() =>{
-    try{
-      const response = await getBoardMembers(token, boardId, workspaceId);
-      if (response&&response.status === 200) {
-        setBoardMembers(response.members);
-      } else {
-        console.error(response?response.error: 'Unknown error');
-      }
-    }catch(error){
-      console.error('Error fetching board members:', error);
-    }
-  };
+  useEffect(()=>{
+    isBoardMember();
+  }, [])
+
+  // const fetchBoardMembers = async() =>{
+  //   try{
+  //     const response = await getBoardMembers(token, boardId, workspaceId);
+  //     if (response&&response.status === 200) {
+  //       setBoardMembers(response.members);
+  //     } else {
+  //       console.error(response?response.error: 'Unknown error');
+  //     }
+  //   }catch(error){
+  //     console.error('Error fetching board members:', error);
+  //   }
+  // };
 
   useEffect(() => {
     const fetchWorkspace = async () => {
@@ -65,10 +70,6 @@ const MenteeWorkspaceContent = () => {
     };
     fetchWorkspace();
   }, [workspaceId, token]);
-
-  useEffect(() => {
-    fetchBoardMembers();
-  }, [boardId, workspaceId, token]);
 
   useEffect(() => {
     if (socket) {
@@ -128,15 +129,17 @@ const MenteeWorkspaceContent = () => {
     }
   };
 
-  const isBoardMember = async () =>{
+  const isBoardMember = async (userId, boardId) =>{
     try{
       const response=await checkBoardMember(token, userId, boardId);
       if (response.status === 200){
         setIsMBoardMember(true);
       }else{
-        console.error(response.error);
+        setIsMBoardMember(false);
+        console.log(response.error);
       }
     }catch(error){
+      setIsMBoardMember(false);
       console.error('Error: ', error)
     }
   };
@@ -302,28 +305,28 @@ const MenteeWorkspaceContent = () => {
         {/* Section */}
         <div className="p-4 bg-white rounded shadow-md">
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {boards.filter(board => isBoardMember(user.id, board.id)) .map((board) => (
-              <li key={board.id} className="p-15 border rounded-md">
-                <Link to={`board/${board.id}`} className="block"
-                  style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <div className="text-center font-medium">{board.boardTitle}</div>
-                  <div className="text-center text-gray-600">{board.description}</div>
-                  <div className="text-center text-gray-600">{board.dtTag}</div>
-                  <div className="text-center text-gray-600">Status: {board.status}</div>
-                  <div className="text-center text-gray-600">
-                    {new Date(board.deadline).toLocaleString()}
-                  </div>
-                </Link>
-              </li>
-            ))}
+            {boards.map((board) => {
+              const userIsMember = isBoardMember(user.id, board.id);
+                return userIsMember?(
+                  <li key={board.id} className="p-15 border rounded-md">
+                    <Link to={`board/${board.id}`} className="block">
+                      <div className="text-center font-medium">{board.boardTitle}</div>
+                      <div className="text-center text-gray-600">{board.description}</div>
+                      <div className="text-center text-gray-600">{board.dtTag}</div>
+                      <div className="text-center text-gray-600">Status: {board.status}</div>
+                      <div className="text-center text-gray-600">
+                        {new Date(board.deadline).toLocaleString()}
+                      </div>
+                    </Link>
+                  </li>
+                ):(
+                  <li key={board.id} className="p-15 border rounded-md">
+                    <div className="text-center text-gray-600">You are not a member of this board</div>
+                  </li>
+                );
+            })}
           </ul>
         </div>
-        {/* Section */}
-        {/* <div className="p-4 bg-white rounded shadow-md">
-          {/* ... content for section 2 ... */}
       </div>
     </div>
     </div>

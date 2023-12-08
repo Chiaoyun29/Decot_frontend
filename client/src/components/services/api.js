@@ -454,21 +454,6 @@ export const deleteBoard = async (token, boardId, workspaceId) => {
   }
 };
 
-// export const uploadImage = async (token, boardId, userId) => {
-//   try {
-//     const response = await fetch(`${API_URL}/board/${boardId}/diagram/${boardId}`, {
-//       method: 'ADD',
-//       headers: { Authorization: `Bearer ${token}` },
-//     });
-//     const data = await response.json();
-//     if (!response.ok) {
-//       throw new Error(data.message || 'Network response was not ok');
-//     }
-//     return { status: response.status, data };
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
 export const createMessage = async (token, message, workspaceId) => {
   try {
     const response = await fetch(`${API_URL}/message/${workspaceId}/create`, {
@@ -777,7 +762,6 @@ export const checkBoardMember = async (token, userId, boardId) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ userId }),
     });
     const data = await response.json();
     return { ...data, status: response.status };

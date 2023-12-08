@@ -51,11 +51,6 @@ const MenteeBoardContent = () => {
     fetchBoardMembers();
   }, [boardId, workspaceId, token]);
 
-  // const isBoardMember = boardMembers.some((member) => member.id===selectedMember.id);
-  // if(!isBoardMember){
-  //   return <div>You are not authorized to access this board.</div>; //can customize as pop up modal 
-  // }
-
   if (!board) return (<div className="flex items-center justify-center min-h-screen">
   <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
 </div>);
