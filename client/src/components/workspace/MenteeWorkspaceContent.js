@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useContext} from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import { getWorkspaceById, leaveWorkspace, getWorkspaceMembers,getBoards } from '../services/api';
+import { getWorkspaceById, leaveWorkspace, getWorkspaceMembers,getBoards, getBoardMembers, checkBoardMember } from '../services/api';
 import CustomModal from '../common/CustomModal';
 import SocketContext from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
 import ChatButton from '../chat/ChatDropdown';
 
 const MenteeWorkspaceContent = () => {
-  const { workspaceId } = useParams();
+  const { workspaceId, userId, boardId } = useParams();
   const [ workspace, setWorkspace] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { token } = useAuthContext();
@@ -22,6 +22,9 @@ const MenteeWorkspaceContent = () => {
   const navigate = useNavigate();
   const [boards, setBoards] = useState([]);
   const [showMessages, setShowMessages] = useState(false);
+  const [boardMembers, setBoardMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [isMBoardMember, setIsMBoardMember] = useState(false);
 
   const fetchBoards = async () => {
     const response = await getBoards(token, workspaceId);
@@ -37,6 +40,19 @@ const MenteeWorkspaceContent = () => {
     fetchBoards();
   }, [workspaceId, token]);
 
+  const fetchBoardMembers = async() =>{
+    try{
+      const response = await getBoardMembers(token, boardId, workspaceId);
+      if (response&&response.status === 200) {
+        setBoardMembers(response.members);
+      } else {
+        console.error(response?response.error: 'Unknown error');
+      }
+    }catch(error){
+      console.error('Error fetching board members:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchWorkspace = async () => {
       const response = await getWorkspaceById(token, workspaceId, user.id);
@@ -49,6 +65,10 @@ const MenteeWorkspaceContent = () => {
     };
     fetchWorkspace();
   }, [workspaceId, token]);
+
+  useEffect(() => {
+    fetchBoardMembers();
+  }, [boardId, workspaceId, token]);
 
   useEffect(() => {
     if (socket) {
@@ -104,7 +124,20 @@ const MenteeWorkspaceContent = () => {
         console.error(response.error);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error: ', error);
+    }
+  };
+
+  const isBoardMember = async () =>{
+    try{
+      const response=await checkBoardMember(token, userId, boardId);
+      if (response.status === 200){
+        setIsMBoardMember(true);
+      }else{
+        console.error(response.error);
+      }
+    }catch(error){
+      console.error('Error: ', error)
     }
   };
 
@@ -269,9 +302,9 @@ const MenteeWorkspaceContent = () => {
         {/* Section */}
         <div className="p-4 bg-white rounded shadow-md">
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {boards.map((board) => (
+            {boards.filter(board => isBoardMember(user.id, board.id)) .map((board) => (
               <li key={board.id} className="p-15 border rounded-md">
-                <Link to={`board/${board.id}`} className="block" //need to do modi for linkage
+                <Link to={`board/${board.id}`} className="block"
                   style={{
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -296,6 +329,5 @@ const MenteeWorkspaceContent = () => {
     </div>
   );
 };
-
 
 export default MenteeWorkspaceContent;

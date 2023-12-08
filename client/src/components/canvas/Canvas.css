@@ -1,6 +1,6 @@
 .canvas-container {
     position: absolute;
-    margin-left: 200px;
+    margin-left: 300px;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -15,15 +15,15 @@
     display: inline-block;
     font-size: 16px;
 }
-.sidebar-container {
+/* .sidebar-container {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    width: 200px; /* Adjust the width as needed */
-    background-color: #FCD34D; /* Set the background color for the sidebar */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a shadow effect to the sidebar */
-  }
+    width: 200px; 
+    background-color: #FCD34D; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+  } */
   
   .sidebar-button {
     display: flex;

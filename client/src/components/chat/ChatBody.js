@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { getAllMessages, deleteMessage } from '../services/api.js';
+import { getAllMessages, deleteMessage, getUsernameById } from '../services/api.js';
 import { useAuthContext } from '../../context/AuthContext.js';
 // import SocketContext from '../../context/SocketContext.js';
 import { useParams } from 'react-router-dom';
@@ -8,7 +8,8 @@ import ChatFooter from './ChatFooter.js'
 
 const ChatBody =({ showContextMenu, setShowContextMenu, messages, user, socket, setMessages })=>{
     const { token } = useAuthContext();
-    const { workspaceId } = useParams();
+    const { workspaceId, userId } = useParams();
+    const { username, setUsername }=useState('');
 
     const fetchMessages = async () => {
         const response = await getAllMessages(token, workspaceId);
@@ -39,6 +40,18 @@ const ChatBody =({ showContextMenu, setShowContextMenu, messages, user, socket, 
         }
     };
 
+    const handleUsername = async (userId)=>{
+        try{
+            const response = await getUsernameById(token, userId);
+            console.log(response);
+            if (response.status === 200) {
+            setUsername(response.username);
+            }
+        }catch(error){
+            console.error('Error fetching username');
+        }
+    };
+
     return (
         <div>
             {/*Chat Box*/}
@@ -46,12 +59,16 @@ const ChatBody =({ showContextMenu, setShowContextMenu, messages, user, socket, 
                 <span className="font-semibold">CHAT</span><div className="flex justify-between items-center mb-2">
                     <div className="message_container">
                         {messages.slice().reverse().map((message) => (
-                            <div className="messages" key={message.id} onContextMenu={handleContextMenu}>
-                                <div className="message_chats">
-                                    <p className="sender_name">{user.username}</p>
-                                    <div className="message_sender">
+                            <div className="messages" onContextMenu={handleContextMenu}>
+                                <div className="message_chats" key={message.id}>
+                                    {message.name === user.username ? (
+                                        <p className="message_recipient">{message.message}</p>
+                                    ):(
+                                        <p className="message_sender">{message.message}</p>
+                                    )}
+                                    {/* <div className="message_sender">
                                         <p>{message.message}</p>
-                                    </div>
+                                    </div> */}
                                     <p id="time">{new Date(message.timestamp).toLocaleString()}</p>
                                 </div>
 

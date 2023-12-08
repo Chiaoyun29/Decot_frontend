@@ -194,6 +194,42 @@ export const removeWorkspaceMember = async (token, workspaceId, userId) => {
   }
 };
 
+export const addWorkspaceMember = async (token, workspaceId, boardId, userId) => {
+  try {
+    const response = await fetch(`${API_URL}/board/workspace/${workspaceId}/board/${boardId}/members/${userId}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log(response);
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { status: response.status, data };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getBoardMembers = async (token, boardId, workspaceId) => {
+  try {
+    const response = await fetch(`${API_URL}/board/workspace/${workspaceId}/board/${boardId}/members`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log("hello");
+    if (response.headers.get('content-type')?.includes('application/json') && response.ok) {
+      return response.json();
+    } else {
+      console.error('Unexpected response:', await response.text());
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
 export const getNotifications = async (token) => {
   try {
     const response = await fetch(`${API_URL}/notification`, {
@@ -712,5 +748,60 @@ export const deleteCanvas = async (token, boardId, canvasId, workspaceId) => {
   } catch (error) {
     console.error('Failed to delete canvas:', error);
     return { error: 'Failed to delete canvas', status: 0 };
+  }
+};
+
+export const getUsernameById = async (token, userId) => {
+  try {
+    const response = await fetch(`${API_URL}/auth/getUsername/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to retrieve username:', error);
+    return { error: 'Failed to retrieve username', status: 0 };
+  }
+};
+
+export const checkBoardMember = async (token, userId, boardId) => {
+  try {
+    const response = await fetch(`${API_URL}/board/${boardId}/members/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ userId }),
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+
+  } catch (error) {
+    console.error('Failed to retrieve board member:', error);
+    return { error: 'Failed to retrieve board member', status: 0 };
+  }
+};
+
+export const saveCanvasData = async (token, boardId, canvasId, workspaceId, serializeDrawingDataXml)=>{
+  try{
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/update`,{
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'text/xml',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: serializeDrawingDataXml,
+    });
+    return { status: response.status };
+
+  } catch (error) {
+    console.error('Failed to save canvas data:', error);
+    return { error: 'Failed to save canvas data', status: 0 };
   }
 };
