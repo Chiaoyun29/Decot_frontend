@@ -59,7 +59,7 @@ const StickyNote=({ stickyNoteCanvasRef, isAddingNote })=>{
         event.preventDefault();
     }
 
-        return (
+    return (
         <div className="canvas-container" onDragOver={dragOver}>
             <form className="note-form" onSubmit={addNote}>
                 <textarea placeholder="Create a new note..." 

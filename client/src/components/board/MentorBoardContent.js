@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import { getBoardById, updateBoard, deleteBoard, getCanvases } from '../services/api';
+import { getBoardById, updateBoard, deleteBoard, getCanvases, addWorkspaceMember, getWorkspaceMembers, getBoardMembers } from '../services/api';
 import CustomModal from '../common/CustomModal';
 import icon_pencil from "../../image/icon_pencil.svg";
-import Canvas from '../canvas/Canvas';
+//import Canvas from '../canvas/Canvas';
 import CreateCanvasModal from '../board/CreateCanvasModal';
 
 
 const MentorBoardContent = () => {
-  const { boardId, workspaceId, canvasId } = useParams();
+  const { boardId, workspaceId } = useParams();
   const [board, setBoard] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -20,9 +20,15 @@ const MentorBoardContent = () => {
   const [editeddtTag, setEditeddtTag] = useState('');
   const [editedDeadline, setEditedDeadline] = useState('');
   const [editedStatus, setEditedStatus] = useState('');
-  const [showCanvas, setShowCanvas] = useState(false);
+  //const [showCanvas, setShowCanvas] = useState(false);
   const navigate = useNavigate();
   const [canvases, setCanvases] = useState([]);
+  const [isMemberAddModalOpen, setIsMemberAddModalOpen] = useState(false);
+  const [isManageMembersModalOpen, setIsManageMembersModalOpen] = useState(false);
+  const [workspaceMembers, setWorkspaceMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [boardMembers, setBoardMembers] = useState([]);
+  const [isAddingMembersModalOpen, setIsAddingMembersModalOpen] = useState(false);
 
   const fetchCanvases = async () => {
     const response = await getCanvases(token, boardId, workspaceId);
@@ -50,6 +56,32 @@ const MentorBoardContent = () => {
     fetchBoard();
   }, [workspaceId, boardId, token]);
 
+  useEffect(() => {
+    if (isManageMembersModalOpen) {
+      fetchWorkspaceMembers();
+      fetchBoardMembers();
+    }
+  }, [isManageMembersModalOpen]);
+
+  const fetchWorkspaceMembers = async () => {
+    try {
+      const members = await getWorkspaceMembers(token, workspaceId);
+      setWorkspaceMembers(members);
+    } catch (error) {
+      console.error('Error fetching members:', error);
+    }
+  };
+
+  const fetchBoardMembers = async () => {
+    try {
+      const members = await getBoardMembers(token, boardId, workspaceId);
+      setBoardMembers(members);
+    } catch (error) {
+      console.error('Error fetching members:', error);
+    }
+  };
+
+
   if (!board) return (<div className="flex items-center justify-center min-h-screen">
     <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
   </div>);
@@ -74,15 +106,38 @@ const MentorBoardContent = () => {
     const response = await deleteBoard(token, boardId, workspaceId);
     if (response.status === 200) {
       // get budao workspaceId
-      navigate("/workspace/:workspaceId");
+      navigate(-1);
     } else {
       console.error(response.error);
     }
   };
 
-  // const handleBoardClick = ()=>{
-  //   setShowCanvas(true);
-  // }
+  const handleAddMember = async () => {
+    try {
+      if (selectedMember) {
+        // Check if the selected member is already a board member
+        const isBoardMember = boardMembers.some(member => member.id === selectedMember.id);
+  
+        if (!isBoardMember) {
+          const response = await addWorkspaceMember(token, workspaceId, boardId, selectedMember.id);
+          if (response && response.status === 200) {
+            fetchWorkspaceMembers(); // refresh the members list
+            setIsMemberAddModalOpen(false);
+          } else {
+            console.error(response && response.error);
+          }
+        } else {
+          console.error('Error: User is already a board member.');
+        }
+      } else {
+        console.error('Error: selectedMember is not defined.');
+      }
+    } catch (error) {
+      console.error('Error: ', error);
+    }
+  };
+  
+
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       {/* Sidebar for managing board */}
@@ -169,6 +224,22 @@ const MentorBoardContent = () => {
             </div>
           )}
 
+        {/* Manage members */}
+        <button
+          onClick={() => setIsAddingMembersModalOpen(true)}
+          className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+        >
+          Add Members
+        </button>
+
+        {/* View Members list button at the middle */}
+        <button
+          onClick={() => setIsManageMembersModalOpen(true)}
+          className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+        >
+          View Members
+        </button>
+
           {/* Delete Board button at the bottom */}
           <button
             onClick={() => setIsDeleteModalOpen(true)}
@@ -176,6 +247,75 @@ const MentorBoardContent = () => {
           >
             Delete Board
           </button>
+
+        {/* The Modal for Manage Member */}
+        <CustomModal 
+          isOpen={isAddingMembersModalOpen}
+          onClose={() => setIsAddingMembersModalOpen(false)}
+          title="Add Members"
+        >
+          <ul>
+            {workspaceMembers && workspaceMembers.length > 0 ? (
+              workspaceMembers.map(member => (
+                <li key={member.id} className="flex justify-between items-center mb-2">
+                  <span>{member.username}</span>
+                  <button
+                    onClick={() => {
+                      setSelectedMember(member);
+                      setIsMemberAddModalOpen(true);
+                    }}
+                    className="px-2 py-1 bg-red-500 text-white rounded-md"
+                  >
+                    Add
+                  </button>
+                </li>
+              ))
+            ) : (
+              <p>No members found</p>
+            )}
+          </ul>
+        </CustomModal>
+
+        <CustomModal
+          isOpen={isMemberAddModalOpen}
+          onClose={() => setIsMemberAddModalOpen(false)}
+          title="Add Member"
+          message={`Are you sure you want to add ${selectedMember?.username} from the workspace to this board?`}
+        >
+          <div className="flex items-center">
+            <button
+              onClick={handleAddMember}
+              className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
+            >
+              Add
+            </button>
+            <button
+              onClick={() => setIsMemberAddModalOpen(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md"
+            >
+              Cancel
+            </button>
+          </div>
+        </CustomModal>
+
+        {/* To view members list */}
+        <CustomModal
+          isOpen={isManageMembersModalOpen}
+          onClose={() => setIsManageMembersModalOpen(false)}
+          title="View Members"
+        >
+         <ul>
+            {boardMembers && boardMembers.length > 0 ? (
+              boardMembers.map(member => (
+                <li key={member.id} className="flex justify-between items-center mb-2">
+                  <span>{member.username}</span>
+                </li>
+              ))
+            ) : (
+              <p>No members found</p>
+            )}
+          </ul>
+        </CustomModal>
 
           {/* The Modal for Delete Board Confirmation */}
           <CustomModal
@@ -197,7 +337,6 @@ const MentorBoardContent = () => {
               >
                 Cancel
               </button>
-              <Link to={`/workspace/${workspaceId}`}></Link>
             </div>
           </CustomModal>
         </div>

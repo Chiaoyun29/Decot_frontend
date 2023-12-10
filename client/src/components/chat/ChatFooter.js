@@ -4,23 +4,24 @@ import { useParams } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import SocketContext from '../../context/SocketContext.js';
 
-const ChatFooter=({ setMessages })=>{
+const ChatFooter=({ setMessages, socket })=>{
     const [message, setMessage]=useState([]);
     const { workspaceId, messageId, userId } = useParams();
     // const [messages, setMessages]=useState([]);
     const { token } = useAuthContext();
-    const { socket } = useContext(SocketContext);
+    //const { socket } = useContext(SocketContext);
 
     const sendMessage = (e) => {
         e.preventDefault();
         const newMessage={
-            id: messageId,
+            id: `${socket.id}${Math.random()}`,
             message,
             timestamp: new Date().toLocaleTimeString(),
             uId: userId,
+            socketId: socket.id,
         };
         //still need to modify a bit
-        setMessages((prevMessages)=>[...prevMessages, newMessage]);
+        setMessages(""); //(prevMessages)=>[...prevMessages, newMessage] in bracket
         socket.emit('new_message', newMessage);
         try {
             const response = createMessage(token, message, workspaceId);
@@ -32,19 +33,6 @@ const ChatFooter=({ setMessages })=>{
           console.error('Error sending message:', error);
         }
     }; 
-    useEffect(()=>{
-        if(socket){
-            console.log('Socket connected!');
-            socket.on('new_message', (data)=>{
-                setMessages((prevMessages)=>[...prevMessages, data]);
-            });
-        }
-        return()=>{
-            if(socket){
-                socket.off('new_message');
-            }
-        };
-    }, [socket]);
 
     return(
         <div className="chat_footer">
