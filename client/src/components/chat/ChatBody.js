@@ -40,53 +40,40 @@ const ChatBody =({ showContextMenu, setShowContextMenu, messages, user, socket, 
         }
     };
 
-    const handleUsername = async (userId)=>{
-        try{
-            const response = await getUsernameById(token, userId);
-            console.log(response);
-            if (response.status === 200) {
-            setUsername(response.username);
-            }
-        }catch(error){
-            console.error('Error fetching username');
-        }
-    };
-
     return (
         <div>
             {/*Chat Box*/}
             <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg p-4 chat-dropdown">
-                <span className="font-semibold">CHAT</span><div className="flex justify-between items-center mb-2">
-                    <div className="message_container">
-                        {messages.slice().reverse().map((message) => (
-                            <div className="messages" onContextMenu={handleContextMenu}>
-                                <div className="message_chats" key={message.id}>
-                                    {message.name === user.username ? (
-                                        <p className="message_recipient">{message.message}</p>
-                                    ):(
-                                        <p className="message_sender">{message.message}</p>
+                <span className="font-semibold text-center">CHAT</span>
+                    <div className="flex justify-between items-center mb-2">
+                        <div className="message_container">
+                            {messages.slice().reverse().map(message => (
+                                <div className="messages" onContextMenu={handleContextMenu} key={message.id}>
+                                    {message.userId === user.id ? (
+                                        <p className="sender_name">{user.username}</p>
+                                        ) : (
+                                        <p className="recipient_name"></p>
                                     )}
-                                    {/* <div className="message_sender">
-                                        <p>{message.message}</p>
-                                    </div> */}
-                                    <p id="time">{new Date(message.timestamp).toLocaleString()}</p>
-                                </div>
-
-                                {showContextMenu && (
-                                    <div className="context-menu">
-                                        <button onClick={() => handleDeleteMessage(message.id)} className="delete-button">
-                                            Delete
-                                        </button>
+                                <div className={`message_chats ${message.userId === user.id || message.workspaceId === user.workspaceId ? 'message_sender' : 'message_recipient'}`}>
+                                    <p>{message.message}</p>
                                     </div>
-                                )}
-                            </div>
-                        ))}
+                                    <p id="time" className="text-center">{new Date(message.timestamp).toLocaleString()}</p>
+
+                                    {showContextMenu && (
+                                        <div className="context-menu">
+                                            <button onClick={() => handleDeleteMessage(message.id)} className="delete-button">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
                 <ChatFooter socket={socket} setMessages={setMessages}/>
             </div>
         </div>
     );
-};    
+};   
 
 export default ChatBody;
