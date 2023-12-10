@@ -299,6 +299,12 @@ const Canvas = () => {
           AddText={addText}
         />
       )}
+      {isAddingImage&&(
+        <UploadAndDisplayImage 
+          imageRef={imageRef}
+          handleUploadAndDisplay={handleUploadAndDisplay}
+      />
+      )}
       {/* Render the comments as draggable boxes */}
       {unresolvedComments.map((comment) => (
         <DraggableCommentIcon
