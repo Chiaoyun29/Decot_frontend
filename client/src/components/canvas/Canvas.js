@@ -85,7 +85,7 @@ const Canvas = () => {
     drawingContextRef.current.globalCompositeOperation = 'destination-out';
   };
 
-  const addNote = (event) => {
+  const addNotes = (event) => {
     event.preventDefault();
     console.log('Note added:', event.target.elements[0].value);
     setIsAddingNote(false);
@@ -125,15 +125,8 @@ const Canvas = () => {
     }
   };
 
-  const HandleUploadAndDisplay = () => {//need to use socket?
-    axios.post('http://localhost:5000/canvas/imageUpload', image)
-      .then(res => {
-        console.log('Axios response: ', res)
-      })
-  };
-
-  const handleFileInput = (e) => {
-    console.log('handleFileInput working!')
+  const handleUploadAndDisplay = () => {
+    setIsAddingImage(!isAddingImage);
   };
 
   const handleAddingShape = () => {
@@ -158,7 +151,7 @@ const Canvas = () => {
 
   const serializeDrawingDataToXml = () => {
     const root = xmlbuilder.create('drawingData');
-    if(Array.isArray(drawingData)){
+    if (Array.isArray(drawingData)) {
       drawingData.forEach(({ type, x, y }) => {
         root
           .ele('drawOperation')
@@ -171,14 +164,14 @@ const Canvas = () => {
           .up()
           .up();
       });
-    }else{
+    } else {
       console.error('Drawing data is not an array: ', drawingData);
     }
 
     return root.end({ pretty: true });
   };
 
-  const handleSaveCanvas = async() => {
+  const handleSaveCanvas = async () => {
     const serializeDrawingDataXml = serializeDrawingDataToXml();
     console.log('Serialized Drawing Data (XML):', serializeDrawingDataXml);
     try {
@@ -301,7 +294,7 @@ const Canvas = () => {
       )}
       {isAddingTextbox && (
         <AddText
-          textboxRef={textboxRef}
+          drawingCanvasRef={drawingCanvasRef}
           handleAddingTextbox={handleAddingTextbox}
           AddText={addText}
         />
