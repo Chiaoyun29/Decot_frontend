@@ -7,9 +7,7 @@ import SocketContext from '../../context/SocketContext.js';
 const ChatFooter=({ setMessages, socket })=>{
     const [message, setMessage]=useState([]);
     const { workspaceId, userId } = useParams();
-    // const [messages, setMessages]=useState([]);
     const { token } = useAuthContext();
-    //const { socket } = useContext(SocketContext);
 
     const sendMessage = (e) => {
         e.preventDefault();
@@ -21,7 +19,7 @@ const ChatFooter=({ setMessages, socket })=>{
             socketId: socket.id,
         };
         //still need to modify a bit
-        setMessages(""); //(prevMessages)=>[...prevMessages, newMessage] in bracket
+        setMessages((prevMessages) => [...prevMessages, newMessage]); //(prevMessages)=>[...prevMessages, newMessage] in bracket
         socket.emit('new_message', newMessage);
         try {
             const response = createMessage(token, message, workspaceId);
