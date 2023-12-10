@@ -789,3 +789,88 @@ export const saveCanvasData = async (token, boardId, canvasId, workspaceId, seri
     return { error: 'Failed to save canvas data', status: 0 };
   }
 };
+
+export const createComment = async (token, workspaceId, boardId, canvasId, text, parentId, x, y) => {
+  try {
+    const response = await fetch(`${API_URL}/comment/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text, parentId, x, y, canvasId }),
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to create comment:', error);
+    return { error: 'Failed to create comment', status: 0 };
+  }
+};
+
+export const getCommentsByCanvas = async (token, workspaceId, boardId, canvasId) => {
+  try {
+    const response = await fetch(`${API_URL}/comment/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/comments`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to retrieve comments:', error);
+    return { error: 'Failed to retrieve comments', status: 0 };
+  }
+};
+
+export const updateComment = async (token, workspaceId, boardId, canvasId, commentId, text, x, y) => {
+  try {
+    const response = await fetch(`${API_URL}/comment/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/comments/${commentId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text, x, y }),
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to update comment:', error);
+    return { error: 'Failed to update comment', status: 0 };
+  }
+};
+
+export const deleteComment = async (token, workspaceId, boardId, canvasId, commentId) => {
+  try {
+    const response = await fetch(`${API_URL}/comment/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/comments/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to delete comment:', error);
+    return { error: 'Failed to delete comment', status: 0 };
+  }
+};
+
+export const toggleCommentResolvedState = async (token, workspaceId, boardId, canvasId, commentId) => {
+  try {
+    const response = await fetch(`${API_URL}/comment/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/comments/${commentId}/toggle-resolve`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to toggle comment resolve state:', error);
+    return { error: 'Failed to toggle comment resolve state', status: 0 };
+  }
+};
