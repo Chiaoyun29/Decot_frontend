@@ -60,7 +60,8 @@ const StickyNote=({ stickyNoteCanvasRef, isAddingNote })=>{
     }
 
     return (
-        <div className="canvas-container" onDragOver={dragOver}>
+        <div className="canvas-container" onDragOver={dragOver}> 
+        {/* maybe use canvas in div? */}
             <form className="note-form" onSubmit={addNote}>
                 <textarea placeholder="Create a new note..." 
                     value={noteInput}

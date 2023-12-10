@@ -6,7 +6,7 @@ import SocketContext from '../../context/SocketContext.js';
 
 const ChatFooter=({ setMessages, socket })=>{
     const [message, setMessage]=useState([]);
-    const { workspaceId, messageId, userId } = useParams();
+    const { workspaceId, userId } = useParams();
     // const [messages, setMessages]=useState([]);
     const { token } = useAuthContext();
     //const { socket } = useContext(SocketContext);

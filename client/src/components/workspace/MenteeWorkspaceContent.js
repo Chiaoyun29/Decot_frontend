@@ -292,11 +292,8 @@ const MenteeWorkspaceContent = () => {
 
     {/* Main content container */}
     <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
-        <h2 className="text-2xl font-semibold mb-4 uppercase">{workspace.name}</h2>
-        <p className="text-gray-600 mb-4">{workspace.description}</p>
         <li
-            className="nav-item relative px-3 py-2 flex items-center text-s font-bold leading-snug text-black z-10"
-            style={{ position: 'absolute', right: '40px', top: '100px' }}
+            className="fixed bottom-4 right-4 px-3 py-2 flex items-center text-xs font-bold leading-snug text-black z-50"
             onClick={() => setShowMessages(!showMessages)}
         >
           <ChatButton />
