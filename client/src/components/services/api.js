@@ -790,7 +790,7 @@ export const saveCanvasData = async (token, boardId, canvasId, workspaceId, seri
   }
 };
 
-export const createComment = async (token, workspaceId, boardId, canvasId, text, parentId, x, y) => {
+export const createComment = async (token, workspaceId, boardId, canvasId, text, x, y) => {
   try {
     const response = await fetch(`${API_URL}/comment/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/create`, {
       method: 'POST',
@@ -798,7 +798,7 @@ export const createComment = async (token, workspaceId, boardId, canvasId, text,
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ text, parentId, x, y, canvasId }),
+      body: JSON.stringify({ text, canvasId, x, y }),
     });
     const data = await response.json();
     return { ...data, status: response.status };
