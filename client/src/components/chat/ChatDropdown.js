@@ -25,12 +25,12 @@ const ChatDropdown =()=>{
     return (
         <div className="chat-icon-container" onContextMenu={handleContextMenu}>
             <button ref={chatRef} onClick={() => setShowMessages(!showMessages)} className="relative">
-                <img src={icon_message} className="w-6 h-6 text-black" alt="Messages" />
-                    {messages.length > 0 && (
-                    <span className="notification-badge">
-                        {messages.length}
-                    </span>
+                {messages.length > 0 && (
+                <span className="notification-badge">
+                    {messages.length}
+                </span>
                 )}
+                <img src={icon_message} className="w-6 h-6 text-black" alt="Messages" />
             </button>
 
             {showMessages && (

@@ -6,10 +6,11 @@ import { useParams } from 'react-router-dom';
 import "./Chatfunction.css";
 import ChatFooter from './ChatFooter.js'
 
-const ChatBody =({ showContextMenu, setShowContextMenu, messages, user, socket, setMessages })=>{
+const ChatBody =({ showContextMenu, setShowContextMenu, user, socket, messages, setMessages })=>{
     const { token } = useAuthContext();
     const { workspaceId, userId } = useParams();
-    const { username, setUsername }=useState('');
+    //const [messages, setMessages]=useState([]);
+    messages = messages || [];
 
     const fetchMessages = async () => {
         const response = await getAllMessages(token, workspaceId);
@@ -47,7 +48,7 @@ const ChatBody =({ showContextMenu, setShowContextMenu, messages, user, socket, 
                 <span className="font-semibold text-center">CHAT</span>
                     <div className="flex justify-between items-center mb-2">
                         <div className="message_container">
-                            {messages.slice().reverse().map(message => (
+                            {messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).map((message) => (
                                 <div className="messages" onContextMenu={handleContextMenu} key={message.id}>
                                     {message.userId === user.id ? (
                                         <p className="sender_name">{user.username}</p>
@@ -70,7 +71,7 @@ const ChatBody =({ showContextMenu, setShowContextMenu, messages, user, socket, 
                             ))}
                         </div>
                     </div>
-                <ChatFooter socket={socket} setMessages={setMessages}/>
+                <ChatFooter socket={socket} setMessages={setMessages} messages={messages}/>
             </div>
         </div>
     );
