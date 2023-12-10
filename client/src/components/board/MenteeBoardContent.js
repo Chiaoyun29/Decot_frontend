@@ -1,20 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import { getBoardById, getCanvases } from '../services/api';
+import { getBoardById, getCanvases, getBoardMembers } from '../services/api';
 
 const MenteeBoardContent = () => {
   const { boardId, workspaceId } = useParams();
   const [board, setBoard] = useState(null);
   const { token } = useAuthContext();
-  const [boards, setBoards] = useState([]);
+  //const [boards, setBoards] = useState([]);
   const [canvases, setCanvases] = useState([]);
+  const [boardMembers, setBoardMembers] = useState([]);
+  //const [selectedMember, setSelectedMember] = useState(null);
 
   const fetchCanvases = async () => {
     const response = await getCanvases(token, boardId, workspaceId);
     console.log(response);
     if (response.status === 200) {
       setCanvases(response.canvases);
+    } else {
+      console.error(response.error);
+    }
+  };
+
+  const fetchBoardMembers = async() =>{
+    const response = await getBoardMembers(token, boardId, workspaceId);
+    if (response.status === 200) {
+      setBoardMembers(response.members);
     } else {
       console.error(response.error);
     }
@@ -36,6 +47,10 @@ const MenteeBoardContent = () => {
     fetchBoard();
   }, [boardId, token]);
 
+  useEffect(() => {
+    fetchBoardMembers();
+  }, [boardId, workspaceId, token]);
+
   if (!board) return (<div className="flex items-center justify-center min-h-screen">
   <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
 </div>);
@@ -55,9 +70,7 @@ const MenteeBoardContent = () => {
       </div>
 
     {/* Main content container */}
-
         {/* Your main content */}
-        {/* Section */}
       <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
         <div className="p-4 bg-white rounded shadow-md">
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

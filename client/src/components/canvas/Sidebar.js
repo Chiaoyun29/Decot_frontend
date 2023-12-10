@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Palette } from '../canvas/Palette';
-import { PiPencil, PiEraser, PiStickerDuotone, PiDownload, PiUploadSimpleDuotone, PiShapes } from 'react-icons/pi';
+import { PiPencil, PiEraser, PiStickerDuotone, PiUploadSimpleDuotone, PiShapes } from 'react-icons/pi';
 import { RiDeleteBinLine } from 'react-icons/ri';
-import { IoMenu, IoHomeOutline } from 'react-icons/io5';
+import { IoMenu } from 'react-icons/io5';
 import { BsTextareaT } from "react-icons/bs";
-import { Link } from 'react-router-dom';
 import GridLines from './GridLines';
+import { MdSaveAlt } from "react-icons/md";
+import { BiExport } from "react-icons/bi";
+import DrawAndErase from './DrawAndErase';
 
-const Sidebar = ({ setToDraw, setToErase, handleAddingNote, deleteCanvas, saveImageToLocal, HandleUploadAndDisplay, handleAddingShape, toggleSidebar, handleAddingTextbox, gridCanvasRef }) => {
+const Sidebar = ({ setToDraw, setToErase, handleAddingNote, deleteCanvas, saveImageToLocal, handleUploadAndDisplay, handleAddingShape, toggleSidebar, handleAddingTextbox, gridCanvasRef, drawingCanvasRef, handleSaveCanvas }) => {
   const [showPalette, setShowPalette]=useState(false);
   const [open, setOpen] = useState(false);
 
@@ -20,9 +22,10 @@ const Sidebar = ({ setToDraw, setToErase, handleAddingNote, deleteCanvas, saveIm
     { label: 'Erase', icon: <PiEraser />, onClick: setToErase },
     { label: 'Sticky Notes', icon: <PiStickerDuotone />, onClick: handleAddingNote },
     { label: 'Delete', icon: <RiDeleteBinLine />, onClick: deleteCanvas },
-    { label: 'Upload Image', icon: <PiUploadSimpleDuotone />, onClick: HandleUploadAndDisplay },
+    { label: 'Upload Image', icon: <PiUploadSimpleDuotone />, onClick: handleUploadAndDisplay },
     { label: 'Add Text', icon: <BsTextareaT />, onClick: handleAddingTextbox },
     { label: 'Insert Shapes', icon: <PiShapes />, onClick: handleTogglePalette },
+    { label: 'Save Canvas', icon: <MdSaveAlt />, onClick: handleSaveCanvas },
   ];
 
   const onDrop = (type) => {
@@ -69,41 +72,26 @@ const Sidebar = ({ setToDraw, setToErase, handleAddingNote, deleteCanvas, saveIm
               console.log(`Selected shape: ${type}`);
             }}/>
           )}
-          {/* <a className="sidebar-button" href="download_link" onClick={saveImageToLocal}>
-            <PiDownload/><span>Download Image</span>
-          </a>
-          <Link to="/dashboard">
-            <button className="sidebar-button"><IoHomeOutline/><span>Dashboard</span></button>
-          </Link> */}
+
           {open ? (
           <>
             <a className="sidebar-button" href="download_link" onClick={saveImageToLocal}>
-              <PiDownload />
-              <span>Download Image</span>
+              <BiExport />
+              <span>Export Image</span>
             </a>
-            <Link to="/dashboard">
-              <button className="sidebar-button">
-                <IoHomeOutline />
-                <span>Dashboard</span>
-              </button>
-            </Link>
           </>
         ) : (
           <>
             <a className="sidebar-button" href="download_link" onClick={(e) => handleButtonClick(e, saveImageToLocal)}>
-              <PiDownload />
+              <BiExport />
             </a>
-            <Link to="/dashboard">
-              <button className="sidebar-button" onClick={(e) => handleButtonClick(e, handleButtonClick)}>
-                <IoHomeOutline />
-              </button>
-            </Link>
           </>
         )}
         </div>
           {/* <input type="file" id="fileInput" onChange={handleFileInput} style={{ display: 'none' }}/> */}
       </div>
       <GridLines gridCanvasRef={gridCanvasRef} sidebarWidth={open?72:16}/>
+      {/* <DrawAndErase drawingCanvasRef={drawingCanvasRef} sidebarWidth={open?72:16}/> */}
     </section>
   );
 };

@@ -11,13 +11,16 @@ import { PropertiesPanel } from './PropertiesPanel';
 import { useShapes } from "./state";
 import ShapeCanvas from "./ShapeCanvas";
 import AddText from './AddText';
+import UploadAndDisplayImage from './UploadAndDisplayImage';
+import Navbar from '../common/Navbar';
+import xmlbuilder from 'xmlbuilder';
+import { saveCanvasData } from '../services/api.js';
 
 const Canvas = () => {
   const { boardId, workspaceId, canvasId } = useParams();
   const drawingCanvasRef = useRef(null);
   const drawingContextRef = useRef(null);
-  const gridCanvasRef = useRef(null);
-  const stickyNoteCanvasRef = useRef(null);
+  //const stickyNoteCanvasRef = useRef(null);
   const saveInterval = useRef(null);
   const shapeCanvasRef = useRef(null);
   const shapeContextRef = useRef(null);
@@ -26,13 +29,17 @@ const Canvas = () => {
   const [isStickyNoteMode, setIsStickyNoteMode] = useState(false);
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
-  const [image, setImage] = useState(null);
+  const [isAddingImage, setIsAddingImage] = useState(null);
   const navigate = useNavigate();
   const shapes = useShapes((state)=>Object.entries(state.shapes));
   const [isAddingShape, setIsAddingShape] = useState(false);
   const stageRef=useRef(null);
   const [isAddingTextbox, setIsAddingTextbox] = useState(false);
-  const textboxRef = useRef(null);
+  //const textboxRef = useRef(null);
+  const imageRef = useRef(null);
+  const [drawingData, setDrawingData] = useState([]);
+  const { token } = useAuthContext();
+  const [stickyNotes, setStickyNotes] = useState([]);
   
   useEffect(()=>{
     if(user){
@@ -51,17 +58,7 @@ const Canvas = () => {
     };
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
-    /* const saveCanvasData = (canvasData) =>{
-      axios.post('/api/saveCanvas', { canvasData })
-        .then((response) => {
-          console.log('Canvas data saved successfully:', response.data);
-        })
-        .catch((error) => {
-          console.error('Error saving canvas data:', error);
-        });
-    };
-    saveInterval.current = setInterval(saveCanvasData, 1000);
-    */
+    
     return()=>{
       window.removeEventListener('resize', resizeCanvas);
       clearInterval(saveInterval.current);
@@ -76,7 +73,7 @@ const Canvas = () => {
     drawingContextRef.current.globalCompositeOperation = 'destination-out';
   };
 
-  const addNote = (event)=>{
+  const addNotes = (event)=>{
     event.preventDefault();
     console.log('Note added:', event.target.elements[0].value);
     setIsAddingNote(false);
@@ -84,6 +81,18 @@ const Canvas = () => {
 
   const handleAddingNote=()=>{
     setIsAddingNote(!isAddingNote);
+  };
+
+  const addStickyNote = (newNote) => {
+    setStickyNotes((prevNotes) => [...prevNotes, newNote]);
+  };
+
+  const updatePosition = (noteId, newX, newY) => {
+    setStickyNotes((prevNotes) =>
+      prevNotes.map((note) =>
+        note.id === noteId ? { ...note, x: newX, y: newY } : note
+      )
+    );
   };
 
   const saveImageToLocal = (event) => {
@@ -104,15 +113,8 @@ const Canvas = () => {
     }
   };
 
-  const HandleUploadAndDisplay = () => {//need to use socket?
-    axios.post('http://localhost:5000/canvas/imageUpload', image)
-    .then(res =>{
-      console.log('Axios response: ', res)
-    })
-  };
-
-  const handleFileInput = (e) => {
-    console.log('handleFileInput working!')
+  const handleUploadAndDisplay = () => {
+    setIsAddingImage(!isAddingImage);
   };
 
   const handleAddingShape=()=>{
@@ -135,17 +137,53 @@ const Canvas = () => {
     setIsAddingTextbox(false);
   };
 
+  const serializeDrawingDataToXml = () => {
+    const root = xmlbuilder.create('drawingData');
+    if(Array.isArray(drawingData)){
+      drawingData.forEach(({ type, x, y }) => {
+        root
+          .ele('drawOperation')
+          .att('type', type)
+          .ele('x')
+          .txt(x.toString())
+          .up()
+          .ele('y')
+          .txt(y.toString())
+          .up()
+          .up();
+      });
+    }else{
+      console.error('Drawing data is not an array: ', drawingData);
+    }
+
+    return root.end({ pretty: true });
+  };
+
+  const handleSaveCanvas = async() => {
+    const serializeDrawingDataXml = serializeDrawingDataToXml();
+    console.log('Serialized Drawing Data (XML):', serializeDrawingDataXml);
+    try {
+      const data = await saveCanvasData(token, boardId, canvasId, workspaceId, serializeDrawingDataXml);
+      setDrawingData(data);
+      console.log('Data saved successfully:', data);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
+
   return (
     <div>
+      <Navbar />
       <Sidebar
         setToDraw={setToDraw}
         setToErase={setToErase}
         handleAddingNote={handleAddingNote}
         deleteCanvas={deleteCanvas}
         saveImageToLocal={saveImageToLocal}
-        HandleUploadAndDisplay={HandleUploadAndDisplay}
+        handleUploadAndDisplay={handleUploadAndDisplay}
         handleAddingShape={handleAddingShape}
         handleAddingTextbox={handleAddingTextbox}
+        handleSaveCanvas={handleSaveCanvas}
       />
       <DrawAndErase 
         drawingCanvasRef={drawingCanvasRef}
@@ -154,12 +192,14 @@ const Canvas = () => {
         setIsDrawing={setIsDrawing}
         setIsChanged={setIsChanged}
         isStickyNoteMode={isStickyNoteMode}
+        setDrawingData={setDrawingData}
       />
       {isAddingNote&&(
         <StickyNote
-          stickyNoteCanvasRef={stickyNoteCanvasRef}
+          drawingCanvasRef={drawingCanvasRef}
           isAddingNote={isAddingNote}
-          addNote={addNote}
+          addNote={addNotes}
+          updatePosition={updatePosition}
         />
       )}
       {isAddingShape&&(
@@ -171,9 +211,15 @@ const Canvas = () => {
       )}
       {isAddingTextbox&&(
         <AddText 
-          textboxRef={textboxRef}
+          drawingCanvasRef={drawingCanvasRef}
           handleAddingTextbox={handleAddingTextbox}
           AddText={addText}
+      />
+      )}
+      {isAddingImage&&(
+        <UploadAndDisplayImage 
+          imageRef={imageRef}
+          handleUploadAndDisplay={handleUploadAndDisplay}
       />
       )}
       {/* <PropertiesPanel />*/}
