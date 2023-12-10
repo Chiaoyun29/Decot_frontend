@@ -112,7 +112,7 @@ const CommentPanel = ({ token, workspaceId, boardId, canvasId, isOpen, onClose, 
 
 
     return (
-        <div className="fixed inset-y-0 right-0 transform transition-transform duration-300 ease-in-out"
+        <div className="fixed inset-y-0 right-0 top-20 transform transition-transform duration-300 ease-in-out"
             style={{ width: isOpen ? '20rem' : '0', backgroundColor: 'white' }}>
             <div className="py-4 px-4 pt-4 pb-0 flex justify-between items-center border-b">
                 <h2 className="px-2 text-xl font-semibold">Comments</h2>
