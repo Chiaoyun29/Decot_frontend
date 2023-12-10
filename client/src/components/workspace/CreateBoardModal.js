@@ -63,11 +63,11 @@ const CreateBoardModal = ({ isOpen, onClose, onBoardCreated }) => {
             className="block w-full p-2 mb-4 border border-gray-300 rounded-md"
           >
             <option value="" disabled>Select design thinking stage</option>
-            <option value="Stage 1 (Empathize)">Empathize</option>
-            <option value="Stage 2 (Define)">Define</option>
-            <option value="Stage 3 (Ideate)">Ideate</option>
-            <option value="Stage 4 (Prototype)">Prototype</option>
-            <option value="Stage 5 (Test)">Test</option>
+            <option value="Stage 1 (Empathize)">Stage 1 (Empathize)</option>
+            <option value="Stage 2 (Define)">Stage 2 (Define)</option>
+            <option value="Stage 3 (Ideate)">Stage 3 (Ideate)</option>
+            <option value="Stage 4 (Prototype)">Stage 4 (Prototype)</option>
+            <option value="Stage 5 (Test)">Stage 5 (Test)</option>
           </select>
           <DatePicker
             selected={deadline}
