@@ -7,41 +7,59 @@ import { BsTextareaT } from "react-icons/bs";
 import GridLines from './GridLines';
 import { MdSaveAlt } from "react-icons/md";
 import { BiExport } from "react-icons/bi";
-import DrawAndErase from './DrawAndErase';
 
-const Sidebar = ({ setToDraw, setToErase, handleAddingNote, deleteCanvas, saveImageToLocal, handleUploadAndDisplay, handleAddingShape, toggleSidebar, handleAddingTextbox, gridCanvasRef, drawingCanvasRef, handleSaveCanvas }) => {
+const Sidebar = ({ activateDrawingMode, activateErasingMode, isDrawing, isErasing, handleAddingNote, deleteCanvas, saveImageToLocal, handleUploadAndDisplay, handleAddingShape, handleAddingTextbox, gridCanvasRef, handleSaveCanvas, setIsDrawing, onSelectShape, setIsErasing }) => {
   const [showPalette, setShowPalette]=useState(false);
   const [open, setOpen] = useState(false);
+  const [activeButton, setActiveButton] = useState(null);
 
   const handleTogglePalette=()=>{
     setShowPalette(!showPalette);
   };
 
+  const handleToggleDrawing=()=>{
+    //setToDraw();
+    setIsDrawing(true);
+    // setIsErasing(false);
+    if (true) {
+      activateDrawingMode(); // Activate drawing mode only if isDrawing was false
+    }
+  };
+
+  const handleToggleErasing=()=>{
+    // setToErase();
+    setIsErasing(true);
+    // setIsDrawing(false);
+    if (!isErasing) {
+      activateErasingMode(); // Activate erasing mode only if isErasing was false
+    }
+  };
+
   const buttons = [
-    { label: 'Draw', icon: <PiPencil />, onClick: setToDraw },
-    { label: 'Erase', icon: <PiEraser />, onClick: setToErase },
+    { label: 'Draw', icon: <PiPencil />, onClick: handleToggleDrawing },
+    { label: 'Erase', icon: <PiEraser />, onClick: handleToggleErasing },
     { label: 'Sticky Notes', icon: <PiStickerDuotone />, onClick: handleAddingNote },
     { label: 'Delete', icon: <RiDeleteBinLine />, onClick: deleteCanvas },
     { label: 'Upload Image', icon: <PiUploadSimpleDuotone />, onClick: handleUploadAndDisplay },
     { label: 'Add Text', icon: <BsTextareaT />, onClick: handleAddingTextbox },
-    { label: 'Insert Shapes', icon: <PiShapes />, onClick: handleTogglePalette },
     { label: 'Save Canvas', icon: <MdSaveAlt />, onClick: handleSaveCanvas },
+    { label: 'Insert Shapes', icon: <PiShapes />, onClick: handleTogglePalette },
   ];
 
-  const onDrop = (type) => {
-    console.log(`Selected shape: ${type}`);
-    handleAddingShape(type);
-  };
-
-  const handleButtonClick = (event, onClick) => {
+  const handleButtonClick = (event, onClick, buttonLabel) => {
     if(event){
       event.preventDefault();
+    }
+    if(activeButton === buttonLabel){
+      setActiveButton(null);
+    }else{
+      setActiveButton(buttonLabel);
     }
     onClick(event);
   };
 
   return (
-    <section className="flex">
+    <div className="flex">
       <div className={`bg-[#FCD34D] ${open ? 'w-72' : 'w-16'} h-screen duration-500 text-black-100 overflow-x-hidden transition-all`}>
         <div className="mt-4 flex flex-col relative">
           <div className={`py-3 flex ${open ? 'justify-start pl-2' : 'justify-center'}`}>
@@ -52,15 +70,15 @@ const Sidebar = ({ setToDraw, setToErase, handleAddingNote, deleteCanvas, saveIm
             ?buttons.map((button, index)=>(
               <button
                 key={index}
-                className="sidebar-button"
-                onClick={(e)=> handleButtonClick(undefined, button.onClick)}>
+                className={`sidebar-button ${activeButton === button.label ? 'active-button-class' : ''}`}
+                onClick={(e)=> handleButtonClick(e, button.onClick, button.label)}>
                 {button.icon}<span>{button.label}</span>
               </button>
             ))
             :buttons.map((button, index)=>(
               <button
               key={index}
-              className="sidebar-button"
+              className={`sidebar-button ${!open ? 'sidebar-button-center' : ''}`}
               onClick={(e) => handleButtonClick(undefined, button.onClick)}
             >
               {button.icon}
@@ -68,9 +86,7 @@ const Sidebar = ({ setToDraw, setToErase, handleAddingNote, deleteCanvas, saveIm
           ))}
 
           {showPalette&&(
-            <Palette onShapeSelect={(type)=>{
-              console.log(`Selected shape: ${type}`);
-            }}/>
+            <Palette onSelectShape={onSelectShape}/>
           )}
 
           {open ? (
@@ -82,17 +98,16 @@ const Sidebar = ({ setToDraw, setToErase, handleAddingNote, deleteCanvas, saveIm
           </>
         ) : (
           <>
-            <a className="sidebar-button" href="download_link" onClick={(e) => handleButtonClick(e, saveImageToLocal)}>
+            <a className={`sidebar-button ${!open ? 'sidebar-button-center' : ''}`} href="download_link" onClick={(e) => handleButtonClick(e, saveImageToLocal)}>
               <BiExport />
             </a>
           </>
         )}
         </div>
-          {/* <input type="file" id="fileInput" onChange={handleFileInput} style={{ display: 'none' }}/> */}
       </div>
       <GridLines gridCanvasRef={gridCanvasRef} sidebarWidth={open?72:16}/>
       {/* <DrawAndErase drawingCanvasRef={drawingCanvasRef} sidebarWidth={open?72:16}/> */}
-    </section>
+    </div>
   );
 };
 

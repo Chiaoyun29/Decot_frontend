@@ -21,17 +21,35 @@ const MenteeWorkspaceContent = () => {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const navigate = useNavigate();
   const [boards, setBoards] = useState([]);
-  const [board, setBoard] = useState(null);
   const [showMessages, setShowMessages] = useState(false);
   const [boardMembers, setBoardMembers] = useState([]);
-  const [selectedMember, setSelectedMember] = useState(null);
-  const [isMBoardMember, setIsMBoardMember] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const isBoardMember = async (userId, boardId) =>{
+    // try{
+    //   const response=await checkBoardMember(token, userId, boardId);
+    //   if (response.status === 200){
+    //     return true;
+    //   // }else{
+    //   //   setIsMBoardMember(false);
+    //   //   console.log(response.error);
+    //   }
+    // }catch(error){
+    //   console.error('Error: ', error)
+    // }
+    return await checkBoardMember(token, userId, boardId);
+  };
 
   const fetchBoards = async () => {
     const response = await getBoards(token, workspaceId);
     console.log(response);
-    if (response.status === 200) {
-      setBoards(response.boards);
+    if (response.boards) {
+      const boardsWithMembership = await Promise.all(response.boards.map(async(board)=>{
+        const isMember = await isBoardMember(user.id, board.id);
+        return { ...board, isMember };
+      }));
+      setBoards(boardsWithMembership);
+      console.log("Updated boards: ", boardsWithMembership);
     } else {
       console.error(response.error);
     }
@@ -39,24 +57,7 @@ const MenteeWorkspaceContent = () => {
 
   useEffect(() => {
     fetchBoards();
-  }, [workspaceId, token]);
-
-  useEffect(()=>{
-    isBoardMember();
-  }, [])
-
-  // const fetchBoardMembers = async() =>{
-  //   try{
-  //     const response = await getBoardMembers(token, boardId, workspaceId);
-  //     if (response&&response.status === 200) {
-  //       setBoardMembers(response.members);
-  //     } else {
-  //       console.error(response?response.error: 'Unknown error');
-  //     }
-  //   }catch(error){
-  //     console.error('Error fetching board members:', error);
-  //   }
-  // };
+  }, [workspaceId, userId, token]);
 
   useEffect(() => {
     const fetchWorkspace = async () => {
@@ -129,21 +130,6 @@ const MenteeWorkspaceContent = () => {
     }
   };
 
-  const isBoardMember = async (userId, boardId) =>{
-    try{
-      const response=await checkBoardMember(token, userId, boardId);
-      if (response.status === 200){
-        setIsMBoardMember(true);
-      }else{
-        setIsMBoardMember(false);
-        console.log(response.error);
-      }
-    }catch(error){
-      setIsMBoardMember(false);
-      console.error('Error: ', error)
-    }
-  };
-
   if (!workspace) {
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -151,6 +137,14 @@ const MenteeWorkspaceContent = () => {
         </div>
     );
   }
+
+  const handleSearchChange = (event) =>{
+    setSearchQuery(event.target.value);
+  }
+
+  const filteredBoards = boards.filter(board =>
+    board.boardTitle.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
@@ -300,11 +294,23 @@ const MenteeWorkspaceContent = () => {
         </li>
         {/* Your main content */}
         {/* Section */}
+        <div className="flex justify-between items-center py-2">
+          <div className="relative flex-grow">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-2"> 
+              <button type="submit" className="p-2 focus:outline-none focus:ring">
+                <svg fill="currentColor" viewBox="0 0 512 512" className="w-5 h-5 dark:text-gray-400">
+                  <path d="M479.6,399.716l-81.084-81.084-62.368-25.767A175.014,175.014,0,0,0,368,192c0-97.047-78.953-176-176-176S16,94.953,16,192,94.953,368,192,368a175.034,175.034,0,0,0,101.619-32.377l25.7,62.2L400.4,478.911a56,56,0,1,0,79.2-79.195ZM48,192c0-79.4,64.6-144,144-144s144,64.6,144,144S271.4,336,192,336,48,271.4,48,192ZM456.971,456.284a24.028,24.028,0,0,1-33.942,0l-76.572-76.572-23.894-57.835L380.4,345.771l76.573,76.572A24.028,24.028,0,0,1,456.971,456.284Z"></path>
+                </svg>
+              </button>
+            </span>
+            <input type="search" name="Search" placeholder="Search Board..." className="py-2 pl-10 text-m rounded-md" value={searchQuery} onChange={handleSearchChange} />
+          </div>
+        </div>
         <div className="p-4 bg-white rounded shadow-md">
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {boards.map((board) => {
-              const userIsMember = isBoardMember(user.id, board.id);
-                return userIsMember?(
+            {filteredBoards.filter(board=>board.isMember).map((board) => ( //boards.map
+              // const userIsMember = isBoardMember(user.id, board.id);
+                // return userIsMember?(
                   <li key={board.id} className="p-15 border rounded-md">
                     <Link to={`board/${board.id}`} className="block">
                       <div className="text-center font-medium">{board.boardTitle}</div>
@@ -316,12 +322,7 @@ const MenteeWorkspaceContent = () => {
                       </div>
                     </Link>
                   </li>
-                ):(
-                  <li key={board.id} className="p-15 border rounded-md">
-                    <div className="text-center text-gray-600">You are not a member of this board</div>
-                  </li>
-                );
-            })}
+            ))}
           </ul>
         </div>
       </div>

@@ -7,7 +7,7 @@ const Feedback=()=>{
     return(
         <div>
             <a href={gmailURL} target="_blank" rel="noopener noreferrer">
-                <button className="w-6 h-6 text-gray-800 dark:text-white" onClick={() => window.location.href = gmailURL}>
+                <button className="w-6 h-6 text-gray-800 dark:text-white">
                     <TbHelpSquareFilled size={25} alt="Feedback" />
                 </button>
             </a> 

@@ -1,119 +1,118 @@
 .canvas-container {
     position: absolute;
-    margin-left: 300px;
+    margin-left: 15vw;
+    height: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
 }
-.display_under{
-    background-color: #ece75f; /* yellow */
-    border: none;
-    color: black;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
+
+.sidebar-button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: 50px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  background-color: #f9a826; /* Set the background color for the buttons */
+  transition: background-color 0.3s ease;
+  padding: 0 5%;
 }
-/* .sidebar-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 200px; 
-    background-color: #FCD34D; 
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-  } */
-  
-  .sidebar-button {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    height: 50px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    background-color: #f9a826; /* Set the background color for the buttons */
-    transition: background-color 0.3s ease;
-    padding: 0 25px;
-  }
-  
-  .sidebar-button:hover {
-    background-color: #FFC043; /* Set the background color for the buttons on hover */
-  }
-  
-  .sidebar-button i {
-    margin-bottom: 8px;
-  }
 
-  .sidebar-button span{
-    margin-left: 12px;
-  }
+.active-button-class{
+  background-color: #FFC043;
+}
+.sidebar-button:hover {
+  background-color: #FFC043; /* Set the background color for the buttons on hover */
+}
 
-  .note-form{
-    display: middle;
-    flex-direction: column;
-    width: 200px;
-    margin: 0 auto;
-  }
+.sidebar-button i {
+  margin-bottom: 8px;
+}
 
-  .note-form button:hover {
-    background-color: tomato;
-    color: white;
-  }
+.sidebar-button span{
+  margin-left: 12px;
+}
 
-  .note-form textarea{
-    font-family: Arial, sans-serif;
-    border: 1px solid gray;
-    min-width: 100%;
-    max-width: 100%;
-    height: 100px;
-    padding: 10px;
-    outline: none;
-  }
+.note-form{
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 90%;
+}
 
-  .note-form button{
-    width: 100%;
-    background-color: #fff27f;
-    cursor: pointer;
-    padding: 10px;
-    border: 0;
-    outline: none;
-  }
+.note-form button:hover {
+  background-color: tomato;
+  color: white;
+}
 
-  .note{
-    position: absolute;
-    cursor: pointer;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANMAAADvCAMAAABfYRE9AAABMlBMVEX394D////+/vb39335+aP4+JjGxsb393v7+7rIyMjLy8vx8Yjb29v8/PzOzs74+PjV1dXy8vLh4eHq6uru7u7Y2Njh4Z/Dw8mQAACvAACgAACZAADw8IjTAADLAAC7AADUKADDAACqAACGAADr66n8/Mbx8X2amlGHh0aLi0jy8rHQ0NbULAC9AACNAADn53nbAACkpFfX13Dl5ev+/uv9/eH9/dj8/M/18Hrw2m/nwmTUej/SSCbVOh/eaTfrrlrapFW+KRXbMSbz4HPar1vhV1XgY0C0PiDgYVLkaGjjjU3XMBbXPzPMXzHREBbdm1DJiEi7Wi/Ix2msTCrddDy2tl+cVC7OzomPazmtJyfOzsK9vXS4ODq+vp2JVy+rExS4uKh5cz2TPCCnp2x5aznd3aSp+WFLAAAFV0lEQVR4nO3dC1MTVxTA8YWlCxt2s3lsKAnNEwxogZgUbAJaBNtS2yryiNZqRaT9/l+h99xNICR3l00HJvecnj+jMzCZsL+cuy8ENKboZUx6A+4hNuFo1DS9tbW1vb395Mn30MxXaHoQbnowP183ZGavdqfTaZu6NzsXYTJN40Y7u0+fPfthr23oXaRp6LHP90tF0cHZi4lsauzim8wf84JUqVQOfvr5hRnydFoU39Q+LEtSpfLLy18pmNo7R7uFqiCtr69Xfnv5u9aDimUyO6/287W+ab1y8HoPu6l9VM7ny1emSqVY0nrxxTEd5UW1wpLcn3qmiW70LcUw7ezXakK0tCSOe/IYUSxuPEc7p2DDXxUEaHNxaakgBlUEUinfwWqak4/YEaLFzeVFiZIn3Wp+V2dStElseb3+RpAWl5c3JSpfrm6Ua8daH8qjTNNzZr3eaB0LUs8kFmFBdNyZ9FZHF2WaqTcarZPTAVNNHNOrpTPNL2JDTa47PSNE3e5pIUDB0quVq48fF7GaXNfzFwSp2XwrTYubmzCnjaIwaX1yMkJNrpf2nXeCtLr6R+G9GJGsVgbS671Jb/QtqU2ClM38+UGQHq6tnX/8KDwFsTNVgVR6qvntk9oEJCf5F5CE6dP5+/OCJMHZqVTSfUxKk5xSyv7clGNau/giLo1qNTjiiapn9Ulv820pTK7n+Zlc0vp8uRqY/v4CF7HlchXS/cbdCDHBmBLXpouLt3BigvaPGtqPSWGCMWWdvglQ4Pp0enh4ePymVdefpDSlfTkn6xKOET3Uw9XVZvekgYE0anIDk9ifhKkJk5KBqNVAsPAMtQn2J1h8l11AyZpdIKGYktIUDEqgPnQFStbFMyRDuT8JkxhUJpcS10ZBJyctNEMyQkyw+sSk3p0EtaQIDUl5fpKTEstvoRXUQDQjSHltJI8TaX+mIcM0Ipn6GlaqxH1u0KS3cdzC7p9cuM818HmgyK9HaP3VofDYhCM24YhNOGITjtiEIzbhiE04YhOO2IQjNuGITThiE47YhCM24YhNOGITjtiEIzbhiE04YhOO2IQjNuGITThiE47YhCM24YhNOGITjtiEIzbhiLDJJWdyXWom+PktNmleYPLYpHlg8kS0TJLEJs0LTGmxQ9Ez0ZqTR8/0CH5cn9jaewQkkqY0RROt/QlEPjmT75Mz+WzSP5omIGXpmbLkTNksm7SPpilL0PQdmxBE1pTJkDNl6JkybNI/kqYVgiaeE4rYhCM24UiaHHImxyFnciBa/6bGJhSxCUezKznHydEymSvfOjl6phyb9I+sKUXPlKJnSrFJ/3omUt/jyyYcsQlH0pRkk+4RNk0RMyWTbNI+uqYMmzTPXGAThqQpwSbdYxOOwJSgZ0oQnFMiYVM0ZYmZvmYTgtiEIzbhSJosiiafnMm2yZlsm96cbJJzImlKkzLNsglF0mQRNJGck8cmzQvWHpt0D0wWQZNtu+RMFpu0j004EibLSlA0TbFJ88iakmzSPTbhiKwpxSbdYxOOyJpybNI9NuFImpz/kWnWHOiOP3HvKa+f3ryzIk3z99k34m3gHfhLNvyw4Q+NPgjev/Gxf4QpozQFBb9a3w/K3iwznDNYrl9quKSixEh2wh7Isi1L/olZbJMfmxQKiuWxQxpDdZspnkhFijWiEZMdgrICVyxYpEkFGvX89yENk8JA/UnFnFWUKfhvhzwvWIP9mSl1N02p3O2e0Z0ofN3BlABkx1t+UabQ3H6ep2Ir0FfeEaYaFGvb79Q0Pn6Qrxz7Df0VfgA+xpHifk1j5w41/EL0X4TrF2CQL8dtyW+znPoXGo8ufnwucC4AAAAASUVORK5CYII=');
-    background-size: cover;
-    top: 100px;
-    left: 300px;
-    height: 200px;
-    width: 200px;
-    padding: 20px;
-  }
+.note-form textarea{
+  font-family: Arial, sans-serif;
+  border: 1px solid gray;
+  min-width: 100%;
+  max-width: 100%;
+  height: 100px;
+  padding: 10px;
+  outline: none;
+}
 
-  .note .text {
-    font-family: Arial, sans-serif;
-    height: 100%;
-    width: 100%;
-    white-space: pre-wrap;
-    overflow-y: scroll;
-  }
+.note-form button{
+  width: 100%;
+  background-color: #fff27f;
+  cursor: pointer;
+  padding: 10px;
+  border: 0;
+  outline: none;
+}
 
-  .note .close {
-    width: 15px;
-    height: 15px;
-    position: absolute;
-    right: 15px;
-    transition: transform .3s ease;
-  }
+.note{
+  position: absolute;
+  cursor: pointer;
+  background-image: url('data:image/png;base64,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');
+  background-size: cover;
+  top: 10%;
+  left: 15%;
+  height: 20vh;
+  width: 12vw;
+  padding: 2vw;
+}
 
-  .note .close:hover {
-    transform: scale(1.6);
+.note .text {
+  font-family: Arial, sans-serif;
+  height: 100%;
+  width: 100%;
+  white-space: pre-wrap;
+  overflow-y: scroll;
+}
+
+.note .close {
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  right: 15px;
+  transition: transform .3s ease;
+}
+
+.note .close:hover {
+  transform: scale(1.6);
 }
 
 .fixed-width{
   width: 200px;
+}
+
+@media screen and (max-width: 768px) {
+  .fixed-width {
+    width: 150px; /* Smaller width on smaller screens */
+  }
+}
+
+.sidebar-button-center {
+  justify-content: center;
+}
+
+h2{
+  text-align: center;
 }

@@ -73,7 +73,6 @@ export const getWorkspaces = async (token) => {
         'Authorization': `Bearer ${token}`,
       },
     });
-
     const data = await response.json();
     return { ...data, status: response.status };
 
@@ -196,7 +195,7 @@ export const removeWorkspaceMember = async (token, workspaceId, userId) => {
 
 export const addWorkspaceMember = async (token, workspaceId, boardId, userId) => {
   try {
-    const response = await fetch(`${API_URL}/board/workspace/${workspaceId}/board/${boardId}/members/${userId}`, {
+    const response = await fetch(`${API_URL}/board/workspace/${workspaceId}/board/${boardId}/members/${userId}/add`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -227,6 +226,23 @@ export const getBoardMembers = async (token, boardId, workspaceId) => {
   } catch (error) {
     console.error(error);
     return null;
+  }
+};
+
+export const deleteWorkspaceMember = async (token, workspaceId, boardId, userId) => {
+  try {
+    const response = await fetch(`${API_URL}/board/workspace/${workspaceId}/board/${boardId}/members/${userId}/delete`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log(response);
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Network response was not ok');
+    }
+    return { status: response.status, data };
+  } catch (error) {
+    console.error(error);
   }
 };
 
@@ -368,7 +384,7 @@ export const getBoards = async (token, workspaceId) => {
       },
     });
     console.log(workspaceId);
-    //console.log(token);
+    console.log(token);
     console.log(response);
     const data = await response.json();
     return { ...data, status: response.status };
@@ -406,7 +422,6 @@ export const joinBoard = async (token) => {
       },
       body: JSON.stringify({}),
     });
-    console.log("Wthell")
     const data = await response.json();
     return { ...data, status: response.status };
 
@@ -454,9 +469,9 @@ export const deleteBoard = async (token, boardId, workspaceId) => {
   }
 };
 
-export const createMessage = async (token, message, workspaceId) => {
+export const createMessage = async (token, message, workspaceId, userId) => {
   try {
-    const response = await fetch(`${API_URL}/message/${workspaceId}/create`, {
+    const response = await fetch(`${API_URL}/message/${workspaceId}/create/${userId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -464,7 +479,7 @@ export const createMessage = async (token, message, workspaceId) => {
       },
       body: JSON.stringify({ message }),
     });
-    console.log(workspaceId);
+    //console.log(workspaceId);
     const data = await response.json();
     return { data:data, status: response.status };
 
@@ -510,6 +525,24 @@ export const deleteMessage = async (token, messageId, workspaceId) => {
   } catch (error) {
     console.error('Failed to delete message:', error);
     return { error: 'Failed to delete message', status: 0 };
+  }
+};
+
+export const updateReadStatus = async (token, messageIds, workspaceId) => {
+  try {
+      const response = await fetch(`${API_URL}/message/${workspaceId}/updateRead`, {
+          method: 'PATCH',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ messageIds }),
+      });
+      const data = await response.json();
+      return { data: data, status: response.status };
+  } catch (error) {
+      console.error('Error updating read status:', error);
+      return { error: 'Error updating read status', status: 0 };
   }
 };
 
@@ -651,7 +684,7 @@ export const createCanvas = async (token, boardId, workspaceId, canvasName ) => 
       },
       body: JSON.stringify({ canvasName }),
     });
-    console.log(token);
+    //console.log(token);
     console.log("create canvas: " + JSON.stringify(response));
     
     const data = await response.json();
@@ -698,9 +731,9 @@ export const getCanvasById = async (token, boardId, canvasId, workspaceId) => {/
     return { error: 'Failed to retrieve canvas', status: 0 };
   }
 };
-export const updateCanvas = async (token, boardId, updatedData, canvasId, workspaceId) => {//for modify purpose
+export const updateCanvas = async (token, workspaceId, boardId, canvasId, updatedData) => {//for modify purpose
   try {
-    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`, {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/update`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -708,7 +741,7 @@ export const updateCanvas = async (token, boardId, updatedData, canvasId, worksp
       },
       body: JSON.stringify(updatedData),
     });
-
+    //console.log(workspaceId, boardId, canvasId);
     const data = await response.json();
     return { ...data, status: response.status };
 
@@ -718,9 +751,9 @@ export const updateCanvas = async (token, boardId, updatedData, canvasId, worksp
   }
 };
 
-export const deleteCanvas = async (token, boardId, canvasId, workspaceId) => {
+export const deleteCanvas = async (token, workspaceId, boardId, canvasId ) => {
   try {
-    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`, {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/delete`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -764,29 +797,65 @@ export const checkBoardMember = async (token, userId, boardId) => {
       },
     });
     const data = await response.json();
-    return { ...data, status: response.status };
+    console.log("API response:", data);
+    if (data.isMember) { //response.status === 200 && 
+      return true;
+    }
+    return false;
 
   } catch (error) {
     console.error('Failed to retrieve board member:', error);
-    return { error: 'Failed to retrieve board member', status: 0 };
+    return false;
   }
 };
 
-export const saveCanvasData = async (token, boardId, canvasId, workspaceId, serializeDrawingDataXml)=>{
+export const uploadCanvas = async (token, boardId, canvasId, workspaceId, file)=>{
+  const formData = new FormData();
+  formData.append('canvasData', file);
+  console.log(file);
   try{
     const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/update`,{
-      method: 'PUT',
+      method: 'POST',
       headers: {
-        'Content-Type': 'text/xml',
         'Authorization': `Bearer ${token}`,
       },
-      body: serializeDrawingDataXml,
+      body: formData
     });
-    return { status: response.status };
-
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
   } catch (error) {
     console.error('Failed to save canvas data:', error);
-    return { error: 'Failed to save canvas data', status: 0 };
+    throw error;
+  }
+};
+
+export const getCanvasDataById = async(token, boardId, canvasId, workspaceId) => {
+  try {
+    const response = await fetch(`${API_URL}/canvas/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/data`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to retrieve comments:', error);
+    return { error: 'Failed to retrieve comments', status: 0 };
+  }
+};
+
+export const getXmlFile = async (s3Url) =>{
+  try{
+    const response = await fetch(s3Url);
+    if (!response.ok) throw new Error('Network response was not ok.');
+    return await response.text();
+  }catch(error){
+    console.error('Error fetching XML file:', error);
+    throw error;
   }
 };
 

@@ -8,7 +8,7 @@ import Rectangle from "./Rectangle";
 const Shape=({ shape })=> {
   const isSelectedSelector = useCallback(
     (state) => state.selected === shape.id,
-    [shape]
+    [shape.id] //wanna try to check whether still can drag and drop
   );
   const isSelected = useShapes(isSelectedSelector);
 

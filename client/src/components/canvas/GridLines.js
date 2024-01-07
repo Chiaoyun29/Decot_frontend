@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Layer, Stage } from "react-konva";
 
 const GridLines=({ drawingCanvasRef })=>{
     const gridCanvasRef = useRef(null);
@@ -6,56 +7,55 @@ const GridLines=({ drawingCanvasRef })=>{
     const saveInterval = useRef(null);
 
     useEffect(()=>{
-        const gridCanvas = gridCanvasRef.current;
-        const gridContext = gridCanvas.getContext('2d');
-        gridContextRef.current = gridContext;
-
         const drawGridLines=()=>{
+            const gridCanvas = gridCanvasRef.current;
+            const gridContext = gridCanvas.getContext('2d');
+            gridContextRef.current = gridContext;
             const { width, height }=window.screen;
             const gridSize=20;
             const scrollX = gridCanvas.scrollLeft;
             const scrollY = gridCanvas.scrollTop;
       
-            gridContext.clearRect(0, 0, width, height);
+            gridContext.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
       
             gridContext.beginPath();
-            for (let x = -scrollX%gridSize; x <= width; x += gridSize) {
+            for (let x = -scrollX%gridSize; x <= gridCanvas.width; x += gridSize) {
               gridContext.moveTo(x, 0);
-              gridContext.lineTo(x, height);
+              gridContext.lineTo(x, gridCanvas.height);
             }
       
-            for (let y = -scrollY%gridSize; y <= height; y += gridSize) {
+            for (let y = -scrollY%gridSize; y <= gridCanvas.height; y += gridSize) {
               gridContext.moveTo(0, y);
-              gridContext.lineTo(width, y);
+              gridContext.lineTo(gridCanvas.width, y);
             }
       
             gridContext.strokeStyle = '#ddd'; // Adjust this value to change the grid color
             gridContext.stroke();
         };
         const resizeCanvas=()=>{
-            const { width, height }=window.screen;
+            const gridCanvas = gridCanvasRef.current;
             // drawingCanvas.width=width;
             // drawingCanvas.height=height;
-            gridCanvas.width=width;
-            gridCanvas.height=height;
+            gridCanvas.width=window.innerWidth;
+            gridCanvas.height=window.innerHeight;
             drawGridLines();
         };
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
-        gridCanvas.addEventListener('scroll', drawGridLines);
+        //gridCanvas.addEventListener('scroll', drawGridLines);
 
         return()=>{
             window.removeEventListener('resize', resizeCanvas);
             clearInterval(saveInterval.current);
         };
-    },[drawingCanvasRef]);
+    },[]);
 
     return(
       <div className="canvas">
         <canvas
           className="grid-container"
           ref={gridCanvasRef}
-          style={{ position: 'absolute' }}
+          style={{ position: 'absolute', top: 0, left: 0 }}
         />
       </div>
 

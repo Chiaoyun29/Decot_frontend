@@ -1,19 +1,21 @@
 import './Canvas.css';
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useAuthContext } from '../../context/AuthContext.js';
 
 const DrawAndErase=({
     drawingCanvasRef,
     drawingContextRef,
+    setIsChanged,
+    setDrawingData,
     isDrawing,
     setIsDrawing,
-    setIsChanged,
-    isStickyNoteMode,
-    setDrawingData,
+    isErasing,
+    setIsErasing
 })=>{
+    const [isMouseDown, setIsMouseDown] = useState(false);
 
     const startDrawing = ({nativeEvent}) => {
+        if (!isDrawing) return;
+        setIsMouseDown(true);
         const {offsetX, offsetY} = nativeEvent;
         drawingContextRef.current.beginPath();
         drawingContextRef.current.moveTo(offsetX, offsetY);
@@ -21,17 +23,19 @@ const DrawAndErase=({
         drawingContextRef.current.stroke();
         setIsDrawing(true);
 
-        setDrawingData((prevDrawingData) => [
-            ...prevDrawingData,
-            { type: 'start', x: offsetX, y: offsetY },
-        ]);
+        setDrawingData((prevDrawingData) => {
+            if(!Array.isArray(prevDrawingData)){
+                console.error('prevDrawingData is not an array:', prevDrawingData);
+                return [];
+            }
+            return [...prevDrawingData,
+            { type: 'start', x: offsetX, y: offsetY }];
+        });
         nativeEvent.preventDefault();
     };
 
     const draw = ({nativeEvent}) => {
-    if(!isDrawing||isStickyNoteMode) {
-        return;
-    }
+    if(!isMouseDown||!isDrawing) return;
         const {offsetX, offsetY} = nativeEvent;
         drawingContextRef.current.lineTo(offsetX, offsetY);
         drawingContextRef.current.stroke();
@@ -44,8 +48,9 @@ const DrawAndErase=({
     };
 
     const stopDrawing = () => {
+        setIsMouseDown(false);
+        if(!isDrawing) return;
         drawingContextRef.current.closePath();
-        setIsDrawing(false);
     };
 
     return(
