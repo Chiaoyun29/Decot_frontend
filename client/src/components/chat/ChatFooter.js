@@ -2,11 +2,10 @@ import React, { useState, useContext, useEffect } from 'react';
 import { createMessage } from '../services/api';
 import { useParams } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import SocketContext from '../../context/SocketContext.js';
 
 const ChatFooter=({ setMessages, socket })=>{
     const [message, setMessage]=useState([]);
-    const { workspaceId, userId } = useParams();
+    const { workspaceId, messageId, userId } = useParams();
     const { token } = useAuthContext();
 
     const sendMessage = (e) => {
@@ -15,12 +14,12 @@ const ChatFooter=({ setMessages, socket })=>{
             id: `${socket.id}${Math.random()}`,
             message,
             timestamp: new Date().toLocaleTimeString(),
-            uId: userId,
+            userId: userId,
             socketId: socket.id,
         };
         //still need to modify a bit
-        setMessages((prevMessages) => [...prevMessages, newMessage]); //(prevMessages)=>[...prevMessages, newMessage] in bracket
-        socket.emit('new_message', newMessage);
+        setMessages((prevMessages) => [...prevMessages, newMessage]); 
+        socket.emit('message', newMessage);
         try {
             const response = createMessage(token, message, workspaceId);
             console.log("dgjgshd",response);

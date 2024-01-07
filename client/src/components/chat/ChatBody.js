@@ -1,30 +1,61 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { getAllMessages, deleteMessage, getUsernameById } from '../services/api.js';
+import { getAllMessages, deleteMessage, getUsernameById, updateReadStatus } from '../services/api.js';
 import { useAuthContext } from '../../context/AuthContext.js';
-// import SocketContext from '../../context/SocketContext.js';
+import SocketContext from '../../context/SocketContext.js';
 import { useParams } from 'react-router-dom';
 import "./Chatfunction.css";
 import ChatFooter from './ChatFooter.js'
 
-const ChatBody =({ showContextMenu, setShowContextMenu, user, socket, messages, setMessages })=>{
+const ChatBody =({ showContextMenu, setShowContextMenu, user, messages, setMessages, setUnreadMessages })=>{
     const { token } = useAuthContext();
     const { workspaceId, userId } = useParams();
-    //const [messages, setMessages]=useState([]);
-    messages = messages || [];
+    const { socket } = useContext(SocketContext);
+    const [ usernames, setUsernames ] = useState({});
 
     const fetchMessages = async () => {
         const response = await getAllMessages(token, workspaceId);
         console.log(response);
         if (response.status === 200) {
-        setMessages(response.messages);
+            setMessages(response.messages);
         } else {
-        console.error(response.error);
+            console.error(response.error);
         }
+    };
+
+    const fetchUsernames = async () => {
+        const newUsernames = {};
+        for (const message of messages) {
+            if (!newUsernames[message.userId]) {
+                const response = await getUsernameById(token, message.userId);
+                if (response.status === 200) {
+                    newUsernames[message.userId] = response.username;
+                }
+            }
+        }
+        setUsernames(newUsernames);
     };
 
     useEffect(()=>{
         fetchMessages();
-    }, [workspaceId, token]);
+        fetchUsernames();
+
+    }, [messages]);
+
+    useEffect(()=>{
+        //socket.on('messageResponse', (data)=>setMessages([...messages, data]));
+        // test this
+        const newUnreadMessages = messages.reduce((count, msg) => (msg.read ? count : count + 1), 0);
+        setUnreadMessages(newUnreadMessages);
+
+        const unreadMessagesToUpdate = messages.filter((msg) => !msg.read);
+        if (unreadMessagesToUpdate.length > 0) {
+            updateReadStatus(token, unreadMessagesToUpdate.map((msg) => msg.id), workspaceId);
+        }
+    },[messages]);
+
+    useEffect(() => {
+        socket.on('messageResponse', (data) => setMessages([...messages, data]));
+    }, [socket, messages]);
 
     const handleContextMenu = (event) => {
         event.preventDefault();
@@ -34,7 +65,7 @@ const ChatBody =({ showContextMenu, setShowContextMenu, user, socket, messages, 
     const handleDeleteMessage = async (messageId) => {
         try {
           await deleteMessage(token, messageId, workspaceId);
-          setMessages(messages.filter((message)=>message.id!==messageId));
+          setMessages(prevMessages => prevMessages.filter((message) => message.id !== messageId));
           socket.emit('message_deleted', messageId);
         } catch (error) {
           console.error('Error deleting message:', error);
@@ -48,12 +79,12 @@ const ChatBody =({ showContextMenu, setShowContextMenu, user, socket, messages, 
                 <span className="font-semibold text-center">CHAT</span>
                     <div className="flex justify-between items-center mb-2">
                         <div className="message_container">
-                            {messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).map((message) => (
+                            {messages.map((message) => (
                                 <div className="messages" onContextMenu={handleContextMenu} key={message.id}>
                                     {message.userId === user.id ? (
                                         <p className="sender_name">{user.username}</p>
                                         ) : (
-                                        <p className="recipient_name"></p>
+                                        <p className="recipient_name">{usernames[message.userId]}</p> //got some error
                                     )}
                                 <div className={`message_chats ${message.userId === user.id || message.workspaceId === user.workspaceId ? 'message_sender' : 'message_recipient'}`}>
                                     <p>{message.message}</p>

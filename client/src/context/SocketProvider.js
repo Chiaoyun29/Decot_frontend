@@ -9,6 +9,7 @@ const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const { user } = useAuthContext();
   const notificationCallbacksRef = useRef([]);
+  const messageCallbacksRef = useRef([]);
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
@@ -31,6 +32,13 @@ const SocketProvider = ({ children }) => {
         notificationCallbacksRef.current.forEach(callback => callback(message));
       });
 
+      newSocket.on('message', (message) => {
+        setMessages((prev) => [...prev, message]);
+        toast(message.content);
+
+        messageCallbacksRef.current.forEach(callback => callback(message));
+      });
+
       newSocket.on('disconnect', () => {
         // Emit event when user disconnects
         newSocket.emit('userAction', { action: 'userOffline', userId: user.id });
@@ -40,25 +48,25 @@ const SocketProvider = ({ children }) => {
     }
   }, [user, setSocket]);
 
-  const sendMessage=(recipientId, message)=>{
-    if(socket){
-      socket.emit('chatMessage', {recipientId: user.id, message});
-    }
-  };
-
   const value = useMemo(
     () => ({
       socket,
       notifications,
+      messages,
       addNotificationCallback: (callback) => {
         notificationCallbacksRef.current.push(callback);
       },
       removeNotificationCallback: (callback) => {
         notificationCallbacksRef.current = notificationCallbacksRef.current.filter(c => c !== callback);
       },
-      sendMessage,
+      addMessageCallback: (callback) => {
+        messageCallbacksRef.current.push(callback);
+      },
+      removeMessageCallback: (callback) => {
+        messageCallbacksRef.current = messageCallbacksRef.current.filter(c => c !== callback);
+      },
     }),
-    [socket, notifications]
+    [socket, notifications, messages]
   );
 
   return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;

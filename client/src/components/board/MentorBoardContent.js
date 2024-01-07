@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import { getBoardById, updateBoard, deleteBoard, getCanvases, addWorkspaceMember, getWorkspaceMembers, getBoardMembers } from '../services/api';
+import { getBoardById, updateBoard, deleteBoard, getCanvases, addWorkspaceMember, getWorkspaceMembers, getBoardMembers, deleteWorkspaceMember, updateCanvas, deleteCanvas } from '../services/api';
 import CustomModal from '../common/CustomModal';
 import icon_pencil from "../../image/icon_pencil.svg";
-//import Canvas from '../canvas/Canvas';
 import CreateCanvasModal from '../board/CreateCanvasModal';
-
 
 const MentorBoardContent = () => {
   const { boardId, workspaceId } = useParams();
@@ -20,7 +18,6 @@ const MentorBoardContent = () => {
   const [editeddtTag, setEditeddtTag] = useState('');
   const [editedDeadline, setEditedDeadline] = useState('');
   const [editedStatus, setEditedStatus] = useState('');
-  //const [showCanvas, setShowCanvas] = useState(false);
   const navigate = useNavigate();
   const [canvases, setCanvases] = useState([]);
   const [isMemberAddModalOpen, setIsMemberAddModalOpen] = useState(false);
@@ -29,6 +26,16 @@ const MentorBoardContent = () => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [boardMembers, setBoardMembers] = useState([]);
   const [isAddingMembersModalOpen, setIsAddingMembersModalOpen] = useState(false);
+  const [isMemberDeleteModalOpen, setIsMemberDeleteModalOpen] = useState(false);
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState({ top: 0, left: 0 });
+  const [isEditingCanvasName, setIsEditingCanvasName] = useState(false);
+  const [isDeletingCanvasName, setIsDeletingCanvasName] = useState(false);
+  const [editedCanvasName, setEditedCanvasName] = useState('');
+  const [selectedCanvasIdForEdit, setSelectedCanvasIdForEdit] = useState(null);
+  const [selectedCanvasIdForDelete, setSelectedCanvasIdForDelete] = useState(null);
+  const [isDeleteCanvasModalOpen, setIsDeleteCanvasModalOpen] = useState(false);
+  const [showDesignThinkingMessage, setShowDesignThinkingMessage] = useState(true);
 
   const fetchCanvases = async () => {
     const response = await getCanvases(token, boardId, workspaceId);
@@ -80,7 +87,6 @@ const MentorBoardContent = () => {
       console.error('Error fetching members:', error);
     }
   };
-
 
   if (!board) return (<div className="flex items-center justify-center min-h-screen">
     <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
@@ -136,10 +142,126 @@ const MentorBoardContent = () => {
       console.error('Error: ', error);
     }
   };
+
+  const handleDeleteMember = async () => {
+    try {
+      if (selectedMember) {
+        // Check if the selected member is already a board member
+        const isBoardMember = boardMembers.some(member => member.id === selectedMember.id);
   
+        if (isBoardMember) {
+          const response = await deleteWorkspaceMember(token, workspaceId, boardId, selectedMember.id);
+          if (response && response.status === 200) {
+            fetchWorkspaceMembers(); // refresh the members list
+            setIsMemberDeleteModalOpen(false);
+          } else {
+            console.error(response && response.error);
+          }
+        } else {
+          console.error('Error: Cannot delete board member.');
+        }
+      } else {
+        console.error('Error: selectedMember is not defined.');
+      }
+    } catch (error) {
+      console.error('Error: ', error);
+    }
+  };
+
+  const handleCanvasRightClick = (e, canvasId) => {
+    e.preventDefault();
+    setSelectedCanvasIdForEdit(canvasId);
+    setSelectedCanvasIdForDelete(canvasId);
+    setContextMenuVisible(true);
+    setContextMenuPosition({ top: e.clientY, left: e.clientX });
+  };
+
+  // Enter edit mode
+  const enterEditMode = () => {
+    if (selectedCanvasIdForEdit != null) {
+      const selectedCanvas = canvases.find(canvas => canvas.id === selectedCanvasIdForEdit);
+      if(selectedCanvas){
+        setIsEditingCanvasName(selectedCanvas.canvasName);
+        setIsEditingCanvasName(true);
+        setContextMenuVisible(false);
+      }else{
+        console.error('Canvas not found for Id: ', selectedCanvasIdForEdit);
+      }
+    }else{
+      console.error('No canvas selected for editing.');
+    }
+  };
+
+  const enterDeleteMode = () => {
+    if (selectedCanvasIdForDelete != null) {
+        setIsDeleteCanvasModalOpen(true);
+        setContextMenuVisible(false);
+    }else{
+      console.error('No canvas selected for editing.');
+    }
+  };
+
+  const handleEditCanvas = async (e, canvasId) => {
+    console.log("Selected Canvas ID for Edit:", selectedCanvasIdForEdit);
+    if(e.key ==="Enter"){
+      setIsEditingCanvasName(false);
+        const response = await updateCanvas(token, workspaceId, boardId, selectedCanvasIdForEdit, { //modify
+        canvasName: editedCanvasName
+      });
+      if (response.status === 200) {
+        const updatedCanvas = canvases.map(c => {
+          if (c.id === canvasId) {
+            return { ...c, canvasName: editedCanvasName };
+          }
+          return c;
+        });
+        setCanvases(updatedCanvas);
+        setIsEditingCanvasName(false);
+        setEditedCanvasName('');
+        setSelectedCanvasIdForEdit(null);
+      } else {
+        console.error(response.error);
+      }
+    }
+  };
+
+  const handleDeleteCanvas = async () => {
+    console.log("Selected Canvas ID for Delete:", selectedCanvasIdForDelete);
+    const response = await deleteCanvas(token, workspaceId, boardId, selectedCanvasIdForDelete); //modify
+    if (response.status === 200) {
+      setIsDeleteCanvasModalOpen(false); // Close the modal
+      setCanvases(canvases.filter(canvas => canvas.id !== selectedCanvasIdForDelete)); // Update the state
+      setSelectedCanvasIdForDelete(null);
+      //navigate(-1);
+    } else {
+      console.error(response.error);
+    }
+  };
+
+  const getDesignThinkingTip = (dtTag) =>{
+    console.log("Received dtTag in getDesignThinkingMessage:", dtTag);
+    switch(dtTag){
+      case 'Stage 1 (Empathize)':
+        return 'Research Your Needs';
+      case 'Stage 2 (Define)':
+        return 'State the Needs and Problems';
+      case 'Stage 3 (Ideate)':
+        return 'Challenge Assumptions and Create Ideas';
+      case 'Stage 4 (Prototype)':
+        return 'Start to Create Solutions';
+      case 'Stage 5 (Test)':
+        return 'Try Your Solutions Out';
+      default: 
+        return '';
+    }
+  };
+
+  const handleCloseMessage = () => {
+    setShowDesignThinkingMessage(false);
+  };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col h-screen bg-gray-100 relative">
       {/* Sidebar for managing board */}
       <div className="flex flex-grow overflow-hidden">
         <div className="w-1/4 h-full bg-white shadow-lg p-4 overflow-y-auto">
@@ -248,7 +370,7 @@ const MentorBoardContent = () => {
             Delete Board
           </button>
 
-        {/* The Modal for Manage Member */}
+        {/* The Modal for Manage Add Member */}
         <CustomModal 
           isOpen={isAddingMembersModalOpen}
           onClose={() => setIsAddingMembersModalOpen(false)}
@@ -309,6 +431,15 @@ const MentorBoardContent = () => {
               boardMembers.map(member => (
                 <li key={member.id} className="flex justify-between items-center mb-2">
                   <span>{member.username}</span>
+                  <button
+                    onClick={() => {
+                      setSelectedMember(member);
+                      setIsMemberDeleteModalOpen(true);
+                    }}
+                    className="px-2 py-1 bg-red-500 text-white rounded-md"
+                  >
+                    Delete
+                  </button>
                 </li>
               ))
             ) : (
@@ -317,29 +448,73 @@ const MentorBoardContent = () => {
           </ul>
         </CustomModal>
 
-          {/* The Modal for Delete Board Confirmation */}
-          <CustomModal
-            isOpen={isDeleteModalOpen}
-            onClose={() => setIsDeleteModalOpen(false)}
-            title="Delete Board"
-            message="Are you sure you want to delete this board?"
-          >
-            <div className="flex items-center">
-              <button
-                onClick={handleDeleteBoard}
-                className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
-              >
-                Delete
-              </button>
-              <button
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="px-4 py-2 bg-gray-500 text-white rounded-md"
-              >
-                Cancel
-              </button>
-            </div>
-          </CustomModal>
+        <CustomModal
+          isOpen={isMemberDeleteModalOpen}
+          onClose={() => setIsMemberDeleteModalOpen(false)}
+          title="Delete Member"
+          message={`Are you sure you want to delete ${selectedMember?.username} from this board?`}
+        >
+          <div className="flex items-center">
+            <button
+              onClick={handleDeleteMember}
+              className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => setIsMemberDeleteModalOpen(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md"
+            >
+              Cancel
+            </button>
+          </div>
+        </CustomModal>
+
+        {/* The Modal for Delete Board Confirmation */}
+        <CustomModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          title="Delete Board"
+          message="Are you sure you want to delete this board?">
+          <div className="flex items-center">
+            <button
+              onClick={handleDeleteBoard}
+              className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md"
+            >
+              Cancel
+            </button>
+          </div>
+        </CustomModal>
         </div>
+
+        {/* The Modal for Delete Canvas Confirmation */}
+        <CustomModal
+          isOpen={isDeleteCanvasModalOpen}
+          onClose={() => setIsDeleteCanvasModalOpen(false)}
+          title="Delete Canvas"
+          message="Are you sure you want to delete this canvas?"
+        >
+          <div className="flex items-center">
+            <button
+              onClick={handleDeleteCanvas}
+              className="mr-4 px-4 py-2 bg-red-500 text-white rounded-md"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => setIsDeleteCanvasModalOpen(false)}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md"
+            >
+              Cancel
+            </button>
+          </div>
+        </CustomModal>
 
         {/* Main content container */}
         <div className="w-3/4 p-6 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
@@ -354,21 +529,59 @@ const MentorBoardContent = () => {
             </div>
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {canvases.map((canvas) => (
-                <li key={canvas.id} className="p-15 border rounded-md">
-                  <Link to={`canvas/${canvas.id}`} className="block" //need to do modi for linkage
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <div className="text-center font-medium">{canvas.canvasName}</div>
-                  </Link>
+                <li key={canvas.id} className="p-15 border rounded-md" onContextMenu={(e) => handleCanvasRightClick(e, canvas.id)}>
+                  {/* Prevent link navigation if editing or deleting */}
+                  {!(isEditingCanvasName || isDeletingCanvasName) && (
+                    <Link to={`canvas/${canvas.id}`} className="block"
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <div className="text-center font-medium">{canvas.canvasName}</div>
+                    </Link>
+                  )}
+                  {/* Show input field for editing or deleting */}
+                  {((isEditingCanvasName && selectedCanvasIdForEdit === canvas.id) || (isDeletingCanvasName && selectedCanvasIdForDelete === canvas.id)) && (
+                    <input
+                      type="text"
+                      value={editedCanvasName}
+                      onChange={(e) => setEditedCanvasName(e.target.value)}
+                      placeholder="Canvas Name"
+                      onKeyPress={(e) => isEditingCanvasName ? handleEditCanvas(e, canvas.id) : handleDeleteCanvas(e, canvas.id)}
+                      className="text-center font-medium"
+                    />
+                  )}
                 </li>
               ))}
             </ul>
-            <CreateCanvasModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)} onCanvasCreated={fetchCanvases} />
+            {contextMenuVisible && !isEditingCanvasName && !isDeletingCanvasName && ( // Render context menu when visible and not editing or deleting
+              <div
+                className="absolute bg-white border rounded shadow-md p-2"
+                style={{
+                  top: contextMenuPosition.top,
+                  left: contextMenuPosition.left,
+                }}
+                onClick={(e) => e.stopPropagation()} // Prevent event propagation
+              >
+                <button onClick={enterEditMode} style={{ marginRight: '10px' }}>Edit</button>
+                <button onClick={enterDeleteMode}>Delete</button>
+              </div>
+            )}
+              <CreateCanvasModal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)} onCanvasCreated={fetchCanvases} />
           </div>
         </div>
       </div>
+      {/* Message container positioned at the bottom right corner */}
+      {showDesignThinkingMessage && board && (
+        <div className="absolute bottom-20 right-10 p-4 my-2 bg-white shadow rounded rounded-lg">
+          <p className="text-lg text-blue-500 font-bold">
+            {getDesignThinkingTip(board.dtTag)}
+          </p>
+          <button onClick={handleCloseMessage} className="absolute top-0 right-0 p-2 text-lg font-bold text-gray-600">
+            &times;
+          </button>
+        </div>
+      )}
     </div>
   );
 };

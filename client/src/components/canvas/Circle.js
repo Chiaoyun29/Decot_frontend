@@ -52,7 +52,7 @@ const Circle=({ id, isSelected, type, ...shapeProps }) =>{
   );
 
   return (
-    <>
+    <div className="canvas-container">
       <KonvaCircle
         onClick={handleSelect}
         onTap={handleSelect}
@@ -78,7 +78,7 @@ const Circle=({ id, isSelected, type, ...shapeProps }) =>{
           boundBoxFunc={boundBoxCallbackForCircle}
         />
       )}
-    </>
+    </div>
   );
 };
 

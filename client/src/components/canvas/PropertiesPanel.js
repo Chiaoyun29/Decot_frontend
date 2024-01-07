@@ -13,8 +13,8 @@ export function PropertiesPanel() {
   }, []);
 
   return (
-    <aside className="panel">
-      <h2>Properties</h2>
+    <aside className="fixed top-16 right-0 bottom-0 w-64 overflow-y-auto bg-white shadow-lg p-4 md:w-48 sm:w-32">
+      <h2><b>Properties</b></h2>
       <div className="properties">
         {selectedShape ? (
           <>

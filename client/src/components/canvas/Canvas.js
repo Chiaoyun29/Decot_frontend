@@ -1,36 +1,73 @@
 import './Canvas.css';
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useReducer } from 'react';
 import Sidebar from './Sidebar';
 import GridLines from './GridLines';
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { useAuthContext } from '../../context/AuthContext';
 import DrawAndErase from './DrawAndErase';
 import StickyNote from './StickyNote';
 import { PropertiesPanel } from './PropertiesPanel';
-import { useShapes } from "./state";
-import ShapeCanvas from "./ShapeCanvas";
+import PropertiesPanelButton from './PropertiesPanelButton';
+import { useShapes, createCircle, createRectangle, clearSelection } from "./state";
 import AddText from './AddText';
 import UploadAndDisplayImage from './UploadAndDisplayImage';
 import Navbar from '../common/Navbar';
 import xmlbuilder from 'xmlbuilder';
-import { saveCanvasData } from '../services/api.js';
+import { uploadCanvas } from '../services/api';
 import CommentPanel from './CommentPanel';
 import CommentButton from './CommentButton';
 import DraggableCommentIcon from './DraggableCommentIcon';
 import CommentDetailBox from './CommentDetailBox';
 import { updateComment, getCommentsByCanvas } from '../services/api';
+import { Layer, Stage } from "react-konva";
+import { SHAPE_TYPES } from "./constants";
+import Shape from "./Shape";
+
+const initialNoteState={
+  lastNoteCreated: null,
+  totalNotes:0,
+  notes: [],
+};
+
+const notesReducer=(prevState, action)=>{
+  switch(action.type){
+      case 'ADD_NOTE':{
+          const newState={
+              lastNoteCreated: new Date().toTimeString().slice(0,8),
+              totalNotes: prevState.notes.length+1,
+              notes: [...prevState.notes, action.payload]
+          };
+          console.log('After ADD_NOTE: ', newState);
+          return newState;
+      }
+      case 'DELETE_NOTE':{
+          const newState={
+              ...prevState,
+              totalNotes: prevState.notes.length-1,
+              notes: prevState.notes.filter(note=>note.id!==action.payload.id),
+          };
+          console.log('After DELETE_NOTE: ', newState);
+          return newState;
+      }
+      case 'UPDATE_POSITION': {
+          return {
+              ...prevState,
+              notes: prevState.notes.map(note =>
+                  note.id === action.payload.id
+                      ? { ...note, x: action.payload.x, y: action.payload.y }
+                      : note
+              )
+          };
+      }
+  }
+};
 
 const Canvas = () => {
   const { boardId, workspaceId, canvasId } = useParams();
   const drawingCanvasRef = useRef(null);
   const drawingContextRef = useRef(null);
-  //const stickyNoteCanvasRef = useRef(null);
   const saveInterval = useRef(null);
-  const shapeCanvasRef = useRef(null);
-  const shapeContextRef = useRef(null);
   const { user, token } = useAuthContext();
-  const [isDrawing, setIsDrawing] = useState(false);
   const [isStickyNoteMode, setIsStickyNoteMode] = useState(false);
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
@@ -38,9 +75,7 @@ const Canvas = () => {
   const navigate = useNavigate();
   const shapes = useShapes((state) => Object.entries(state.shapes));
   const [isAddingShape, setIsAddingShape] = useState(false);
-  const stageRef = useRef(null);
   const [isAddingTextbox, setIsAddingTextbox] = useState(false);
-  //const textboxRef = useRef(null);
   const imageRef = useRef(null);
   const [drawingData, setDrawingData] = useState([]);
   const [stickyNotes, setStickyNotes] = useState([]);
@@ -48,21 +83,39 @@ const Canvas = () => {
   const [comments, setComments] = useState([]);
   const [activeComment, setActiveComment] = useState(null);
   const [activeCommentPosition, setActiveCommentPosition] = useState(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [isErasing, setIsErasing] = useState(false);
+  const [canvasSize, setCanvasSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+  const [selectedShapeType, setSelectedShapeType] = useState(null);
+  const [isPropertiesPanelOpen, setIsPropertiesPanelOpen] = useState(false);
+  const [textboxes, setTextboxes] = useState([]);
+  const [notesState, dispatch] = useReducer(notesReducer, initialNoteState);
+
+  const updateStickyNotes = (action) => {
+    dispatch(action);
+  };
 
   useEffect(() => {
     if (user) {
       navigate(`/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`)
     }
-  })
+  },[user, navigate, workspaceId, boardId, canvasId]);
+
   useEffect(() => {
     const drawingCanvas = drawingCanvasRef.current;
     const drawingContext = drawingCanvas.getContext("2d");
     drawingContextRef.current = drawingContext;
 
     const resizeCanvas = () => {
-      const { width, height } = window.screen;
+      //const { width, height } = window.screen;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
       drawingCanvas.width = width;
       drawingCanvas.height = height;
+      setCanvasSize({ width, height });
     };
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
@@ -77,34 +130,25 @@ const Canvas = () => {
     fetchComments();
   }, [canvasId, token]);
 
-  const setToDraw = () => {
+  const activateDrawingMode = () => {
     drawingContextRef.current.globalCompositeOperation = 'source-over';
   };
 
-  const setToErase = () => {
+  const activateErasingMode = () => {
     drawingContextRef.current.globalCompositeOperation = 'destination-out';
+    setIsAddingNote(false);
   };
 
   const addNotes = (event) => {
     event.preventDefault();
     console.log('Note added:', event.target.elements[0].value);
     setIsAddingNote(false);
+    setIsDrawing(false);
   };
 
   const handleAddingNote = () => {
     setIsAddingNote(!isAddingNote);
-  };
-
-  const addStickyNote = (newNote) => {
-    setStickyNotes((prevNotes) => [...prevNotes, newNote]);
-  };
-
-  const updatePosition = (noteId, newX, newY) => {
-    setStickyNotes((prevNotes) =>
-      prevNotes.map((note) =>
-        note.id === noteId ? { ...note, x: newX, y: newY } : note
-      )
-    );
+    setIsDrawing(false);
   };
 
   const saveImageToLocal = (event) => {
@@ -133,14 +177,14 @@ const Canvas = () => {
     setIsAddingShape(!isAddingShape);
   };
 
-  const addShape = (event) => {
-    event.preventDefault();
-    console.log('Shape added:', event.target.elements[0].value);
-    setIsAddingShape(false);
+  const handleSelectShape = (shapeType) => {
+    console.log("Shape selected in palette: ", shapeType);
+    setSelectedShapeType(shapeType);
   };
 
   const handleAddingTextbox = () => {
     setIsAddingTextbox(!isAddingTextbox);
+    setIsDrawing(false);
   };
 
   const addText = (event) => {
@@ -149,34 +193,60 @@ const Canvas = () => {
     setIsAddingTextbox(false);
   };
 
-  const serializeDrawingDataToXml = () => {
+  const serializeDrawingDataToXml = (drawingData, textboxes, stickyNotes) => {
     const root = xmlbuilder.create('drawingData');
-    if (Array.isArray(drawingData)) {
-      drawingData.forEach(({ type, x, y }) => {
-        root
-          .ele('drawOperation')
-          .att('type', type)
-          .ele('x')
-          .txt(x.toString())
-          .up()
-          .ele('y')
-          .txt(y.toString())
-          .up()
-          .up();
-      });
-    } else {
-      console.error('Drawing data is not an array: ', drawingData);
+    // Process drawingData if it exists and is not empty
+    if (Array.isArray(drawingData) && drawingData.length > 0) {
+        drawingData.forEach(({ type, x, y }) => {
+            root.ele('drawOperation')
+                .att('type', type)
+                .ele('x').txt(x.toString()).up()
+                .ele('y').txt(y.toString()).up()
+                .up();
+        });
     }
 
+    // Process textboxes if they exist and are not empty
+    if (Array.isArray(textboxes) && textboxes.length > 0) {
+        textboxes.forEach(({ id, text, width, height, position }) => {
+            root.ele('textbox')
+                .att('id', id)
+                .ele('text').txt(text).up()
+                .ele('width').txt(width.toString()).up()
+                .ele('height').txt(height.toString()).up()
+                .ele('position')
+                .ele('x').txt(position.x.toString()).up()
+                .ele('y').txt(position.y.toString()).up()
+                .up().up();
+        });
+    }
+
+    // Process stickyNotes if they exist and are not empty
+    if (Array.isArray(stickyNotes) && stickyNotes.length > 0) {
+        stickyNotes.forEach(({ id, text, x, y, width, height }) => {
+            root.ele('stickyNote')
+                .att('id', id)
+                .ele('text').txt(text).up()
+                .ele('width').txt(width.toString()).up()
+                .ele('height').txt(height.toString()).up()
+                .ele('position')
+                .ele('x').txt(x.toString()).up()
+                .ele('y').txt(y.toString()).up()
+                .up().up();
+        });
+    }
     return root.end({ pretty: true });
   };
 
   const handleSaveCanvas = async () => {
-    const serializeDrawingDataXml = serializeDrawingDataToXml();
+    const serializeDrawingDataXml = serializeDrawingDataToXml(drawingData, textboxes, notesState.notes);
     console.log('Serialized Drawing Data (XML):', serializeDrawingDataXml);
+    const xmlBlob = new Blob([serializeDrawingDataXml], { type: 'text/xml' });
+    const xmlFile = new File([xmlBlob], "canvas-data.xml", { type: 'text/xml' });
     try {
-      const data = await saveCanvasData(token, boardId, canvasId, workspaceId, serializeDrawingDataXml);
-      setDrawingData(data);
+      const data = await uploadCanvas(token, boardId, canvasId, workspaceId, xmlFile);
+      console.log('XML FILE: ',xmlFile);
+      setDrawingData(xmlFile);
       console.log('Data saved successfully:', data);
     } catch (error) {
       console.error('Error saving data:', error);
@@ -242,12 +312,26 @@ const Canvas = () => {
     );
   };
 
+  const togglePropertiesPanel = () => {
+    setIsPropertiesPanelOpen(!isPropertiesPanelOpen);
+  };
+
+  useEffect(() => {
+    if (selectedShapeType) {
+      const defaultPosition = { x: 100, y: 100 };
+      if (selectedShapeType === SHAPE_TYPES.RECT) {
+        createRectangle(defaultPosition);
+      } else if (selectedShapeType === SHAPE_TYPES.CIRCLE) {
+        createCircle(defaultPosition);
+      }
+      setSelectedShapeType(null); // Reset selected shape type
+    }
+  }, [selectedShapeType]);
+
   return (
     <div>
       <Navbar />
       <Sidebar
-        setToDraw={setToDraw}
-        setToErase={setToErase}
         handleAddingNote={handleAddingNote}
         deleteCanvas={deleteCanvas}
         saveImageToLocal={saveImageToLocal}
@@ -255,15 +339,32 @@ const Canvas = () => {
         handleAddingShape={handleAddingShape}
         handleAddingTextbox={handleAddingTextbox}
         handleSaveCanvas={handleSaveCanvas}
+        isDrawing={isDrawing} 
+        setIsDrawing={setIsDrawing}
+        setIsErasing={setIsErasing}
+        onSelectShape={handleSelectShape}
+        activateDrawingMode={activateDrawingMode}
+        activateErasingMode={activateErasingMode}
       />
+      {/* <div className="canvas-container"> */}
+      <Stage drawingCanvasRef={drawingCanvasRef} width={canvasSize.width} height={canvasSize.height}>
+        <Layer>
+          {shapes.map(([key, shape]) => {
+            //console.log("Rendering shape", shape);
+            return <Shape key={key} shape={{ ...shape, id: key }} />;
+          })}
+        </Layer>
+      </Stage>
+      
       <DrawAndErase
         drawingCanvasRef={drawingCanvasRef}
         drawingContextRef={drawingContextRef}
-        isDrawing={isDrawing}
-        setIsDrawing={setIsDrawing}
         setIsChanged={setIsChanged}
         isStickyNoteMode={isStickyNoteMode}
         setDrawingData={setDrawingData}
+        isDrawing={isDrawing} 
+        setIsDrawing={setIsDrawing}
+        setIsErasing={setIsErasing}
       />
       <CommentButton onClick={() => toggleCommentPanel(commentPanelOpen)} />
       <CommentPanel
@@ -277,28 +378,23 @@ const Canvas = () => {
         onDeleteComment={handleDeleteComment}
         onToggleResolved={handleCommentResolvedToggle}
       />
-      {isAddingNote && (
-        <StickyNote
-          drawingCanvasRef={drawingCanvasRef}
-          isAddingNote={isAddingNote}
-          addNote={addNotes}
-          updatePosition={updatePosition}
-        />
-      )}
-      {isAddingShape && (
-        <ShapeCanvas
-          stageRef={stageRef}
-          handleAddingShape={handleAddingShape}
-          addShape={addShape}
-        />
-      )}
-      {isAddingTextbox && (
-        <AddText
-          drawingCanvasRef={drawingCanvasRef}
-          handleAddingTextbox={handleAddingTextbox}
-          AddText={addText}
-        />
-      )}
+      <StickyNote
+        drawingCanvasRef={drawingCanvasRef}
+        isAddingNote={isAddingNote}
+        addNote={addNotes}
+        setStickyNotes={setStickyNotes}
+        setIsDrawing={setIsDrawing}
+        updateStickyNotes={updateStickyNotes}
+        notesState={notesState}
+      />
+      <AddText
+        drawingCanvasRef={drawingCanvasRef}
+        handleAddingTextbox={handleAddingTextbox}
+        isAddingTextbox={isAddingTextbox}
+        AddText={addText}
+        textboxes={textboxes}
+        setTextboxes={setTextboxes}
+      />
       {isAddingImage&&(
         <UploadAndDisplayImage 
           imageRef={imageRef}
@@ -321,8 +417,10 @@ const Canvas = () => {
           position={activeCommentPosition}
           onClose={() => setActiveComment(null)}
         />
-      )}
-      {/* <PropertiesPanel />*/}
+      )}      
+      <PropertiesPanelButton onClick={() => togglePropertiesPanel(isPropertiesPanelOpen)} />
+      {isPropertiesPanelOpen && <PropertiesPanel />}
+      {/* </div> */}
     </div>
   );
 };

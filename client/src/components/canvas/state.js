@@ -32,6 +32,7 @@ const setState = (fn) => useShapes.set(produce(fn));
 // };
 
 export const createRectangle = ({ x, y }) => {
+  console.log("Creating rectangle");
   setState((state) => {
     state.shapes[nanoid()] = {
       type: SHAPE_TYPES.RECT,
@@ -78,6 +79,7 @@ export const moveShape = (id, event) => {
     if (shape) {
       shape.x = event.target.x();
       shape.y = event.target.y();
+      console.log("move the shape to:" + shape.x + shape.y);
     }
   });
 };
@@ -108,7 +110,6 @@ export const transformRectangleShape = (node, id, event) => {
     if (shape) {
       shape.x = node.x();
       shape.y = node.y();
-
       shape.rotation = node.rotation();
 
       shape.width = clamp(
