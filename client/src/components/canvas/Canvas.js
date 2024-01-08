@@ -23,42 +23,42 @@ import { Layer, Stage } from "react-konva";
 import { SHAPE_TYPES } from "./constants";
 import Shape from "./Shape";
 
-const initialNoteState={
+const initialNoteState = {
   lastNoteCreated: null,
-  totalNotes:0,
+  totalNotes: 0,
   notes: [],
 };
 
-const notesReducer=(prevState, action)=>{
-  switch(action.type){
-      case 'ADD_NOTE':{
-          const newState={
-              lastNoteCreated: new Date().toTimeString().slice(0,8),
-              totalNotes: prevState.notes.length+1,
-              notes: [...prevState.notes, action.payload]
-          };
-          console.log('After ADD_NOTE: ', newState);
-          return newState;
-      }
-      case 'DELETE_NOTE':{
-          const newState={
-              ...prevState,
-              totalNotes: prevState.notes.length-1,
-              notes: prevState.notes.filter(note=>note.id!==action.payload.id),
-          };
-          console.log('After DELETE_NOTE: ', newState);
-          return newState;
-      }
-      case 'UPDATE_POSITION': {
-          return {
-              ...prevState,
-              notes: prevState.notes.map(note =>
-                  note.id === action.payload.id
-                      ? { ...note, x: action.payload.x, y: action.payload.y }
-                      : note
-              )
-          };
-      }
+const notesReducer = (prevState, action) => {
+  switch (action.type) {
+    case 'ADD_NOTE': {
+      const newState = {
+        lastNoteCreated: new Date().toTimeString().slice(0, 8),
+        totalNotes: prevState.notes.length + 1,
+        notes: [...prevState.notes, action.payload]
+      };
+      console.log('After ADD_NOTE: ', newState);
+      return newState;
+    }
+    case 'DELETE_NOTE': {
+      const newState = {
+        ...prevState,
+        totalNotes: prevState.notes.length - 1,
+        notes: prevState.notes.filter(note => note.id !== action.payload.id),
+      };
+      console.log('After DELETE_NOTE: ', newState);
+      return newState;
+    }
+    case 'UPDATE_POSITION': {
+      return {
+        ...prevState,
+        notes: prevState.notes.map(note =>
+          note.id === action.payload.id
+            ? { ...note, x: action.payload.x, y: action.payload.y }
+            : note
+        )
+      };
+    }
   }
 };
 
@@ -81,7 +81,6 @@ const Canvas = () => {
   const [stickyNotes, setStickyNotes] = useState([]);
   const [commentPanelOpen, setCommentPanelOpen] = useState(false);
   const [comments, setComments] = useState([]);
-  const [activeComment, setActiveComment] = useState(null);
   const [activeCommentPosition, setActiveCommentPosition] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isErasing, setIsErasing] = useState(false);
@@ -93,6 +92,9 @@ const Canvas = () => {
   const [isPropertiesPanelOpen, setIsPropertiesPanelOpen] = useState(false);
   const [textboxes, setTextboxes] = useState([]);
   const [notesState, dispatch] = useReducer(notesReducer, initialNoteState);
+  const [activeCommentId, setActiveCommentId] = useState(null);
+
+  const activeComment = comments.find(comment => comment.id === activeCommentId);
 
   const updateStickyNotes = (action) => {
     dispatch(action);
@@ -102,7 +104,7 @@ const Canvas = () => {
     if (user) {
       navigate(`/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}`)
     }
-  },[user, navigate, workspaceId, boardId, canvasId]);
+  }, [user, navigate, workspaceId, boardId, canvasId]);
 
   useEffect(() => {
     const drawingCanvas = drawingCanvasRef.current;
@@ -197,43 +199,43 @@ const Canvas = () => {
     const root = xmlbuilder.create('drawingData');
     // Process drawingData if it exists and is not empty
     if (Array.isArray(drawingData) && drawingData.length > 0) {
-        drawingData.forEach(({ type, x, y }) => {
-            root.ele('drawOperation')
-                .att('type', type)
-                .ele('x').txt(x.toString()).up()
-                .ele('y').txt(y.toString()).up()
-                .up();
-        });
+      drawingData.forEach(({ type, x, y }) => {
+        root.ele('drawOperation')
+          .att('type', type)
+          .ele('x').txt(x.toString()).up()
+          .ele('y').txt(y.toString()).up()
+          .up();
+      });
     }
 
     // Process textboxes if they exist and are not empty
     if (Array.isArray(textboxes) && textboxes.length > 0) {
-        textboxes.forEach(({ id, text, width, height, position }) => {
-            root.ele('textbox')
-                .att('id', id)
-                .ele('text').txt(text).up()
-                .ele('width').txt(width.toString()).up()
-                .ele('height').txt(height.toString()).up()
-                .ele('position')
-                .ele('x').txt(position.x.toString()).up()
-                .ele('y').txt(position.y.toString()).up()
-                .up().up();
-        });
+      textboxes.forEach(({ id, text, width, height, position }) => {
+        root.ele('textbox')
+          .att('id', id)
+          .ele('text').txt(text).up()
+          .ele('width').txt(width.toString()).up()
+          .ele('height').txt(height.toString()).up()
+          .ele('position')
+          .ele('x').txt(position.x.toString()).up()
+          .ele('y').txt(position.y.toString()).up()
+          .up().up();
+      });
     }
 
     // Process stickyNotes if they exist and are not empty
     if (Array.isArray(stickyNotes) && stickyNotes.length > 0) {
-        stickyNotes.forEach(({ id, text, x, y, width, height }) => {
-            root.ele('stickyNote')
-                .att('id', id)
-                .ele('text').txt(text).up()
-                .ele('width').txt(width.toString()).up()
-                .ele('height').txt(height.toString()).up()
-                .ele('position')
-                .ele('x').txt(x.toString()).up()
-                .ele('y').txt(y.toString()).up()
-                .up().up();
-        });
+      stickyNotes.forEach(({ id, text, x, y, width, height }) => {
+        root.ele('stickyNote')
+          .att('id', id)
+          .ele('text').txt(text).up()
+          .ele('width').txt(width.toString()).up()
+          .ele('height').txt(height.toString()).up()
+          .ele('position')
+          .ele('x').txt(x.toString()).up()
+          .ele('y').txt(y.toString()).up()
+          .up().up();
+      });
     }
     return root.end({ pretty: true });
   };
@@ -245,7 +247,7 @@ const Canvas = () => {
     const xmlFile = new File([xmlBlob], "canvas-data.xml", { type: 'text/xml' });
     try {
       const data = await uploadCanvas(token, boardId, canvasId, workspaceId, xmlFile);
-      console.log('XML FILE: ',xmlFile);
+      console.log('XML FILE: ', xmlFile);
       setDrawingData(xmlFile);
       console.log('Data saved successfully:', data);
     } catch (error) {
@@ -258,20 +260,44 @@ const Canvas = () => {
   };
 
   const handleActiveComment = (comment, position) => {
-    setActiveComment(comment);
+    setActiveCommentId(comment.id);
     setActiveCommentPosition(position);
   };
 
   const unresolvedComments = comments.filter(comment => !comment.resolved);
 
   const handleAddNewComment = (newComment) => {
-    // Add the new comment to the state, which will cause a new DraggableCommentIcon to be rendered
     setComments([...comments, newComment]);
   };
 
   const handleDeleteComment = (deletedCommentId) => {
-    setComments(comments.filter(comment => comment.id !== deletedCommentId));
+    setComments(currentComments => {
+      return currentComments.reduce((updatedComments, comment) => {
+        if (comment.id === deletedCommentId) {
+          if (activeComment && activeComment.id === deletedCommentId) {
+            setActiveCommentId(null);
+          }
+          return updatedComments;
+        }
+
+        if (comment.replies && comment.replies.some(reply => reply.id === deletedCommentId)) {
+          const updatedReplies = comment.replies.filter(reply => reply.id !== deletedCommentId);
+          const updatedParentComment = { ...comment, replies: updatedReplies };
+
+          if (activeComment && activeComment.id === comment.id) {
+            setActiveCommentId(updatedParentComment.id);
+          }
+
+          updatedComments.push(updatedParentComment);
+          return updatedComments;
+        }
+
+        updatedComments.push(comment);
+        return updatedComments;
+      }, []);
+    });
   };
+
 
   const handlePositionChange = async (commentId, newPosition) => {
     const commentToUpdate = comments.find(c => c.id === commentId);
@@ -306,11 +332,17 @@ const Canvas = () => {
 
   const handleCommentResolvedToggle = (updatedComment) => {
     setComments(currentComments =>
-      currentComments.map(comment =>
-        comment.id === updatedComment.id ? updatedComment : comment
-      )
+        currentComments.map(comment => {
+            if (comment.id === updatedComment.id) {
+                return {
+                    ...comment,
+                    resolved: updatedComment.resolved
+                };
+            }
+            return comment;
+        })
     );
-  };
+};
 
   const togglePropertiesPanel = () => {
     setIsPropertiesPanelOpen(!isPropertiesPanelOpen);
@@ -328,6 +360,36 @@ const Canvas = () => {
     }
   }, [selectedShapeType]);
 
+  const handleUpdateComment = (updatedComment) => {
+    setComments(currentComments => {
+      return currentComments.map(comment => {
+        if (comment.id === updatedComment.id) {
+          return updatedComment;
+        }
+
+        // Handle nested replies
+        if (comment.replies) {
+          return {
+            ...comment,
+            replies: comment.replies.map(reply => {
+              if (reply.id === updatedComment.id) {
+                return updatedComment;
+              }
+              return reply;
+            }),
+          };
+        }
+
+        return comment;
+      });
+    });
+
+    if (activeComment && (activeComment.id === updatedComment.id ||
+      (activeComment.id === updatedComment.parentId))) {
+      setActiveCommentId(updatedComment.id);
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -339,7 +401,7 @@ const Canvas = () => {
         handleAddingShape={handleAddingShape}
         handleAddingTextbox={handleAddingTextbox}
         handleSaveCanvas={handleSaveCanvas}
-        isDrawing={isDrawing} 
+        isDrawing={isDrawing}
         setIsDrawing={setIsDrawing}
         setIsErasing={setIsErasing}
         onSelectShape={handleSelectShape}
@@ -355,14 +417,14 @@ const Canvas = () => {
           })}
         </Layer>
       </Stage>
-      
+
       <DrawAndErase
         drawingCanvasRef={drawingCanvasRef}
         drawingContextRef={drawingContextRef}
         setIsChanged={setIsChanged}
         isStickyNoteMode={isStickyNoteMode}
         setDrawingData={setDrawingData}
-        isDrawing={isDrawing} 
+        isDrawing={isDrawing}
         setIsDrawing={setIsDrawing}
         setIsErasing={setIsErasing}
       />
@@ -377,6 +439,8 @@ const Canvas = () => {
         onAddComment={handleAddNewComment}
         onDeleteComment={handleDeleteComment}
         onToggleResolved={handleCommentResolvedToggle}
+        onUpdateComment={handleUpdateComment}
+        onRefresh={() => fetchComments()}
       />
       <StickyNote
         drawingCanvasRef={drawingCanvasRef}
@@ -395,11 +459,11 @@ const Canvas = () => {
         textboxes={textboxes}
         setTextboxes={setTextboxes}
       />
-      {isAddingImage&&(
-        <UploadAndDisplayImage 
+      {isAddingImage && (
+        <UploadAndDisplayImage
           imageRef={imageRef}
           handleUploadAndDisplay={handleUploadAndDisplay}
-      />
+        />
       )}
       {/* Render the comments as draggable boxes */}
       {unresolvedComments.map((comment) => (
@@ -415,9 +479,9 @@ const Canvas = () => {
         <CommentDetailBox
           comment={activeComment}
           position={activeCommentPosition}
-          onClose={() => setActiveComment(null)}
+          onClose={() => setActiveCommentId(null)}
         />
-      )}      
+      )}
       <PropertiesPanelButton onClick={() => togglePropertiesPanel(isPropertiesPanelOpen)} />
       {isPropertiesPanelOpen && <PropertiesPanel />}
       {/* </div> */}

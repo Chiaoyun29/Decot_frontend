@@ -859,21 +859,21 @@ export const getXmlFile = async (s3Url) =>{
   }
 };
 
-export const createComment = async (token, workspaceId, boardId, canvasId, text, x, y) => {
+export const createComment = async (token, workspaceId, boardId, canvasId, text, x, y,parentId) => {
   try {
-    const response = await fetch(`${API_URL}/comment/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/create`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ text, canvasId, x, y }),
-    });
-    const data = await response.json();
-    return { ...data, status: response.status };
+      const response = await fetch(`${API_URL}/comment/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/create`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ text, canvasId, parentId, x, y }),
+      });
+      const data = await response.json();
+      return { ...data, status: response.status };
   } catch (error) {
-    console.error('Failed to create comment:', error);
-    return { error: 'Failed to create comment', status: 0 };
+      console.error('Failed to create comment:', error);
+      return { error: 'Failed to create comment', status: 0 };
   }
 };
 
