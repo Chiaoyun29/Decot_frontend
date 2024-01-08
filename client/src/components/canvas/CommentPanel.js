@@ -1,21 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { getCommentsByCanvas, createComment, deleteComment, toggleCommentResolvedState, updateComment } from '../services/api';
-import icon_toggle_off from '../../image/icon_toggle_off.svg';
-import icon_toggle_on from '../../image/icon_toggle_on.svg';
+import CommentItem from './CommentItem';
+import SocketContext from '../../context/SocketContext';
 
-const CommentPanel = ({ token, workspaceId, boardId, canvasId, isOpen, onClose, onAddComment, onDeleteComment, onToggleResolved }) => {
+const CommentPanel = ({ token, workspaceId, boardId, canvasId, isOpen, onClose, onAddComment, onDeleteComment, onToggleResolved, onUpdateComment, onRefresh }) => {
     const [comments, setComments] = useState([]);
-    const [comment, setComment] = useState([]);
     const [newCommentText, setNewCommentText] = useState('');
-    const [editingCommentId, setEditingCommentId] = useState(null);
-    const [editText, setEditText] = useState('');
     const [viewFilter, setViewFilter] = useState('unresolved'); // 'all', 'unresolved', 'resolved'
+    const { socket } = useContext(SocketContext);
+    const [searchKeyword, setSearchKeyword] = useState('');
 
     useEffect(() => {
         if (isOpen) {
             fetchComments();
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        if (socket) {
+            const handleCommentUpdated = (data) => {
+                onRefresh();
+                fetchComments();
+            };
+
+            socket.on('commentCreated', handleCommentUpdated);
+            socket.on('commentUpdated', handleCommentUpdated);
+            socket.on('commentDeleted', handleCommentUpdated);
+            socket.on('commentToggled', handleCommentUpdated);
+
+            return () => {
+                socket.off('commentCreated', handleCommentUpdated);
+                socket.off('commentUpdated', handleCommentUpdated);
+                socket.off('commentDeleted', handleCommentUpdated);
+                socket.off('commentToggled', handleCommentUpdated);
+
+            };
+
+        }
+    }, [socket]);
 
     const fetchComments = async () => {
         const response = await getCommentsByCanvas(token, workspaceId, boardId, canvasId);
@@ -27,26 +49,32 @@ const CommentPanel = ({ token, workspaceId, boardId, canvasId, isOpen, onClose, 
         }
     };
 
-    const filteredComments = comments.filter(comment => {
-        if (viewFilter === 'all') return true;
-        return viewFilter === 'resolved' ? comment.resolved : !comment.resolved;
-    });
+    const handleSearchChange = (e) => {
+        setSearchKeyword(e.target.value.toLowerCase());
+    };
 
-    const ToggleResolvedSwitch = ({ isResolved, onToggle }) => (
-        <div onClick={onToggle} className="flex items-center cursor-pointer space-x-2">
-            {isResolved ? (
-                <>
-                    <img src={icon_toggle_on} alt="Resolved" className="h-5 w-5" />
-                    <span className="text-gray-700">Resolved</span>
-                </>
-            ) : (
-                <>
-                    <img src={icon_toggle_off} alt="Unresolve" className="h-5 w-5" />
-                    <span className="text-gray-700">Resolve</span>
-                </>
-            )}
-        </div>
-    );
+    const searchFilter = (comment) => {
+        if (!searchKeyword.trim()) return true;
+    
+        const keyword = searchKeyword.toLowerCase();
+        
+        const searchCommentAndReplies = (comment) => {
+            const textMatch = comment.text.toLowerCase().includes(keyword);
+            const usernameMatch = comment.User.username.toLowerCase().includes(keyword);
+    
+            if (textMatch || usernameMatch) {
+                return true;
+            }
+    
+            return comment.replies && comment.replies.some(reply => searchCommentAndReplies(reply));
+        };
+    
+        return searchCommentAndReplies(comment);
+    };
+    
+    const filteredComments = comments.filter(comment => {
+        return (viewFilter === 'all' || viewFilter === 'resolved' === comment.resolved) && searchFilter(comment);
+    });
 
     const handleAddComment = async () => {
         const x = window.innerWidth / 2;
@@ -68,7 +96,7 @@ const CommentPanel = ({ token, workspaceId, boardId, canvasId, isOpen, onClose, 
         console.log(response)
         if (response.status === 200) {
             onDeleteComment(commentId);
-            setComments(comments.filter(comment => comment.id !== commentId));
+            fetchComments();
         } else {
             console.error('Failed to delete comment:', response.error);
         }
@@ -77,39 +105,136 @@ const CommentPanel = ({ token, workspaceId, boardId, canvasId, isOpen, onClose, 
     const handleToggleResolved = async (commentId) => {
         const response = await toggleCommentResolvedState(token, workspaceId, boardId, canvasId, commentId);
         if (response.status === 200 && response.message) {
-            const updatedComment = { ...response.comment, resolved: response.comment.resolved };
-            setComments(currentComments =>
-                currentComments.map(comment =>
-                    comment.id === commentId ? updatedComment : comment
-                )
-            );
+            const updatedComment = response.comment;
+
+            setComments(currentComments => currentComments.map(comment => {
+                if (comment.id === commentId) {
+                    return updatedComment;
+                }
+                return comment;
+            }));
             onToggleResolved(updatedComment);
+            fetchComments();
         } else {
             console.error('Failed to toggle comment resolved state:', response.error);
         }
     };
 
-    const handleEdit = (comment) => {
-        setEditingCommentId(comment.id);
-        setEditText(comment.text);
+    const updateNestedComments = (comments, updatedComment) => {
+        return comments.map(comment => {
+            if (comment.id === updatedComment.id) {
+                return updatedComment;
+            }
+            if (comment.replies) {
+                return {
+                    ...comment,
+                    replies: updateNestedComments(comment.replies, updatedComment),
+                };
+            }
+            return comment;
+        });
     };
 
-    const handleSaveEdit = async () => {
-        const currentComment = comments.find(c => c.id === editingCommentId);
-        if (!currentComment) {
-            console.error('No comment found with the current editing ID:', editingCommentId);
-            return;
-        }
+    const handleSaveEdit = async (commentId, newText) => {
+        let x, y;
+        const findComment = (comments, id) => {
+            for (const comment of comments) {
+                if (comment.id === id) {
+                    x = comment.x;
+                    y = comment.y;
+                    return comment;
+                }
+                if (comment.replies) {
+                    const foundReply = findComment(comment.replies, id);
+                    if (foundReply) return foundReply;
+                }
+            }
+        };
 
-        const response = await updateComment(token, workspaceId, boardId, canvasId, editingCommentId, editText, currentComment.x, currentComment.y);
+        findComment(comments, commentId);
+
+        const response = await updateComment(token, workspaceId, boardId, canvasId, commentId, newText, x, y);
         if (response.status === 200) {
-            setComments(comments.map(c => c.id === editingCommentId ? { ...c, text: editText } : c));
-            setEditingCommentId(null);
+            const updatedCommentOrReply = response.comment;
+
+            setComments(currentComments => {
+                const updatedComments = currentComments.map(comment => {
+                    if (comment.id === commentId) {
+                        return updatedCommentOrReply;
+                    }
+
+                    if (comment.replies) {
+                        const updatedReplies = comment.replies.map(reply => {
+                            if (reply.id === commentId) {
+                                return updatedCommentOrReply;
+                            }
+                            return reply;
+                        });
+
+                        return updatedReplies.some(reply => reply.id === commentId) ? { ...comment, replies: updatedReplies } : comment;
+                    }
+
+                    return comment;
+                });
+
+                const parentComment = updatedComments.find(comment =>
+                    comment.replies && comment.replies.some(reply => reply.id === commentId)
+                );
+
+                if (parentComment) {
+                    onUpdateComment(parentComment);
+                } else {
+                    onUpdateComment(updatedCommentOrReply);
+                }
+
+                return updatedComments;
+            });
         } else {
             console.error('Failed to update comment:', response.error);
         }
     };
 
+    const handleAddReply = async (replyingToCommentId, replyText) => {
+        let x, y;
+        const findComment = (comments, id) => {
+            for (const comment of comments) {
+                if (comment.id === id) {
+                    x = comment.x;
+                    y = comment.y;
+                    return comment;
+                }
+                if (comment.replies) {
+                    const foundReply = findComment(comment.replies, id);
+                    if (foundReply) return foundReply;
+                }
+            }
+        };
+
+        findComment(comments, replyingToCommentId);
+        const response = await createComment(token, workspaceId, boardId, canvasId, replyText, x, y, replyingToCommentId);
+
+        if (response.status === 201) {
+            const newReply = response.comment;
+
+            setComments(currentComments => {
+                return currentComments.map(comment => {
+                    if (comment.id === replyingToCommentId) {
+                        const updatedParentComment = {
+                            ...comment,
+                            replies: [...comment.replies, newReply],
+                        };
+
+                        onUpdateComment(updatedParentComment);
+
+                        return updatedParentComment;
+                    }
+                    return comment;
+                });
+            });
+        } else {
+            console.error('Failed to add reply:', response.error);
+        }
+    };
 
     return (
         <div className="fixed inset-y-0 right-0 top-20 transform transition-transform duration-300 ease-in-out"
@@ -150,34 +275,32 @@ const CommentPanel = ({ token, workspaceId, boardId, canvasId, isOpen, onClose, 
                 </div>
 
                 {/* Comment List */}
-                <div className="overflow-auto p-4 space-y-4 max-h-[calc(100vh-15rem)]">
+                <div className="overflow-auto p-4 space-y-4 max-h-[calc(100vh-20rem)]">
+                    {/* Search Bar */}
+                    <div className="relative p-1 bg-slate-50">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <svg fill="currentColor" viewBox="0 0 512 512" className="w-5 h-5 text-gray-600">
+                                    <path d="M479.6,399.716l-81.084-81.084-62.368-25.767A175.014,175.014,0,0,0,368,192c0-97.047-78.953-176-176-176S16,94.953,16,192,94.953,368,192,368a175.034,175.034,0,0,0,101.619-32.377l25.7,62.2L400.4,478.911a56,56,0,1,0,79.2-79.195ZM48,192c0-79.4,64.6-144,144-144s144,64.6,144,144S271.4,336,192,336,48,271.4,48,192ZM456.971,456.284a24.028,24.028,0,0,1-33.942,0l-76.572-76.572-23.894-57.835L380.4,345.771l76.573,76.572A24.028,24.028,0,0,1,456.971,456.284Z"></path>
+                                </svg>
+                        </span>
+                        <input
+                            type="text"
+                            value={searchKeyword}
+                            onChange={handleSearchChange}
+                            placeholder="Search comments..."
+                            className="w-full pl-10 py-2 border border-gray-300 rounded-md shadow-sm text-md"
+                        />
+                    </div>
                     {filteredComments.map((comment) => (
-                        <div key={comment.id} className="p-2 border-b border-gray-200">
-                            <div className="flex justify-between text-xs mb-2">
-                                <span className="font-semibold">{comment.User.username}</span>
-                                <span className="text-gray-500">{new Date(comment.createdAt).toLocaleString()}</span>
-                            </div>
-                            {editingCommentId === comment.id ? (
-                                <input type="text" value={editText}
-                                    onChange={(e) => setEditText(e.target.value)}
-                                    className="w-full mb-2 p-2 border border-gray-300 rounded-md shadow-sm"
-                                />
-                            ) : (
-                                <p className="text-sm mb-2">{comment.text}</p>
-                            )}
-                            <div className="flex justify-between items-center text-xs">
-                                <ToggleResolvedSwitch
-                                    isResolved={comment.resolved}
-                                    onToggle={() => handleToggleResolved(comment.id)}
-                                />
-                                {editingCommentId === comment.id ? (
-                                    <button onClick={handleSaveEdit} className="text-blue-500">Save</button>
-                                ) : (
-                                    <button onClick={() => handleEdit(comment)} className="text-blue-500">Edit</button>
-                                )}
-                                <button onClick={() => handleDeleteComment(comment.id)} className="text-red-500">Delete</button>
-                            </div>
-                        </div>
+                        <CommentItem
+                            key={comment.id}
+                            comment={comment}
+                            onSaveEdit={handleSaveEdit}
+                            onDelete={handleDeleteComment}
+                            onToggleResolved={handleToggleResolved}
+                            onAddReply={handleAddReply}
+                            showReplySection={!comment.parentId}
+                        />
                     ))}
                 </div>
             </div>
