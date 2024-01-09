@@ -91,16 +91,16 @@ const Sidebar = ({ activateDrawingMode, activateErasingMode, isDrawing, isErasin
 
           {open ? (
           <>
-            <a className="sidebar-button" href="download_link" onClick={saveImageToLocal}>
+            <button className="sidebar-button"  onClick={saveImageToLocal}>
               <BiExport />
               <span>Export Image</span>
-            </a>
+            </button>
           </>
         ) : (
           <>
-            <a className={`sidebar-button ${!open ? 'sidebar-button-center' : ''}`} href="download_link" onClick={(e) => handleButtonClick(e, saveImageToLocal)}>
+            <button className={`sidebar-button ${!open ? 'sidebar-button-center' : ''}`}  onClick={(e) => handleButtonClick(e, saveImageToLocal)}>
               <BiExport />
-            </a>
+            </button>
           </>
         )}
         </div>
