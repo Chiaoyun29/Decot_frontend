@@ -25,7 +25,7 @@ const App = () => {
           <AuthProvider>
             <SocketProvider>
               <Routes>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/Decot_frontend" element={<HomePage />} />
                 <Route path="/Decot_frontend/googleCallback" element={<Register />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
