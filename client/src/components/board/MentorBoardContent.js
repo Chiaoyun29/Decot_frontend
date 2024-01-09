@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
-import { getBoardById, updateBoard, deleteBoard, getCanvases, addWorkspaceMember, getWorkspaceMembers, getBoardMembers, deleteWorkspaceMember, updateCanvas, deleteCanvas } from '../services/api';
+import { getBoardById, updateBoard, deleteBoard, getCanvases, addWorkspaceMember, getWorkspaceMembers, getBoardMembers, deleteBoardMember, updateCanvas, deleteCanvas } from '../services/api';
 import CustomModal from '../common/CustomModal';
 import icon_pencil from "../../image/icon_pencil.svg";
 import CreateCanvasModal from '../board/CreateCanvasModal';
@@ -36,6 +36,7 @@ const MentorBoardContent = () => {
   const [selectedCanvasIdForDelete, setSelectedCanvasIdForDelete] = useState(null);
   const [isDeleteCanvasModalOpen, setIsDeleteCanvasModalOpen] = useState(false);
   const [showDesignThinkingMessage, setShowDesignThinkingMessage] = useState(true);
+  const [memberUpdate, setMemberUpdate] = useState(0);
 
   const fetchCanvases = async () => {
     const response = await getCanvases(token, boardId, workspaceId);
@@ -68,7 +69,7 @@ const MentorBoardContent = () => {
       fetchWorkspaceMembers();
       fetchBoardMembers();
     }
-  }, [isManageMembersModalOpen]);
+  }, [token, workspaceId, boardId, memberUpdate, isManageMembersModalOpen]);
 
   const fetchWorkspaceMembers = async () => {
     try {
@@ -150,10 +151,12 @@ const MentorBoardContent = () => {
         const isBoardMember = boardMembers.some(member => member.id === selectedMember.id);
   
         if (isBoardMember) {
-          const response = await deleteWorkspaceMember(token, workspaceId, boardId, selectedMember.id);
+          const response = await deleteBoardMember(token, workspaceId, boardId, selectedMember.id);
           if (response && response.status === 200) {
             fetchWorkspaceMembers(); // refresh the members list
             setIsMemberDeleteModalOpen(false);
+            setMemberUpdate(prev => prev + 1);
+            navigate();
           } else {
             console.error(response && response.error);
           }
@@ -239,7 +242,6 @@ const MentorBoardContent = () => {
   };
 
   const getDesignThinkingTip = (dtTag) =>{
-    console.log("Received dtTag in getDesignThinkingMessage:", dtTag);
     switch(dtTag){
       case 'Stage 1 (Empathize)':
         return 'Research Your Needs';

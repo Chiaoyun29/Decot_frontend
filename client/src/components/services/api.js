@@ -216,7 +216,6 @@ export const getBoardMembers = async (token, boardId, workspaceId) => {
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
     });
-    console.log("hello");
     if (response.headers.get('content-type')?.includes('application/json') && response.ok) {
       return response.json();
     } else {
@@ -229,7 +228,7 @@ export const getBoardMembers = async (token, boardId, workspaceId) => {
   }
 };
 
-export const deleteWorkspaceMember = async (token, workspaceId, boardId, userId) => {
+export const deleteBoardMember = async (token, workspaceId, boardId, userId) => {
   try {
     const response = await fetch(`${API_URL}/board/workspace/${workspaceId}/board/${boardId}/members/${userId}/delete`, {
       method: 'DELETE',
@@ -383,9 +382,8 @@ export const getBoards = async (token, workspaceId) => {
         'Authorization': `Bearer ${token}`,
       },
     });
-    console.log(workspaceId);
     console.log(token);
-    console.log(response);
+    // console.log(response);
     const data = await response.json();
     return { ...data, status: response.status };
   } catch (error) {
@@ -409,25 +407,6 @@ export const getBoardById = async (token, boardId, workspaceId) => {
   } catch (error) {
     console.error('Failed to retrieve board:', error);
     return { error: 'Failed to retrieve board', status: 0 };
-  }
-};
-
-export const joinBoard = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/board/join`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({}),
-    });
-    const data = await response.json();
-    return { ...data, status: response.status };
-
-  } catch (error) {
-    console.error('Failed to join board:', error);
-    return { error: 'Failed to join board', status: 0 };
   }
 };
 
@@ -840,17 +819,19 @@ export const getCanvasDataById = async(token, boardId, canvasId, workspaceId) =>
         'Authorization': `Bearer ${token}`,
       },
     });
+    console.log(response);
     const data = await response.json();
     return { ...data, status: response.status };
   } catch (error) {
-    console.error('Failed to retrieve comments:', error);
-    return { error: 'Failed to retrieve comments', status: 0 };
+    console.error('Failed to retrieve canvas data:', error);
+    return { error: 'Failed to retrieve canvas data', status: 0 };
   }
 };
 
 export const getXmlFile = async (s3Url) =>{
   try{
     const response = await fetch(s3Url);
+    console.log(response);
     if (!response.ok) throw new Error('Network response was not ok.');
     return await response.text();
   }catch(error){
@@ -941,5 +922,74 @@ export const toggleCommentResolvedState = async (token, workspaceId, boardId, ca
   } catch (error) {
     console.error('Failed to toggle comment resolve state:', error);
     return { error: 'Failed to toggle comment resolve state', status: 0 };
+  }
+};
+
+export const createStickyNote = async (token, workspaceId, boardId, canvasId, text, x, y) => {
+  try {
+    const response = await fetch(`${API_URL}/stickyNote/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/sticky-notes/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text, canvasId, x, y }),
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to create StickyNote:', error);
+    return { error: 'Failed to create StickyNote', status: 0 };
+  }
+};
+
+export const getStickyNotes = async (token, workspaceId, boardId, canvasId) => {
+  try {
+    const response = await fetch(`${API_URL}/stickyNote/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/sticky-notes`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to retrieve StickyNote:', error);
+    return { error: 'Failed to retrieve StickyNote', status: 0 };
+  }
+};
+
+export const updateStickyNote = async (token, workspaceId, boardId, canvasId, stickyNoteId, x, y) => {
+  try {
+    const response = await fetch(`${API_URL}/stickyNote/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/sticky-notes/${stickyNoteId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ x, y }),
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to update StickyNote:', error);
+    return { error: 'Failed to update StickyNote', status: 0 };
+  }
+};
+
+export const deleteStickyNote = async (token, workspaceId, boardId, canvasId, stickyNoteId) => {
+  try {
+    const response = await fetch(`${API_URL}/stickyNote/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/sticky-notes/${stickyNoteId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to delete StickyNote:', error);
+    return { error: 'Failed to delete StickyNote', status: 0 };
   }
 };

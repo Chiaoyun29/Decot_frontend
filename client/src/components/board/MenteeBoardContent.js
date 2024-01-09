@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getBoardById, getCanvases, getBoardMembers } from '../services/api';
+import CustomModal from '../common/CustomModal';
 
 const MenteeBoardContent = () => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const { boardId, workspaceId } = useParams();
   const [board, setBoard] = useState(null);
   const { token } = useAuthContext();
-  //const [boards, setBoards] = useState([]);
   const [canvases, setCanvases] = useState([]);
   const [boardMembers, setBoardMembers] = useState([]);
-  //const [selectedMember, setSelectedMember] = useState(null);
   const [showDesignThinkingMessage, setShowDesignThinkingMessage] = useState(true);
+  const [isViewMembersModalOpen, setIsViewMembersModalOpen] = useState(false);
 
   const fetchCanvases = async () => {
     const response = await getCanvases(token, boardId, workspaceId);
@@ -23,12 +24,18 @@ const MenteeBoardContent = () => {
     }
   };
 
-  const fetchBoardMembers = async() =>{
-    const response = await getBoardMembers(token, boardId, workspaceId);
-    if (response.status === 200) {
-      setBoardMembers(response.members);
-    } else {
-      console.error(response.error);
+  useEffect(() => {
+    if(isViewMembersModalOpen){
+      fetchBoardMembers();
+    }
+  }, [isViewMembersModalOpen]);
+
+  const fetchBoardMembers = async () => {
+    try {
+      const members = await getBoardMembers(token, boardId, workspaceId);
+      setBoardMembers(members);
+    } catch (error) {
+      console.error('Error fetching members:', error);
     }
   };
 
@@ -47,10 +54,6 @@ const MenteeBoardContent = () => {
     };
     fetchBoard();
   }, [boardId, token]);
-
-  useEffect(() => {
-    fetchBoardMembers();
-  }, [boardId, workspaceId, token]);
 
   if (!board) return (<div className="flex items-center justify-center min-h-screen">
     <div className="p-8 w-16 h-16 border-4 border-dashed rounded-full animate-spin dark:border-violet-400"></div>
@@ -89,8 +92,35 @@ const MenteeBoardContent = () => {
           <p className="text-gray-600 mb-4">{board.dtTag}</p>
           <p className="text-gray-600 mb-4">{board.status}</p>
           <p className="text-gray-600 mb-4">{new Date(board.deadline).toLocaleString()}</p>
-        </div>
+        </div>      
+        {/* View Members list button at the middle */}
+        <button
+          onClick={() => setIsViewMembersModalOpen(true)}
+          className="font-semibold w-full flex items-center justify-center py-2 px-4 my-3 text-white bg-indigo-500 hover:bg-purple-600 focus:ring-indigo-500 focus:ring-offset-yellow-200 transition ease-in duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+        >
+          View Members
+        </button>
+
+        {/* To view members list */}
+        <CustomModal
+          isOpen={isViewMembersModalOpen}
+          onClose={() => setIsViewMembersModalOpen(false)}
+          title="View Members"
+        >
+         <ul>
+            {boardMembers && boardMembers.length > 0 ? (
+              boardMembers.map(member => (
+                <li key={member.id} className="flex justify-between items-center mb-2">
+                  <span>{member.username}</span>
+                </li>
+              ))
+            ) : (
+              <p>No members found</p>
+            )}
+          </ul>
+        </CustomModal>
       </div>
+
 
       {/* Main content container */}
       {/* Your main content */}

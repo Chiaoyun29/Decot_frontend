@@ -16,6 +16,7 @@
     "chart": "^0.1.2",
     "chart.js": "^4.4.0",
     "clamp": "^1.0.1",
+    "html2canvas": "^1.4.1",
     "postcss": "^8.4.31",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
