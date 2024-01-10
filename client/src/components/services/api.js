@@ -1,4 +1,4 @@
-const API_URL = 'https://decot.azurewebsites.net';
+const API_URL = 'https://decot-41f64098cefb.herokuapp.com';
 
 export const registerUser = async (username, email, password, role) => {
   try {
