@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { updateProfile, deleteAccount, verifyEnteredPassword, changePassword, uploadProfilePic } from '../../components/services/api'; // Assuming you have this API function
 import CustomModal from '../../components/common/CustomModal';
 import { Link, useNavigate } from 'react-router-dom';
-import defaultProfilePic from "../../image/user.png";
+import defaultProfilePic from "/image/user.png";
 
 const EditProfile = ({ user,  setUser,isEditing, setIsEditing, onCancel }) => {
     const [username, setUsername] = useState(user.username || '');

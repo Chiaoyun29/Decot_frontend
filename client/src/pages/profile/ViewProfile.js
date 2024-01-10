@@ -1,5 +1,5 @@
 import React from 'react';
-import defaultProfilePic from "../../image/user.png";
+import defaultProfilePic from "/image/user.png";
 
 const ViewProfile = ({ user, onEditClick }) => {
   const profilePicUrl = user.profilePic || defaultProfilePic;

@@ -1,5 +1,5 @@
 import React from 'react';
-import panel_button from '../../image/palette.png';
+import panel_button from '/image/palette.png';
 
 const PaletteButton = ({ onClick }) => {
   return (

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useRef } from "react";
-import icon_message from '../../image/icon_message.svg';
+import icon_message from '/image/icon_message.svg';
 import "./Chatfunction.css";
 import ChatBody from './ChatBody.js';
 import { useAuthContext } from '../../context/AuthContext.js';

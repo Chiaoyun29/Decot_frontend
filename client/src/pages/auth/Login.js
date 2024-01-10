@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { loginUser, authenticateWithGoogle, updateUserRole, changePassword } from '../../components/services/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import CustomModal from '../../components/common/CustomModal';
-import logo from "../../image/DECOT.png";
+import logo from "/image/DECOT.png";
 import { Link } from 'react-router-dom';
 import './auth.css';
 import { useAuthContext } from '../../context/AuthContext';
-import g_sign_in from "../../image/google_sign_in.png";
+import g_sign_in from "/image/google_sign_in.png";
 
 const Login = () => {
     const { user, setUser, setToken } = useAuthContext();

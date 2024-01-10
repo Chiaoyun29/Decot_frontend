@@ -5,7 +5,7 @@ import { getWorkspaceById, updateWorkspace, deleteWorkspace, getWorkspaceMembers
 import CustomModal from '../common/CustomModal';
 import SocketContext from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
-import icon_pencil from "../../image/icon_pencil.svg";
+import icon_pencil from "/image/icon_pencil.svg";
 import CreateBoardModal from './CreateBoardModal';
 import ChatButton from '../chat/ChatDropdown';
 

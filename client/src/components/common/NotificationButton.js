@@ -2,9 +2,9 @@ import React, { useEffect, useState, useContext, useRef } from 'react';
 import { getNotifications, removeAllNotifications, deleteNotification, markNotificationAsRead, markAllNotificationsAsRead } from '../services/api';
 import { useAuthContext} from '../../context/AuthContext';
 import SocketContext from '../../context/SocketContext';
-import icon_notification from '../../image/icon_notification_bell.svg';
-import icon_check from '../../image/icon_check.svg';
-import icon_delete from '../../image/icon_delete.svg';
+import icon_notification from '/image/icon_notification_bell.svg';
+import icon_check from '/image/icon_check.svg';
+import icon_delete from '/image/icon_delete.svg';
 
 const NotificationButton = () => {
   const [notifications, setNotifications] = useState([]);

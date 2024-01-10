@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from "../../image/DECOT.png";
-import icon_menu from "../../image/icon_menu.svg";
+import logo from "/image/DECOT.png";
+import icon_menu from "/image/icon_menu.svg";
 import CustomModal from './CustomModal';
 import { useAuthContext } from '../../context/AuthContext';
 import NotificationButton from '../common/NotificationButton';

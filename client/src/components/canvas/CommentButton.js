@@ -1,5 +1,5 @@
 import React from 'react';
-import icon_comment from '../../image/icon_comment.svg';
+import icon_comment from '/image/icon_comment.svg';
 
 const CommentButton = ({ onClick }) => {
   return (

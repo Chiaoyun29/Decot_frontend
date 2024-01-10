@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import icon_facebook from "../../image/icon_facebook.svg";
-import icon_github from "../../image/icon_github.svg";
-import icon_insta from "../../image/icon_insta.svg";
+import icon_facebook from "/image/icon_facebook.svg";
+import icon_github from "/image/icon_github.svg";
+import icon_insta from "/image/icon_insta.svg";
 
 const Section = () => {
  

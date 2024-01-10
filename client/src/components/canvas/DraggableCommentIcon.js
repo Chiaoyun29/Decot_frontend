@@ -1,6 +1,6 @@
 import React from 'react';
 import { DraggableCore } from 'react-draggable';
-import icon_comment from '../../image/icon_comment_for_draggable.svg';
+import icon_comment from '/image/icon_comment_for_draggable.svg';
 
 const DraggableCommentIcon = ({ comment, onSelectComment, onPositionChange }) => {
     const handleDrag = (e, data) => {

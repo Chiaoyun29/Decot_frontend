@@ -6,7 +6,7 @@ import { getMenteeAnalysisData } from "../services/api";
 import { useAuthContext } from '../../context/AuthContext';
 import Navbar from '../common/Navbar';
 import CustomModal from '../common/CustomModal';
-import icon_cross from "../../image/icon_cross.svg"
+import icon_cross from "/image/icon_cross.svg"
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { registerUser, authenticateWithGoogle, updateUserRole } from '../../components/services/api';
 import { useNavigate } from 'react-router-dom';
 import CustomModal from '../../components/common/CustomModal';
-import logo from "../../image/DECOT.png";
+import logo from "/image/DECOT.png";
 import { Link } from 'react-router-dom';
 import './auth.css';
 import { useAuthContext } from '../../context/AuthContext';
-import g_sign_up from "../../image/google_sign_up.png";
+import g_sign_up from "/image/google_sign_up.png";
 
 const Register = () => {
     const [username, setUsername] = useState('');

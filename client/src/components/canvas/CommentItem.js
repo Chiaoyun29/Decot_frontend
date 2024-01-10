@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import icon_toggle_off from '../../image/icon_toggle_off.svg';
-import icon_toggle_on from '../../image/icon_toggle_on.svg';
+import icon_toggle_off from '/image/icon_toggle_off.svg';
+import icon_toggle_on from '/image/icon_toggle_on.svg';
 import { useAuthContext } from '../../context/AuthContext';
 
 const CommentItem = ({ comment, onSaveEdit, onDelete, onToggleResolved, onAddReply, showReplySection }) => {
