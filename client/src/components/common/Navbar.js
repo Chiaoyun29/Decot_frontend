@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from "../../image/DECOT.png";
+import icon_menu from "../../image/icon_menu.svg";
 import CustomModal from './CustomModal';
 import { useAuthContext } from '../../context/AuthContext';
 import NotificationButton from '../common/NotificationButton';
@@ -30,13 +31,13 @@ const Navbar = (props) => {
 
   return (
     <nav
-        className={
-          (props.transparent
-            ? 'top-0 absolute z-50 w-full'
-            : 'relative shadow-lg bg-white shadow-lg') +
-          ' flex flex-wrap items-center justify-between px-2 py-3'
-        }
-      >
+      className={
+        (props.transparent
+          ? 'top-0 absolute z-50 w-full'
+          : 'relative shadow-lg bg-white shadow-lg') +
+        ' flex flex-wrap items-center justify-between px-2 py-3'
+      }
+    >
       <div className="container px-4 mx-auto flex flex-wrap items-center justify-between">
         <div className="w-full relative flex justify-between lg:w-auto lg:static lg:block lg:justify-start">
           <Link to="/Decot_Frontend">
@@ -47,6 +48,7 @@ const Navbar = (props) => {
             type="button"
             onClick={() => setNavbarOpen(!navbarOpen)}
           >
+            <img src={icon_menu} alt="Logo" className="" />
             <i className={(props.transparent ? 'text-white' : 'text-gray-800') + ' fas fa-bars'}></i>
           </button>
         </div>
