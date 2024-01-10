@@ -63,7 +63,7 @@ const MenteeWorkspaceContent = () => {
     const fetchWorkspace = async () => {
       const response = await getWorkspaceById(token, workspaceId, user.id);
       if (response.workspace) {
-        socket.emit('userAction', { action: 'viewWorkspace' });
+        // socket.emit('userAction', { action: 'viewWorkspace' });
         setWorkspace(response.workspace);
       } else {
         console.error(response.error);

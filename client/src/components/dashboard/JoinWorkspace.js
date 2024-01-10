@@ -12,7 +12,7 @@ const JoinWorkspace = ({ onWorkspaceJoined }) => {
     const response = await joinWorkspace(token, joinToken);
     if (response.message) {
       if (onWorkspaceJoined) {
-        socket.emit('userAction', { action: 'joinWorkspace' });
+        // socket.emit('userAction', { action: 'joinWorkspace' });
         onWorkspaceJoined();
       }
     } else {
