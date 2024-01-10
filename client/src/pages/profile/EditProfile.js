@@ -95,7 +95,7 @@ const EditProfile = ({ user,  setUser,isEditing, setIsEditing, onCancel }) => {
     const handleDeleteAccount = async () => {
         try {
             await deleteAccount(user.id);
-            navigate("/Decot_frontend");
+            navigate("/");
         } catch (error) {
             setMessageTitle('Error');
             setMessage('An error occurred while trying to delete the account');

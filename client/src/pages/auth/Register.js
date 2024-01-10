@@ -124,7 +124,7 @@ const Register = () => {
         <div className="bg-blend-darken bg flex flex-col items-center min-h-screen pt-6 sm:justify-center sm:pt-0 bg-black-800">
             <div className="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-lg sm:rounded-lg">
                 <div className="flex flex-col items-center">
-                    <Link to="/Decot_frontend">
+                    <Link to="/">
                         <img src={logo} alt="logo" className="w-1/4 h-1/4 m-auto pt-5" />
                     </Link>
                 </div>

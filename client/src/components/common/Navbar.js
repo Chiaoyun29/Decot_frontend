@@ -22,7 +22,7 @@ const Navbar = (props) => {
     setToken(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    navigate('/Decot_frontend'); // navigate to homepage
+    navigate('/'); // navigate to homepage
   };
 
   const confirmLogout = () => {
@@ -40,7 +40,7 @@ const Navbar = (props) => {
     >
       <div className="container px-4 mx-auto flex flex-wrap items-center justify-between">
         <div className="w-full relative flex justify-between lg:w-auto lg:static lg:block lg:justify-start">
-          <Link to="/Decot_Frontend">
+          <Link to="/">
             <img src={logo} alt="Logo" className="w-1/4 h-1/4" />
           </Link>
           <button
