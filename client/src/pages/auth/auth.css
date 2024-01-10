@@ -1,5 +1,5 @@
 .bg{
-    background-image: url('/client/public/image/bg_auth_1_blurred.jpg');
+    background-image: url(../../image/bg_auth_1_blurred.jpg);
     min-width: 100%;
     min-height: 100vh;
     background-size: cover;
