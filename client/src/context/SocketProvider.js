@@ -14,7 +14,7 @@ const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user && user.id) {
-      const newSocket = io('http://localhost:5000', {
+      const newSocket = io('https://decot-41f64098cefb.herokuapp.com', {
         query: { userId: user.id },
       });
 
