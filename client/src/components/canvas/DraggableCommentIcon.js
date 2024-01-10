@@ -6,7 +6,7 @@ const DraggableCommentIcon = ({ comment, onSelectComment, onPositionChange }) =>
     const handleDrag =  debounce((e, data) => {
         const newPosition = { x: comment.x + data.deltaX, y: comment.y + data.deltaY };
         onPositionChange(comment.id, newPosition);
-    }, 150);
+    }, 50);
 
     const handleStop = (e, data) => {
         // No need to calculate final position, handleDrag has already updated it
