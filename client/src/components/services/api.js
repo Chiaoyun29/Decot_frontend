@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://decot.azurewebsites.net';
 
 export const registerUser = async (username, email, password, role) => {
   try {
