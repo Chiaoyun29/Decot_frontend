@@ -1,6 +1,5 @@
 import React from 'react';
 import { DraggableCore } from 'react-draggable';
-import icon_comment from '/image/icon_comment_for_draggable.svg';
 
 const DraggableCommentIcon = ({ comment, onSelectComment, onPositionChange }) => {
     const handleDrag = (e, data) => {
@@ -20,7 +19,7 @@ const DraggableCommentIcon = ({ comment, onSelectComment, onPositionChange }) =>
                 style={{ left: comment.x, top: comment.y, zIndex: 1000 }}
             >
                 <img
-                    src={icon_comment}
+                    src='/image/icon_comment_for_draggable.svg'
                     alt="Comment Icon"
                     style={{ pointerEvents: 'none' }}
                 />

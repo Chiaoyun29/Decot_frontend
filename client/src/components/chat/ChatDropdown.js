@@ -1,5 +1,4 @@
 import React, { useState, useContext, useRef } from "react";
-import icon_message from '/image/icon_message.svg';
 import "./Chatfunction.css";
 import ChatBody from './ChatBody.js';
 import { useAuthContext } from '../../context/AuthContext.js';
@@ -28,7 +27,7 @@ const ChatDropdown =()=>{
                     {/* messages.length */}
                 </span>
                 )}
-                <img src={icon_message} className="w-6 h-6 text-black" alt="Messages" />
+                <img src='/image/icon_message.svg' className="w-6 h-6 text-black" alt="Messages" />
             </button>
 
             {showMessages && (

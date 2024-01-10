@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { loginUser, authenticateWithGoogle, updateUserRole, changePassword } from '../../components/services/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import CustomModal from '../../components/common/CustomModal';
-import logo from "/image/DECOT.png";
 import { Link } from 'react-router-dom';
 import './auth.css';
 import { useAuthContext } from '../../context/AuthContext';
-import g_sign_in from "/image/google_sign_in.png";
 
 const Login = () => {
     const { user, setUser, setToken } = useAuthContext();
@@ -121,7 +119,7 @@ const Login = () => {
             <div className="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-lg sm:rounded-lg">
                 <div className="flex flex-col items-center">
                     <Link to="/">
-                        <img src={logo} alt="logo" className="w-1/4 h-1/4 m-auto pt-5" />
+                        <img src="/image/DECOT.png" alt="logo" className="w-1/4 h-1/4 m-auto pt-5" />
                     </Link>
                 </div>
                 <input
@@ -151,7 +149,7 @@ const Login = () => {
                         className="mt-4 px-2 py-2 bg-white border border-gray-300 rounded-full hover:bg-blue-100 focus:outline-none"
                     >
                         <img
-                            src={g_sign_in}
+                            src="/image/google_sign_in.png"
                             alt="Login with Google"
                             className="w-40 h-auto"  // Adjust w-24 to the width you want. h-auto will maintain aspect ratio.
                         />

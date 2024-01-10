@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '/image/DECOT.png';
 
 export default function Navbar(props) {
   const [navbarOpen, setNavbarOpen] = useState(false);
@@ -17,7 +16,7 @@ export default function Navbar(props) {
       <div className="container px-4 mx-auto flex flex-wrap items-center justify-between">
         <div className="w-full relative flex justify-between lg:w-auto lg:static lg:block lg:justify-start">
           <Link to="/">
-            <img src={logo} alt="Logo" className="w-1/4 h-1/4" />
+            <img src='/image/DECOT.png' alt="Logo" className="w-1/4 h-1/4" />
           </Link>
           <button
             className="cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"

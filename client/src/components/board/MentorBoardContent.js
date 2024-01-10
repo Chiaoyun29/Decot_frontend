@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import { getBoardById, updateBoard, deleteBoard, getCanvases, addWorkspaceMember, getWorkspaceMembers, getBoardMembers, deleteBoardMember, updateCanvas, deleteCanvas } from '../services/api';
 import CustomModal from '../common/CustomModal';
-import icon_pencil from "/image/icon_pencil.svg";
 import CreateCanvasModal from '../board/CreateCanvasModal';
 
 const MentorBoardContent = () => {
@@ -338,7 +337,7 @@ const MentorBoardContent = () => {
                   }}
                   className="text-xl text-blue-500"
                 >
-                  <img src={icon_pencil} alt="edit icon" className="w-4 h-4" />
+                  <img src="/image/icon_pencil.svg" alt="edit icon" className="w-4 h-4" />
                 </button>
               </div>
               <p className="mb-2 text-sm text-gray-600">{board.description}</p>
