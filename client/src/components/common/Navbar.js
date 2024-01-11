@@ -20,7 +20,7 @@ const Navbar = (props) => {
     setToken(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    navigate('/'); // navigate to homepage
+    navigate('/', { replace: true });
   };
 
   const confirmLogout = () => {

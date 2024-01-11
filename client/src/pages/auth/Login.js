@@ -26,7 +26,6 @@ const Login = () => {
                 setToken(response.token); // set token in context
                 const postLoginRedirect = JSON.parse(sessionStorage.getItem('postLoginRedirect'));
                 if (postLoginRedirect?.from === 'joinWorkspace' && postLoginRedirect?.token) {
-                    console.log("got COme here?")
                     navigate(`/join/${postLoginRedirect.token}`);
                 } else {
                     navigate("/dashboard");
