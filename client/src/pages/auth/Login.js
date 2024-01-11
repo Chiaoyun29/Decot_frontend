@@ -62,6 +62,9 @@ const Login = () => {
                 setUser(user);
                 setToken(token);
 
+                urlParams.delete('token');
+                urlParams.delete('user');
+
                 if (user?.role === null) {
                     setRoleModalIsOpen(true);
                 } else {
@@ -76,6 +79,9 @@ const Login = () => {
 
             setUser(user);
             setToken(token);
+
+            urlParams.delete('token');
+            urlParams.delete('user');
 
             if (user?.role === null) {
                 setRoleModalIsOpen(true);

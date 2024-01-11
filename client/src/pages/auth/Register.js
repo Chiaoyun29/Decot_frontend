@@ -62,11 +62,12 @@ const Register = () => {
         if (postLoginRedirect?.from === 'joinWorkspace' && postLoginRedirect?.token) {
             if (token && userJSON) {
                 const user = JSON.parse(userJSON);
-                console.log("wth hell user@!")
-                console.log(user)
+              
                 setUser(user);
                 setToken(token);
 
+                urlParams.delete('token');
+                urlParams.delete('user');
                 if (user?.role === null) {
                     setRoleModalIsOpen(true);
                 } else {
@@ -81,6 +82,9 @@ const Register = () => {
 
             setUser(user);
             setToken(token);
+
+            urlParams.delete('token');
+            urlParams.delete('user');
 
             if (user?.role === null) {
                 setRoleModalIsOpen(true);

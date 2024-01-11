@@ -20,7 +20,6 @@ const Navbar = (props) => {
     setToken(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    window.location.hash = '';
     navigate('/', { replace: true });
   };
 
