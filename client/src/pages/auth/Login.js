@@ -64,6 +64,7 @@ const Login = () => {
 
                 urlParams.delete('token');
                 urlParams.delete('user');
+                window.history.replaceState({}, document.title, `${window.location.pathname}?${urlParams}`);
 
                 if (user?.role === null) {
                     setRoleModalIsOpen(true);
@@ -82,6 +83,7 @@ const Login = () => {
 
             urlParams.delete('token');
             urlParams.delete('user');
+            window.history.replaceState({}, document.title, `${window.location.pathname}?${urlParams}`);
 
             if (user?.role === null) {
                 setRoleModalIsOpen(true);
