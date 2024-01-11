@@ -13,12 +13,11 @@ import AddText from './AddText';
 import UploadAndDisplayImage from './UploadAndDisplayImage';
 import Navbar from '../common/Navbar';
 import xmlbuilder from 'xmlbuilder';
-import { uploadCanvas, getCanvasDataById, getXmlFile } from '../services/api';
+import { uploadCanvas, getCanvasDataById, getXmlFile, updateComment, getCommentsByCanvas } from '../services/api';
 import CommentPanel from './CommentPanel';
 import CommentButton from './CommentButton';
 import DraggableCommentIcon from './DraggableCommentIcon';
 import CommentDetailBox from './CommentDetailBox';
-import { updateComment, getCommentsByCanvas } from '../services/api';
 import { Layer, Stage } from "react-konva";
 import { SHAPE_TYPES } from "./constants";
 import Shape from "./Shape";
@@ -55,7 +54,6 @@ const Canvas = () => {
   const [textboxes, setTextboxes] = useState([]);
   const [canvasData, setCanvasData] = useState(null);  
   const [activeCommentId, setActiveCommentId] = useState(null);
-
   const activeComment = comments.find(comment => comment.id === activeCommentId);
 
   const [drawingOperations, setDrawingOperations] = useState([]);
@@ -73,7 +71,6 @@ const Canvas = () => {
     drawingContextRef.current = drawingContext;
 
     const resizeCanvas = () => {
-      //const { width, height } = window.screen;
       const width = window.innerWidth;
       const height = window.innerHeight;
       drawingCanvas.width = width;
@@ -166,7 +163,7 @@ const Canvas = () => {
     setIsAddingTextbox(false);
   };
 
-  const serializeDrawingDataToXml = (drawingData, textboxes, stickyNotes) => {
+  const serializeDrawingDataToXml = (drawingData) => {
     const root = xmlbuilder.create('drawingData');
     // Process drawingData if it exists and is not empty
     if (Array.isArray(drawingData) && drawingData.length > 0) {
@@ -178,41 +175,11 @@ const Canvas = () => {
           .up();
         });
     }
-
-    // Process textboxes if they exist and are not empty
-    if (Array.isArray(textboxes) && textboxes.length > 0) {
-      textboxes.forEach(({ id, text, width, height, position }) => {
-        root.ele('textbox')
-          .att('id', id)
-          .ele('text').txt(text).up()
-          .ele('width').txt(width.toString()).up()
-          .ele('height').txt(height.toString()).up()
-          .ele('position')
-          .ele('x').txt(position.x.toString()).up()
-          .ele('y').txt(position.y.toString()).up()
-          .up().up();
-      });
-    }
-
-    // Process stickyNotes if they exist and are not empty
-    // if (Array.isArray(stickyNotes) && stickyNotes.length > 0) {
-    //     stickyNotes.forEach(({ id, text, x, y, width, height }) => {
-    //         root.ele('stickyNote')
-    //             .att('id', id)
-    //             .ele('text').txt(text).up()
-    //             .ele('width').txt(width.toString()).up()
-    //             .ele('height').txt(height.toString()).up()
-    //             .ele('position')
-    //             .ele('x').txt(x.toString()).up()
-    //             .ele('y').txt(y.toString()).up()
-    //             .up().up();
-    //     });
-    // }
     return root.end({ pretty: true });
   };
 
   const handleSaveCanvas = async () => {
-    const serializeDrawingDataXml = serializeDrawingDataToXml(drawingData, textboxes); //notesState.notes
+    const serializeDrawingDataXml = serializeDrawingDataToXml(drawingData);
     console.log('Serialized Drawing Data (XML):', serializeDrawingDataXml);
     const xmlBlob = new Blob([serializeDrawingDataXml], { type: 'text/xml' });
     const xmlFile = new File([xmlBlob], "canvas-data.xml", { type: 'text/xml' });
@@ -321,13 +288,13 @@ const Canvas = () => {
 
   useEffect(() => {
     if (selectedShapeType) {
-      const defaultPosition = { x: 100, y: 100 };
+      const defaultPosition = { x: 200, y: 200 };
       if (selectedShapeType === SHAPE_TYPES.RECT) {
         createRectangle(defaultPosition);
       } else if (selectedShapeType === SHAPE_TYPES.CIRCLE) {
         createCircle(defaultPosition);
       }
-      setSelectedShapeType(null); // Reset selected shape type
+      setSelectedShapeType(null);
     }
   }, [selectedShapeType]);
 
@@ -354,8 +321,6 @@ const Canvas = () => {
     const xmlDoc = parser.parseFromString(xmlContent, "text/xml");
 
     const drawOperations=xmlDoc.getElementsByTagName('drawOperation');
-    // const textboxOperations=xmlDoc.getElementsByTagName('textbox');
-    // const noteOperations=xmlDoc.getElementsByTagName('stickyNote');
     const ctx = drawingCanvasRef.current.getContext('2d');
 
     //Render drawing
@@ -379,24 +344,6 @@ const Canvas = () => {
           break;
       }
     }
-    // Render sticky notes
-    // for (let i = 0; i < noteOperations.length; i++) {
-    //   const note = noteOperations[i];
-    //   const text = note.getElementsByTagName('text')[0].textContent;
-    //   const width = parseFloat(note.getElementsByTagName('width')[0].textContent);
-    //   const height = parseFloat(note.getElementsByTagName('height')[0].textContent);
-    //   const x = parseFloat(note.getElementsByTagName('x')[0].textContent);
-    //   const y = parseFloat(note.getElementsByTagName('y')[0].textContent);
-
-    //   // Draw the sticky note background
-    //   ctx.fillStyle = 'yellow'; // Sticky note color
-    //   ctx.fillRect(x, y, width, height);
-
-    //   // Draw the text
-    //   ctx.fillStyle = 'black'; // Text color
-    //   ctx.font = '12px Arial'; // Adjust font as needed
-    //   ctx.fillText(text, x, y); // Simple text render. Consider wrapping text if needed.
-    // }
   };
 
   const handleUpdateComment = (updatedComment) => {
@@ -463,16 +410,6 @@ const Canvas = () => {
         activateDrawingMode={activateDrawingMode}
         activateErasingMode={activateErasingMode}
       />
-      {/* <div className="canvas-container"> */}
-      <Stage drawingCanvasRef={drawingCanvasRef} width={canvasSize.width} height={canvasSize.height}>
-        <Layer>
-          {shapes.map(([key, shape]) => {
-            //console.log("Rendering shape", shape);
-            return <Shape key={key} shape={{ ...shape, id: key }} />;
-          })}
-        </Layer>
-      </Stage>
-
       <DrawAndErase
         drawingCanvasRef={drawingCanvasRef}
         drawingContextRef={drawingContextRef}
@@ -503,8 +440,6 @@ const Canvas = () => {
         addNote={addNotes}
         setStickyNotes={setStickyNotes}
         setIsDrawing={setIsDrawing}
-        // updateStickyNotes={updateStickyNotes}
-        // notesState={notesState}
       />
       <AddText
         drawingCanvasRef={drawingCanvasRef}
@@ -538,8 +473,16 @@ const Canvas = () => {
         />
       )}
       <PropertiesPanelButton onClick={() => togglePropertiesPanel(isPropertiesPanelOpen)} />
-      {isPropertiesPanelOpen && <PropertiesPanel />}
+      {/* <div style={{ position: 'absolute', top: 0, left: 0, width: '60%', height: '100%' }}> */}
+        <Stage width={canvasSize.width} height={canvasSize.height}>
+          <Layer>
+            {shapes.map(([key, shape]) => {
+              return <Shape key={key} shape={{ ...shape, id: key }} />;
+            })}
+          </Layer>
+        </Stage>
       {/* </div> */}
+      {isPropertiesPanelOpen && <PropertiesPanel />}
     </div>
   );
 };

@@ -60,7 +60,7 @@ const Sidebar = ({ activateDrawingMode, activateErasingMode, isDrawing, isErasin
 
   return (
     <div className="flex">
-      <div className={`bg-[#FCD34D] ${open ? 'w-72' : 'w-16'} h-screen duration-500 text-black-100 overflow-x-hidden transition-all`}>
+      <div className={`bg-[#FCD34D] ${open ? 'w-72' : 'w-16'} h-screen duration-500 text-black-100 overflow-x-hidden transition-all z-10 relative`}>
         <div className="mt-4 flex flex-col relative">
           <div className={`py-3 flex ${open ? 'justify-start pl-2' : 'justify-center'}`}>
             <IoMenu size={26} className="cursor-pointer" onClick={()=>setOpen(!open)}
@@ -106,7 +106,6 @@ const Sidebar = ({ activateDrawingMode, activateErasingMode, isDrawing, isErasin
         </div>
       </div>
       <GridLines gridCanvasRef={gridCanvasRef} sidebarWidth={open?72:16}/>
-      {/* <DrawAndErase drawingCanvasRef={drawingCanvasRef} sidebarWidth={open?72:16}/> */}
     </div>
   );
 };

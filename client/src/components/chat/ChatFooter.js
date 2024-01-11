@@ -17,7 +17,6 @@ const ChatFooter=({ setMessages, socket })=>{
             userId: userId,
             socketId: socket.id,
         };
-        //still need to modify a bit
         setMessages((prevMessages) => [...prevMessages, newMessage]); 
         socket.emit('message', newMessage);
         try {
@@ -29,6 +28,7 @@ const ChatFooter=({ setMessages, socket })=>{
         } catch (error) {
           console.error('Error sending message:', error);
         }
+        setMessage('');
     }; 
 
     return(
