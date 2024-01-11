@@ -382,8 +382,6 @@ export const getBoards = async (token, workspaceId) => {
         'Authorization': `Bearer ${token}`,
       },
     });
-    console.log(token);
-    // console.log(response);
     const data = await response.json();
     return { ...data, status: response.status };
   } catch (error) {
@@ -458,7 +456,6 @@ export const createMessage = async (token, message, workspaceId, userId) => {
       },
       body: JSON.stringify({ message }),
     });
-    //console.log(workspaceId);
     const data = await response.json();
     return { data:data, status: response.status };
 
@@ -477,7 +474,6 @@ export const getAllMessages = async (token, workspaceId) => {
         'Authorization': `Bearer ${token}`,
       },
     });
-    console.log(workspaceId);
     const data = await response.json();
     return { ...data, status: response.status };
   } catch (error) {
@@ -488,7 +484,6 @@ export const getAllMessages = async (token, workspaceId) => {
 
 export const deleteMessage = async (token, messageId, workspaceId) => {
   try {
-    console.log(workspaceId)
     const response = await fetch(`${API_URL}/message/${workspaceId}/${messageId}`, {
       method: 'DELETE',
       headers: {
@@ -663,7 +658,6 @@ export const createCanvas = async (token, boardId, workspaceId, canvasName ) => 
       },
       body: JSON.stringify({ canvasName }),
     });
-    //console.log(token);
     console.log("create canvas: " + JSON.stringify(response));
     
     const data = await response.json();
@@ -720,7 +714,6 @@ export const updateCanvas = async (token, workspaceId, boardId, canvasId, update
       },
       body: JSON.stringify(updatedData),
     });
-    //console.log(workspaceId, boardId, canvasId);
     const data = await response.json();
     return { ...data, status: response.status };
 
@@ -777,7 +770,7 @@ export const checkBoardMember = async (token, userId, boardId) => {
     });
     const data = await response.json();
     console.log("API response:", data);
-    if (data.isMember) { //response.status === 200 && 
+    if (data.isMember) {
       return true;
     }
     return false;
@@ -991,5 +984,75 @@ export const deleteStickyNote = async (token, workspaceId, boardId, canvasId, st
   } catch (error) {
     console.error('Failed to delete StickyNote:', error);
     return { error: 'Failed to delete StickyNote', status: 0 };
+  }
+};
+
+export const createTextbox = async (token, workspaceId, boardId, canvasId, text, x, y) => {
+  try {
+    const response = await fetch(`${API_URL}/textbox/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/textboxes/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text, canvasId, x, y }),
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to create Textbox:', error);
+    return { error: 'Failed to create Textbox', status: 0 };
+  }
+};
+
+export const getTextboxes = async (token, workspaceId, boardId, canvasId) => {
+  try {
+    const response = await fetch(`${API_URL}/textbox/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/textboxes`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    console.log(response);
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to retrieve textbox:', error);
+    return { error: 'Failed to retrieve textbox', status: 0 };
+  }
+};
+
+export const updateTextbox = async (token, workspaceId, boardId, canvasId, textboxId, text, x, y) => {
+  try {
+    const response = await fetch(`${API_URL}/textbox/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/textboxes/${textboxId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text, x, y }),
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to update textbox:', error);
+    return { error: 'Failed to update textbox', status: 0 };
+  }
+};
+
+export const deleteTextbox = async (token, workspaceId, boardId, canvasId, textboxId) => {
+  try {
+    const response = await fetch(`${API_URL}/textbox/workspace/${workspaceId}/board/${boardId}/canvas/${canvasId}/textboxes/${textboxId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    return { ...data, status: response.status };
+  } catch (error) {
+    console.error('Failed to delete textbox:', error);
+    return { error: 'Failed to delete textbox', status: 0 };
   }
 };

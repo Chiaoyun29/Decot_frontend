@@ -17,19 +17,8 @@ export const useShapes = createStore(() => {
 
   return { ...baseState, shapes: initialState ?? {} };
 });
+
 const setState = (fn) => useShapes.set(produce(fn));
-
-// export const saveDiagram = () => {
-//   const state = useShapes.get();
-
-//   localStorage.setItem(APP_NAMESPACE, JSON.stringify(state.shapes));
-// };
-
-// export const reset = () => {
-//   localStorage.removeItem(APP_NAMESPACE);
-
-//   useShapes.set(baseState);
-// };
 
 export const createRectangle = ({ x, y }) => {
   console.log("Creating rectangle");
@@ -73,13 +62,14 @@ export const clearSelection = () => {
 };
 
 export const moveShape = (id, event) => {
+  console.log(id);
   setState((state) => {
     const shape = state.shapes[id];
 
     if (shape) {
       shape.x = event.target.x();
       shape.y = event.target.y();
-      console.log("move the shape to:" + shape.x + shape.y);
+      console.log("move the shape to:" + shape.x +","+ shape.y);
     }
   });
 };
@@ -95,8 +85,6 @@ export const updateAttribute = (attr, value) => {
 };
 
 export const transformRectangleShape = (node, id, event) => {
-  // in the store we have width and height
-  // to match the data better we will reset scale on transform end
   const scaleX = node.scaleX();
   const scaleY = node.scaleY();
 
@@ -150,4 +138,13 @@ export const transformCircleShape = (node, id, event) => {
       );
     }
   });
+};
+
+export const deleteSelectedShape = ()=>{
+  setState((state)=>{
+    if(state.selected){
+      delete state.shapes[state.selected];
+      state.selected = null;
+    }
+  })
 };

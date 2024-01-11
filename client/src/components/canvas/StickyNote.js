@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import { DraggableCore } from 'react-draggable';
 import { useAuthContext } from '../../context/AuthContext';
 import { createStickyNote, updateStickyNote, getStickyNotes, deleteStickyNote } from '../services/api';
-// import { create } from 'xmlbuilder';
 
 const initialNoteState={
     lastNoteCreated: null,
@@ -68,7 +67,7 @@ const notesReducer=(prevState, action)=>{
 const StickyNote=({ isAddingNote, setIsDrawing })=>{
     const [notesState, dispatch]=useReducer(notesReducer, initialNoteState);
     const { token } = useAuthContext();
-    const { boardId, workspaceId, canvasId, stickyNoteId } = useParams();
+    const { boardId, workspaceId, canvasId } = useParams();
     const[noteInput, setNoteInput]=useState('');
 
     const updateStickyNotes = (action) => {
