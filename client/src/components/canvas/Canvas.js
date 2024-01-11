@@ -430,18 +430,20 @@ const Canvas = () => {
   };
 
   useEffect(() => {
-    socket.on('commentPositionChange', (data) => {
-      setComments(currentComments =>
-        currentComments.map(comment =>
-          comment.id === data.commentId ? { ...comment, x: data.newPosition.x, y: data.newPosition.y } : comment
-        )
-      );
-    });
-  
-    return () => {
-      socket.off('commentPositionChange');
-    };
-  }, [socket, setComments]);
+    if(socket){
+      socket.on('commentPositionChange', (data) => {
+        setComments(currentComments =>
+          currentComments.map(comment =>
+            comment.id === data.commentId ? { ...comment, x: data.newPosition.x, y: data.newPosition.y } : comment
+          )
+        );
+      });
+    
+      return () => {
+        socket.off('commentPositionChange');
+      };
+    }
+  }, [socket]);
 
   return (
     <div>
