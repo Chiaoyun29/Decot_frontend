@@ -120,7 +120,7 @@ const MenteeWorkspaceContent = () => {
     try {
       const response = await leaveWorkspace(token, workspaceId);
       if (response.status === 200) {
-        socket.emit('userAction', { action: 'leaveWorkspace' });
+        // socket.emit('userAction', { action: 'leaveWorkspace' });
         navigate('/dashboard');
       } else {
         console.error(response.error);

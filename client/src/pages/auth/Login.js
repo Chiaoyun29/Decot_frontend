@@ -26,9 +26,9 @@ const Login = () => {
                 setToken(response.token); // set token in context
                 const postLoginRedirect = JSON.parse(sessionStorage.getItem('postLoginRedirect'));
                 if (postLoginRedirect?.from === 'joinWorkspace' && postLoginRedirect?.token) {
-                    navigate(`/join/${postLoginRedirect.token}`);
+                    setTimeout(() => navigate(`/join/${postLoginRedirect.token}`), 0);
                 } else {
-                    navigate("/dashboard");
+                    setTimeout(() => navigate(`/dashboard`), 0);
                 }
             } else if (response.status === 401) {
                 setMessageTitle('Error');
@@ -67,9 +67,9 @@ const Login = () => {
                 window.history.replaceState({}, document.title, `${window.location.pathname}?${urlParams}`);
 
                 if (user?.role === null) {
-                    setRoleModalIsOpen(true);
+                    setTimeout(() => setRoleModalIsOpen(true), 0);
                 } else {
-                    navigate(`/join/${postLoginRedirect.token}`);
+                    setTimeout(() => navigate(`/join/${postLoginRedirect.token}`), 0);
                 }
             }
         }
@@ -86,9 +86,9 @@ const Login = () => {
             window.history.replaceState({}, document.title, `${window.location.pathname}?${urlParams}`);
 
             if (user?.role === null) {
-                setRoleModalIsOpen(true);
+                setTimeout(() => setRoleModalIsOpen(true), 0);
             } else {
-                navigate("/dashboard");
+                setTimeout(() => navigate(`/dashboard`), 0);
             }
         }
     }, [navigate, setUser, setToken]);
@@ -183,9 +183,9 @@ const Login = () => {
                             onClick={() => {
                                 const postLoginRedirect = JSON.parse(sessionStorage.getItem('postLoginRedirect'));
                                 if (postLoginRedirect?.from === 'joinWorkspace' && postLoginRedirect?.token) {
-                                    navigate(`/join/${postLoginRedirect.token}`);
+                                    setTimeout(() => navigate(`/join/${postLoginRedirect.token}`), 0);
                                 } else {
-                                    navigate("/dashboard");
+                                    setTimeout(() => navigate(`/dashboard`), 0);
                                 }
                             }}
                         >

@@ -72,7 +72,7 @@ const Register = () => {
                 if (user?.role === null) {
                     setRoleModalIsOpen(true);
                 } else {
-                    navigate(`/join/${postLoginRedirect.token}`);
+                    setTimeout(() => navigate(`/join/${postLoginRedirect.token}`), 0);
                 }
             }
         }
@@ -91,7 +91,7 @@ const Register = () => {
             if (user?.role === null) {
                 setRoleModalIsOpen(true);
             } else {
-                navigate("/dashboard");
+                setTimeout(() => navigate(`/dashboard`), 0);
             }
         }
     }, [navigate, setToken, setUser]);
@@ -231,9 +231,9 @@ const Register = () => {
                             onClick={() => {
                                 const postLoginRedirect = JSON.parse(sessionStorage.getItem('postLoginRedirect'));
                                 if (postLoginRedirect?.from === 'joinWorkspace' && postLoginRedirect?.token) {
-                                    navigate(`/join/${postLoginRedirect.token}`);
+                                    setTimeout(() => navigate(`/join/${postLoginRedirect.token}`), 0);
                                 } else {
-                                    navigate("/dashboard");
+                                    setTimeout(() => navigate(`/dashboard`), 0);
                                 }
                             }}
                         >
