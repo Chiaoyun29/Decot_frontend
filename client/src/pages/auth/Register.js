@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { registerUser, authenticateWithGoogle, updateUserRole } from '../../components/services/api';
 import { useNavigate } from 'react-router-dom';
 import CustomModal from '../../components/common/CustomModal';
-import logo from "../../image/DECOT.png";
 import { Link } from 'react-router-dom';
 import './auth.css';
 import { useAuthContext } from '../../context/AuthContext';
-import g_sign_up from "../../image/google_sign_up.png";
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -64,15 +62,17 @@ const Register = () => {
         if (postLoginRedirect?.from === 'joinWorkspace' && postLoginRedirect?.token) {
             if (token && userJSON) {
                 const user = JSON.parse(userJSON);
-                console.log("wth hell user@!")
-                console.log(user)
+              
                 setUser(user);
                 setToken(token);
 
+                urlParams.delete('token');
+                urlParams.delete('user');
+                window.history.replaceState({}, document.title, `${window.location.pathname}?${urlParams}`);
                 if (user?.role === null) {
                     setRoleModalIsOpen(true);
                 } else {
-                    navigate(`/join/${postLoginRedirect.token}`);
+                    setTimeout(() => navigate(`/join/${postLoginRedirect.token}`), 0);
                 }
             }
         }
@@ -84,10 +84,14 @@ const Register = () => {
             setUser(user);
             setToken(token);
 
+            urlParams.delete('token');
+            urlParams.delete('user');
+            window.history.replaceState({}, document.title, `${window.location.pathname}?${urlParams}`);
+
             if (user?.role === null) {
                 setRoleModalIsOpen(true);
             } else {
-                navigate("/dashboard");
+                setTimeout(() => navigate(`/dashboard`), 0);
             }
         }
     }, [navigate, setToken, setUser]);
@@ -124,8 +128,8 @@ const Register = () => {
         <div className="bg-blend-darken bg flex flex-col items-center min-h-screen pt-6 sm:justify-center sm:pt-0 bg-black-800">
             <div className="w-full px-6 py-4 mt-6 overflow-hidden bg-white shadow-md sm:max-w-lg sm:rounded-lg">
                 <div className="flex flex-col items-center">
-                    <Link to="/Decot_frontend">
-                        <img src={logo} alt="logo" className="w-1/4 h-1/4 m-auto pt-5" />
+                    <Link to="/">
+                        <img src="/image/DECOT.png" alt="logo" className="w-1/4 h-1/4 m-auto pt-5" />
                     </Link>
                 </div>
                 <input
@@ -193,7 +197,7 @@ const Register = () => {
                         className="mt-4 px-2 py-2 bg-white border border-gray-300 rounded-full hover:bg-blue-100 focus:outline-none"
                     >
                         <img
-                            src={g_sign_up}
+                            src="/image/google_sign_up.png"
                             alt="Register with Google"
                             className="w-40 h-auto"  // Adjust w-24 to the width you want. h-auto will maintain aspect ratio.
                         />
@@ -227,9 +231,9 @@ const Register = () => {
                             onClick={() => {
                                 const postLoginRedirect = JSON.parse(sessionStorage.getItem('postLoginRedirect'));
                                 if (postLoginRedirect?.from === 'joinWorkspace' && postLoginRedirect?.token) {
-                                    navigate(`/join/${postLoginRedirect.token}`);
+                                    setTimeout(() => navigate(`/join/${postLoginRedirect.token}`), 0);
                                 } else {
-                                    navigate("/dashboard");
+                                    setTimeout(() => navigate(`/dashboard`), 0);
                                 }
                             }}
                         >

@@ -1,5 +1,5 @@
 import './Canvas.css';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import Sidebar from './Sidebar';
 import html2canvas from 'html2canvas';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -21,6 +21,7 @@ import CommentDetailBox from './CommentDetailBox';
 import { Layer, Stage } from "react-konva";
 import { SHAPE_TYPES } from "./constants";
 import Shape from "./Shape";
+import SocketContext from '../../context/SocketContext';
 
 const Canvas = () => {
   const { boardId, workspaceId, canvasId } = useParams();
@@ -54,6 +55,9 @@ const Canvas = () => {
   const [canvasData, setCanvasData] = useState(null);  
   const [activeCommentId, setActiveCommentId] = useState(null);
   const activeComment = comments.find(comment => comment.id === activeCommentId);
+
+  const [drawingOperations, setDrawingOperations] = useState([]);
+  const { socket } = useContext(SocketContext);
 
   useEffect(() => {
     if (user) {
@@ -371,6 +375,22 @@ const Canvas = () => {
       setActiveCommentId(updatedComment.id);
     }
   };
+
+  useEffect(() => {
+    if(socket){
+      socket.on('commentPositionChange', (data) => {
+        setComments(currentComments =>
+          currentComments.map(comment =>
+            comment.id === data.commentId ? { ...comment, x: data.newPosition.x, y: data.newPosition.y } : comment
+          )
+        );
+      });
+    
+      return () => {
+        socket.off('commentPositionChange');
+      };
+    }
+  }, [socket]);
 
   return (
     <div>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { updateProfile, deleteAccount, verifyEnteredPassword, changePassword, uploadProfilePic } from '../../components/services/api'; // Assuming you have this API function
 import CustomModal from '../../components/common/CustomModal';
 import { Link, useNavigate } from 'react-router-dom';
-import defaultProfilePic from "../../image/user.png";
 
 const EditProfile = ({ user,  setUser,isEditing, setIsEditing, onCancel }) => {
     const [username, setUsername] = useState(user.username || '');
@@ -21,7 +20,7 @@ const EditProfile = ({ user,  setUser,isEditing, setIsEditing, onCancel }) => {
     const navigate = useNavigate();
     const isDirectRegistration = user.registeredVia === "Direct";
     const [selectedFile, setSelectedFile] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState(user.profilePic || defaultProfilePic);
+    const [previewUrl, setPreviewUrl] = useState(user.profilePic || "/image/user.png");
 
   useEffect(() => {
     setUsername(user.username);
@@ -95,7 +94,7 @@ const EditProfile = ({ user,  setUser,isEditing, setIsEditing, onCancel }) => {
     const handleDeleteAccount = async () => {
         try {
             await deleteAccount(user.id);
-            navigate("/Decot_frontend");
+            navigate("/");
         } catch (error) {
             setMessageTitle('Error');
             setMessage('An error occurred while trying to delete the account');

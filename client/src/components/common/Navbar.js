@@ -1,7 +1,5 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from "../../image/DECOT.png";
-import icon_menu from "../../image/icon_menu.svg";
 import CustomModal from './CustomModal';
 import { useAuthContext } from '../../context/AuthContext';
 import NotificationButton from '../common/NotificationButton';
@@ -27,7 +25,7 @@ const Navbar = (props) => {
     setToken(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    navigate('/Decot_frontend'); // navigate to homepage
+    navigate('/', { replace: true });
   };
 
   const confirmLogout = () => {
@@ -45,15 +43,15 @@ const Navbar = (props) => {
     >
       <div className="container px-4 mx-auto flex flex-wrap items-center justify-between">
         <div className="w-full relative flex justify-between lg:w-auto lg:static lg:block lg:justify-start">
-          <Link to="/Decot_Frontend">
-            <img src={logo} alt="Logo" className="w-1/4 h-1/4" />
+          <Link to="/">
+            <img src="/image/DECOT.png" alt="Logo" className="w-1/4 h-1/4" />
           </Link>
           <button
             className="cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"
             type="button"
             onClick={() => setNavbarOpen(!navbarOpen)}
           >
-            <img src={icon_menu} alt="Logo" className="" />
+            <img src="/image/icon_menu.svg" alt="Logo" className="" />
             <i className={(props.transparent ? 'text-white' : 'text-gray-800') + ' fas fa-bars'}></i>
           </button>
         </div>

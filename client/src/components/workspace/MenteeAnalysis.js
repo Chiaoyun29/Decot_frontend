@@ -6,7 +6,6 @@ import { getMenteeAnalysisData } from "../services/api";
 import { useAuthContext } from '../../context/AuthContext';
 import Navbar from '../common/Navbar';
 import CustomModal from '../common/CustomModal';
-import icon_cross from "../../image/icon_cross.svg"
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -195,7 +194,7 @@ const MenteeAnalysis = () => {
                         className="text-gray-700 font-semibold p-2 rounded inline-flex items-center justify-center hover:bg-gray-200 transition-colors duration-150"
                         aria-label="Close"
                     >
-                        <img src={icon_cross} alt="x mark" />
+                        <img src="/image/icon_cross.svg" alt="x mark" />
                     </button>
                 </div>
                 <div className="bg-indigo-100 bg-opacity-50 rounded-lg p-6 shadow-lg">

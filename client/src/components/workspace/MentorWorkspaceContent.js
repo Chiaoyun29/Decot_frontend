@@ -5,7 +5,6 @@ import { getWorkspaceById, updateWorkspace, deleteWorkspace, getWorkspaceMembers
 import CustomModal from '../common/CustomModal';
 import SocketContext from '../../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
-import icon_pencil from "../../image/icon_pencil.svg";
 import CreateBoardModal from './CreateBoardModal';
 import ChatButton from '../chat/ChatDropdown';
 
@@ -200,7 +199,7 @@ const MentorWorkspaceContent = () => {
                   }}
                   className="text-blue-500 hover:text-blue-600"
                 >
-                  <img src={icon_pencil} alt="edit icon" className="w-4 h-4" />
+                  <img src="/image/icon_pencil.svg" alt="edit icon" className="w-4 h-4" />
                 </button>
               </div>
               <p className="pt-2 mb-2 text-xl text-gray-600">{workspace.description}</p>
@@ -355,7 +354,7 @@ const MentorWorkspaceContent = () => {
           isOpen={isMemberDeleteModalOpen}
           onClose={() => setIsMemberDeleteModalOpen(false)}
           title="Delete Member"
-          message={`Are you sure you want to remove ${selectedMember?.name} from the workspace?`}
+          message={`Are you sure you want to remove ${selectedMember?.username} from the workspace?`}
         >
           <div className="flex items-center">
             <button

@@ -1,15 +1,21 @@
-import React from 'react';
+import React, {useContext, useState} from 'react';
 import { DraggableCore } from 'react-draggable';
-import icon_comment from '../../image/icon_comment_for_draggable.svg';
+import SocketContext from '../../context/SocketContext';
 
 const DraggableCommentIcon = ({ comment, onSelectComment, onPositionChange }) => {
+    const { socket } = useContext(SocketContext);
+    const [position, setPosition] = useState({ x: comment.x, y: comment.y });
+
     const handleDrag = (e, data) => {
-        const newPosition = { x: comment.x + data.deltaX, y: comment.y + data.deltaY };
-        onPositionChange(comment.id, newPosition);
+        const newPosition = { x: position.x + data.deltaX, y: position.y + data.deltaY };
+        setPosition(newPosition);
+        if(socket){
+            socket.emit('commentPositionChange', { commentId: comment.id, newPosition });
+        }
     };
 
     const handleStop = (e, data) => {
-        // No need to calculate final position, handleDrag has already updated it
+        onPositionChange(comment.id, position);
     };
 
     return (
@@ -20,7 +26,7 @@ const DraggableCommentIcon = ({ comment, onSelectComment, onPositionChange }) =>
                 style={{ left: comment.x, top: comment.y, zIndex: 1000 }}
             >
                 <img
-                    src={icon_comment}
+                    src='/image/icon_comment_for_draggable.svg'
                     alt="Comment Icon"
                     style={{ pointerEvents: 'none' }}
                 />

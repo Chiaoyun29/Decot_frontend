@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Register from './pages/auth/Register';
 import Login from './pages/auth/Login';
@@ -25,8 +25,8 @@ const App = () => {
           <AuthProvider>
             <SocketProvider>
               <Routes>
-                <Route path="/Decot_frontend" element={<HomePage />} />
-                <Route path="/Decot_frontend/googleCallback" element={<Register />} />
+                <Route path="/" element={<HomePage />} />
+                <Route path="/googleCallback" element={<Register />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/dashboard" element={<Dashboard />} />

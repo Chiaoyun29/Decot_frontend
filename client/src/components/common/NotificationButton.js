@@ -2,9 +2,6 @@ import React, { useEffect, useState, useContext, useRef } from 'react';
 import { getNotifications, removeAllNotifications, deleteNotification, markNotificationAsRead, markAllNotificationsAsRead } from '../services/api';
 import { useAuthContext} from '../../context/AuthContext';
 import SocketContext from '../../context/SocketContext';
-import icon_notification from '../../image/icon_notification_bell.svg';
-import icon_check from '../../image/icon_check.svg';
-import icon_delete from '../../image/icon_delete.svg';
 
 const NotificationButton = () => {
   const [notifications, setNotifications] = useState([]);
@@ -111,7 +108,7 @@ const NotificationButton = () => {
   return (
     <div className="relative text-center z-100">
       <button ref={notificationButtonRef} onClick={() => setShowNotifications(!showNotifications)} className="relative">
-        <img src={icon_notification} className="w-6 h-6 text-black" alt="Notifications" />
+        <img src='/image/icon_notification_bell.svg' className="w-6 h-6 text-black" alt="Notifications" />
         {notifications.length > 0 && (
           <span className="absolute top-0 right-0 inline-block w-4 h-4 text-xs text-center text-white bg-red-500 rounded-full">
             {notifications.length}
@@ -129,7 +126,7 @@ const NotificationButton = () => {
                   className="text-xs hover:bg-gray-200 p-2 rounded"
                   title="Mark all notifications as read"
                 >
-                  <img src={icon_check} alt="Mark all as read" className="w-4 h-4" />
+                  <img src='/image/icon_check.svg' alt="Mark all as read" className="w-4 h-4" />
                 </button>
               )}
               {notifications.length > 0 && (
@@ -138,7 +135,7 @@ const NotificationButton = () => {
                   className="text-xs hover:bg-gray-200 p-2 rounded ml-2"
                   title="Delete all read notifications"
                 >
-                  <img src={icon_delete} alt="Delete all" className="w-4 h-4" />
+                  <img src='/image/icon_delete.svg' alt="Delete all" className="w-4 h-4" />
                 </button>
               )}
             </div>

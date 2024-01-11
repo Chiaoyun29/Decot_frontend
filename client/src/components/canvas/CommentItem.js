@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import icon_toggle_off from '../../image/icon_toggle_off.svg';
-import icon_toggle_on from '../../image/icon_toggle_on.svg';
 import { useAuthContext } from '../../context/AuthContext';
 
 const CommentItem = ({ comment, onSaveEdit, onDelete, onToggleResolved, onAddReply, showReplySection }) => {
@@ -36,9 +34,9 @@ const CommentItem = ({ comment, onSaveEdit, onDelete, onToggleResolved, onAddRep
     const ToggleResolvedSwitch = () => (
         <div onClick={handleToggleResolvedClick} className="flex items-center cursor-pointer space-x-2">
             {comment.resolved ? (
-                <><img src={icon_toggle_on} alt="Resolved" className="h-5 w-5" /><span className="text-gray-700">Resolved</span></>
+                <><img src='/image/icon_toggle_on.svg' alt="Resolved" className="h-5 w-5" /><span className="text-gray-700">Resolved</span></>
             ) : (
-                <><img src={icon_toggle_off} alt="Unresolved" className="h-5 w-5" /><span className="text-gray-700">Unresolved</span></>
+                <><img src='/image/icon_toggle_off.svg' alt="Unresolved" className="h-5 w-5" /><span className="text-gray-700">Unresolved</span></>
             )}
         </div>
     );
