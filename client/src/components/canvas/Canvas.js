@@ -22,6 +22,7 @@ import { updateComment, getCommentsByCanvas } from '../services/api';
 import { Layer, Stage } from "react-konva";
 import { SHAPE_TYPES } from "./constants";
 import Shape from "./Shape";
+import SocketContext from '../../context/SocketContext';
 
 const Canvas = () => {
   const { boardId, workspaceId, canvasId } = useParams();
@@ -58,6 +59,7 @@ const Canvas = () => {
   const activeComment = comments.find(comment => comment.id === activeCommentId);
 
   const [drawingOperations, setDrawingOperations] = useState([]);
+  const { socket } = useContext(SocketContext);
 
   useEffect(() => {
     if (user) {
@@ -426,6 +428,20 @@ const Canvas = () => {
       setActiveCommentId(updatedComment.id);
     }
   };
+
+  useEffect(() => {
+    socket.on('commentPositionChange', (data) => {
+      setComments(currentComments =>
+        currentComments.map(comment =>
+          comment.id === data.commentId ? { ...comment, x: data.newPosition.x, y: data.newPosition.y } : comment
+        )
+      );
+    });
+  
+    return () => {
+      socket.off('commentPositionChange');
+    };
+  }, [socket, setComments]);
 
   return (
     <div>

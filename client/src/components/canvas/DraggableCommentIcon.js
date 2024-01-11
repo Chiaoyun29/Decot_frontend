@@ -1,15 +1,14 @@
 import React from 'react';
 import { DraggableCore } from 'react-draggable';
-import { debounce } from 'lodash';
 
 const DraggableCommentIcon = ({ comment, onSelectComment, onPositionChange }) => {
-    const handleDrag =  debounce((e, data) => {
+    const handleDrag = (e, data) => {
         const newPosition = { x: comment.x + data.deltaX, y: comment.y + data.deltaY };
-        onPositionChange(comment.id, newPosition);
-    }, 50);
+        socket.emit('commentPositionChange', { commentId: comment.id, newPosition });
+    };
 
     const handleStop = (e, data) => {
-        // No need to calculate final position, handleDrag has already updated it
+        onPositionChange(comment.id, { x: comment.x, y: comment.y });
     };
 
     return (
