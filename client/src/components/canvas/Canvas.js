@@ -1,5 +1,5 @@
 import './Canvas.css';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import Sidebar from './Sidebar';
 import html2canvas from 'html2canvas';
 import { useNavigate, useParams } from 'react-router-dom';

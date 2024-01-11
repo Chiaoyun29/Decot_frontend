@@ -1,7 +1,10 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { DraggableCore } from 'react-draggable';
+import SocketContext from '../../context/SocketContext';
 
 const DraggableCommentIcon = ({ comment, onSelectComment, onPositionChange }) => {
+    const { socket } = useContext(SocketContext);
+    
     const handleDrag = (e, data) => {
         const newPosition = { x: comment.x + data.deltaX, y: comment.y + data.deltaY };
         socket.emit('commentPositionChange', { commentId: comment.id, newPosition });
